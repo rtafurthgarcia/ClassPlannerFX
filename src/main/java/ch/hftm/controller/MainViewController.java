@@ -5,10 +5,10 @@ import ch.hftm.ClassPlannerFX;
 import javafx.fxml.FXML;
 
 public class MainViewController {
-    private ClassPlannerFX app;  
+    private ClassPlannerFX _app;  
 
     public void setApp(ClassPlannerFX app) {
-        this.app = app;
+        this._app = app;
     }
 
     @FXML
@@ -18,6 +18,11 @@ public class MainViewController {
 
     @FXML
     void onClose() {
-        this.app.getPrimaryStage().close();
+        this._app.getPrimaryStage().close();
+    }
+
+    @FXML
+    public void onOpenSettings() {
+        this._app.showSettingsView();
     }
 }
