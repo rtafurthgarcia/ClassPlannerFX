@@ -43,7 +43,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="900.0" prefWidth="1440.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.hftm.controller.MainViewController">
+<VBox prefHeight="900.0" prefWidth="1440.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.hftm.controller.MainViewController">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -74,7 +74,7 @@
                <children>
                   <TreeView fx:id="twSchoolYearPlan" layoutX="14.0" layoutY="52.0" prefHeight="831.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children></AnchorPane>
-            <AnchorPane />
+            <AnchorPane fx:id="apSpreadsheet" />
         <AnchorPane maxWidth="200.0" prefWidth="200.0" />
       </items>
     </SplitPane>
