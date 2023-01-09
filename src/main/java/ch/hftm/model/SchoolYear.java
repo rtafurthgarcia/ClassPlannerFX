@@ -1,6 +1,6 @@
 package ch.hftm.model;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -8,33 +8,33 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 public class SchoolYear {
-    private ObjectProperty<LocalDate> _startDay;
-    private ObjectProperty<LocalDate> _endDay;
+    private ObjectProperty<Date> _startDay;
+    private ObjectProperty<Date> _endDay;
     private BooleanProperty _archived;
 
-    public SchoolYear(LocalDate startDay, LocalDate endDay) {
-        this._startDay = new SimpleObjectProperty<LocalDate>(startDay);
-        this._endDay =  new SimpleObjectProperty<LocalDate>(endDay);
+    public SchoolYear(Date date, Date date2) {
+        this._startDay = new SimpleObjectProperty<Date>(date);
+        this._endDay =  new SimpleObjectProperty<Date>(date2);
 
         this._archived = new SimpleBooleanProperty(false);
     }
 
-    public ObjectProperty<LocalDate> startDayProperty() {
+    public ObjectProperty<Date> startDayProperty() {
         return _startDay;
     }
 
-    public SchoolYear setStartDay(LocalDate startDay) {
-        this._startDay = new SimpleObjectProperty<LocalDate>(startDay);
+    public SchoolYear setStartDay(Date startDay) {
+        this._startDay = new SimpleObjectProperty<Date>(startDay);
 
         return this;
     }
 
-    public ObjectProperty<LocalDate> endDayProperty() {
+    public ObjectProperty<Date> endDayProperty() {
         return _endDay;
     }
 
-    public SchoolYear setEndDay(LocalDate endDay) {
-        this._endDay = new SimpleObjectProperty<LocalDate>(endDay);
+    public SchoolYear setEndDay(Date endDay) {
+        this._endDay = new SimpleObjectProperty<Date>(endDay);
 
         return this;
     }
@@ -53,11 +53,11 @@ public class SchoolYear {
         return this;
     }
 
-    public LocalDate getEndDay() {
+    public Date getEndDay() {
         return _endDay.get();
     }
 
-    public LocalDate getStartDay() {
+    public Date getStartDay() {
         return _startDay.get();
     }
 

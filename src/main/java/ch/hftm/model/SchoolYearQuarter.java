@@ -1,41 +1,43 @@
 package ch.hftm.model;
 
-import java.time.LocalDate;
+import java.util.Date;
 
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 public class SchoolYearQuarter {
-    private ObjectProperty<LocalDate> _startWeek;
-    private ObjectProperty<LocalDate> _endWeek;
+    private IntegerProperty _startWeek;
+    private IntegerProperty _endWeek;
     
-    public SchoolYearQuarter(LocalDate startWeek, LocalDate endWeek) {
-        this._startWeek = new SimpleObjectProperty<>(startWeek);
-        this._endWeek = new SimpleObjectProperty<>(endWeek);
+    public SchoolYearQuarter(Integer startWeek, Integer endWeek) {
+        this._startWeek = new SimpleIntegerProperty(startWeek);
+        this._endWeek = new SimpleIntegerProperty(endWeek);
     }
     
-    public LocalDate getStartWeek() {
+    public Integer getStartWeek() {
         return _startWeek.get();
     }
     
-    public void setStartWeek(LocalDate startWeek) {
-        this._startWeek = new SimpleObjectProperty<>(startWeek);
+    public void setStartWeek(Integer startWeek) {
+        this._startWeek = new SimpleIntegerProperty(startWeek);
     }
     
-    public ObjectProperty<LocalDate> endWeekProperty() {
+    public IntegerProperty endWeekProperty() {
         return _endWeek;
     } 
 
-    public ObjectProperty<LocalDate> startWeekProperty() {
+    public IntegerProperty startWeekProperty() {
         return _startWeek;
     }
 
-    public LocalDate getEndWeek() {
+    public Integer getEndWeek() {
         return _endWeek.get();
     }
 
-    public void setEndWeek(LocalDate endWeek) {
-        this._endWeek = new SimpleObjectProperty<>(endWeek);
+    public void setEndWeek(Integer endWeek) {
+        this._endWeek = new SimpleIntegerProperty(endWeek);
     }
 
     @Override
