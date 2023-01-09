@@ -3,6 +3,7 @@ package ch.hftm.controller;
 import java.io.IOException;
 
 import ch.hftm.ClassPlannerFX;
+import ch.hftm.model.Context;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.Pane;
@@ -19,12 +20,11 @@ public class SettingsController {
     @FXML
     Pane pClassrooms;
 
-    private ClassPlannerFX _app;  
     private Stage _stage;
 
-    public void setApp(ClassPlannerFX app) throws IOException {
-        this._app = app;
+    private Context _sharedContext = Context.getInstance();
 
+    public void setApp() throws IOException {
         this.pGeneral = FXMLLoader.load(ClassPlannerFX.class.getResource("view/GeneralView.fxml"));
         this.pQuarters = FXMLLoader.load(ClassPlannerFX.class.getResource("view/QuartersView.fxml"));
         this.pClassrooms = FXMLLoader.load(ClassPlannerFX.class.getResource("view/ClassroomsView.fxml"));
@@ -42,6 +42,6 @@ public class SettingsController {
 
     @FXML
     void onClose() {
-        this._app.getPrimaryStage().close();
+        Context.getInstance().primaryStage.close();
     }
 }
