@@ -13,8 +13,10 @@ import ch.hftm.controller.MainViewController;
 import ch.hftm.controller.SettingsController;
 import ch.hftm.model.Classroom;
 import ch.hftm.model.Context;
+import ch.hftm.model.Lesson;
 import ch.hftm.model.SchoolYear;
 import ch.hftm.model.SchoolYearQuarter;
+import ch.hftm.model.ThematicAxis;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -49,6 +51,14 @@ public class ClassPlannerFX extends Application {
             new SchoolYearQuarter(2, 20, 35), 
             new SchoolYearQuarter(3, 36, 51), 
             new SchoolYearQuarter(4, 52, 68)
+        ));
+
+        _sharedContext.lessons = new HashSet<>(Arrays.asList(new Lesson("Français"), new Lesson("Maths"), new Lesson("Géographie")));
+
+        _sharedContext.thematicAxises = new HashSet<>(Arrays.asList(
+            new ThematicAxis("Vocabulaire 1", 1, new Lesson("Français"), _sharedContext.schoolYear),
+            new ThematicAxis("Verbes irréguliers G4", 2, new Lesson("Français"), _sharedContext.schoolYear),
+            new ThematicAxis("Poésie", 2, new Lesson("Français"), _sharedContext.schoolYear)
         ));
 	}
 }
