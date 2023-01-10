@@ -43,6 +43,7 @@ class ClassPlannerFXTests {
     @Start
 	public void start(Stage stage) {
         _sharedContext.primaryStage = stage;
+        
         _sharedContext.primaryStage.setTitle("ClassPlannerFX");
 
         _sharedContext.showMainView();
@@ -55,10 +56,10 @@ class ClassPlannerFXTests {
 		_sharedContext.classrooms = new HashSet<> (Arrays.asList(new Classroom("Classe 711"), new Classroom("Classe 712")));
 		_sharedContext.schoolYear = new SchoolYear(_sharedContext.dateFormatUsed.parse("02.05.2023"), _sharedContext.dateFormatUsed.parse("29.04.2024"));
         _sharedContext.schoolYearQuarters = new HashSet<> (Arrays.asList(
-            new SchoolYearQuarter(4, 19), 
-            new SchoolYearQuarter(20, 35), 
-            new SchoolYearQuarter(36, 51), 
-            new SchoolYearQuarter(52, 68)
+            new SchoolYearQuarter(1, 4, 19), 
+            new SchoolYearQuarter(2, 20, 35), 
+            new SchoolYearQuarter(3, 36, 51), 
+            new SchoolYearQuarter(4, 52, 68)
         ));
 	}
 
