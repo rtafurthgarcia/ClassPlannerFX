@@ -11,11 +11,11 @@ public class ThematicAxis {
     private Lesson _parentLesson;
     private SchoolYear _parentSchoolYear;
 
-    public ThematicAxis(StringProperty _name, Integer _order, Lesson _parentLesson, SchoolYear _parentSchoolYear) {
-        this._name = _name;
-        this._order = _order;
-        this._parentLesson = _parentLesson;
-        this._parentSchoolYear = _parentSchoolYear;
+    public ThematicAxis(String name, Integer order, Lesson parentLesson, SchoolYear parentSchoolYear) {
+        this._name = new SimpleStringProperty(name);
+        this._order = order;
+        this._parentLesson = parentLesson;
+        this._parentSchoolYear = parentSchoolYear;
     }
 
     public StringProperty nameProperty() {

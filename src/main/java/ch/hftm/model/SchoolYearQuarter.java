@@ -55,7 +55,7 @@ public class SchoolYearQuarter {
     }
 
     public String toString() {
-        return String.format("Trimestre %d%nSemaine %d à %d", getQuarter(), getStartWeek(), getEndWeek()); 
+        return String.format("Semaine %d à %d", getStartWeek(), getEndWeek()); 
     }
 
     @Override
