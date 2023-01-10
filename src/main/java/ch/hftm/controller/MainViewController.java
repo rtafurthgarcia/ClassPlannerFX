@@ -51,9 +51,9 @@ public class MainViewController {
         setQuarters();
         setQuartersWithWeeks();
         setClassrooms();
+        setThematicAxis();
     }  
 
-    
     void setGridConstraints() {
         int rowCount =  4; // one for the trimestre, one for the semestres, one for the weeks and one for classes;
         int columnCount = _sharedContext.schoolYearQuarters.size() * _sharedContext.classrooms.size() + 1; // + 1 -> thematic axis column
@@ -168,6 +168,22 @@ public class MainViewController {
                 counter ++;
             });
         }
+
+        counter = null;
+    }
+
+    public void setThematicAxis() {
+        final int COLUMN_INDEX = 0;
+
+        _sharedContext.thematicAxises.forEach(ta -> {
+            gpMain.getRowConstraints().add(new RowConstraints());
+
+            Text tNewThematicAxis = new Text(ta.getName());
+            tNewThematicAxis.setUserData(ta);
+
+            gpMain.getChildren().add(tNewThematicAxis);
+            GridPane.setConstraints(tNewThematicAxis, COLUMN_INDEX, gpMain.getRowCount(), 1, 1, HPos.CENTER, VPos.CENTER);
+        });
     }
 
     @FXML
