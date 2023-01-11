@@ -1,5 +1,7 @@
 package ch.hftm.controller;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
 import org.controlsfx.control.CheckTreeView;
@@ -23,6 +25,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -46,9 +50,11 @@ public class MainViewController {
 
     private Integer counter;
 
+    private ImageView ivSelect = new ImageView(new Image(ClassPlannerFX.class.getResourceAsStream("resources/right-arrow.png")));
+
     @FXML
     public void initialize() {
-        //_sharedContext.primaryStage.getScene().getStylesheets().add(ClassPlannerFX.class.getResource("/css/style.css").toExternalForm());
+        //_sharedContext.primaryStage.getScene().getStylesheets().add(ClassPlannerFX.class.getResource("@../resources/css/style.css").toExternalForm());
         setGridConstraints();
         setSemestres();
         setQuarters();
@@ -62,21 +68,32 @@ public class MainViewController {
     void loadTreeView() {
         TreeItem tiSchoolName = new TreeItem(_sharedContext.schoolName);
 
-        TreeItem tiSchoolYear = new TreeItem<>(_sharedContext.schoolYear);
-        tiSchoolName.getChildren().add(tiSchoolYear);
+        _sharedContext.schoolYears.forEach(sy -> {
+            TreeItem tiSchoolYear = new TreeItem<>(sy);
 
-        _sharedContext.lessons.stream()
-            .filter(l -> l.getSchoolYear().equals(_sharedContext.schoolYear))
-            .forEach(le -> {
-                TreeItem tiLesson = new TreeItem<>(le);
-                _sharedContext.thematicAxises.stream()
-                    .filter(ta -> ta.getSchoolYear().equals(_sharedContext.schoolYear) && ta.getLesson().equals(le))
-                    .forEach(ta -> {
-                        tiLesson.getChildren().add(new TreeItem<>(ta));
-                    });
-                
-                tiSchoolYear.getChildren().add(tiLesson);
-            });
+            if (sy.equals(_sharedContext.selectedSchoolYear)) {
+                tiSchoolYear.setGraphic(ivSelect);
+            }
+            tiSchoolName.getChildren().add(tiSchoolYear);
+
+            _sharedContext.lessons.stream()
+                .filter(l -> l.getSchoolYear().equals(sy))
+                .forEach(le -> {
+                    TreeItem tiLesson = new TreeItem<>(le);
+
+                    if (le.equals(_sharedContext.selectedLesson)) {
+                        tiLesson.setGraphic(ivSelect);
+                    }
+
+                    _sharedContext.thematicAxises.stream()
+                        .filter(ta -> ta.getSchoolYear().equals(sy) && ta.getLesson().equals(le))
+                        .forEach(ta -> {
+                            tiLesson.getChildren().add(new TreeItem<>(ta));
+                        });
+                    
+                    tiSchoolYear.getChildren().add(tiLesson);
+                });
+        });
 
         twSchoolYearPlan.setRoot(tiSchoolName);
     }

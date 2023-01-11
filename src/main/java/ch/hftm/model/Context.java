@@ -26,10 +26,13 @@ public class Context {
 
     public Set<Classroom> classrooms;
     public Set<Lesson> lessons;
-    public SchoolYear schoolYear;
+    public Set<SchoolYear> schoolYears;
     public Set<SchoolYearQuarter> schoolYearQuarters;
     public Set<ThematicAxis> thematicAxises;
     public Set<CoreCompetency> coreCompetencies;
+
+    public Lesson selectedLesson;
+    public SchoolYear selectedSchoolYear;
 
     public DateTimeFormatter dateFormatUsed;
 
