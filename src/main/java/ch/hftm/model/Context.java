@@ -20,6 +20,8 @@ public class Context {
 
     public Stage primaryStage;
 
+    public String schoolName;
+
     public HashSet<Classroom> classrooms;
     public HashSet<Lesson> lessons;
     public SchoolYear schoolYear;
