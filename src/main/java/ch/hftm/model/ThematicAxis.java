@@ -9,7 +9,24 @@ public class ThematicAxis {
     private Integer _order;
 
     private Lesson _parentLesson;
+
+    public Lesson getLesson() {
+        return _parentLesson;
+    }
+
+    public void setLesson(Lesson lesson) {
+        this._parentLesson = lesson;
+    }
+
     private SchoolYear _parentSchoolYear;
+
+    public SchoolYear getSchoolYear() {
+        return _parentSchoolYear;
+    }
+
+    public void setSchoolYear(SchoolYear schoolYear) {
+        this._parentSchoolYear = schoolYear;
+    }
 
     public ThematicAxis(String name, Integer order, Lesson parentLesson, SchoolYear parentSchoolYear) {
         this._name = new SimpleStringProperty(name);
@@ -28,6 +45,10 @@ public class ThematicAxis {
 
     public void setName(StringProperty name) {
         this._name = name;
+    }
+
+    public String toString() {
+        return _name.get();
     }
 
     @Override

@@ -8,6 +8,14 @@ public class Lesson {
 
     private SchoolYear _parentSchoolYear;
 
+    public SchoolYear getSchoolYear() {
+        return _parentSchoolYear;
+    }
+
+    public void setParentSchoolYear(SchoolYear schoolYear) {
+        this._parentSchoolYear = schoolYear;
+    }
+
     public Lesson(String name) {
         _name = new SimpleStringProperty(name);
     }
@@ -22,5 +30,9 @@ public class Lesson {
 
     public void setName(StringProperty name) {
         this._name = name;
+    }
+
+    public String toString() {
+        return _name.get();
     }
 }

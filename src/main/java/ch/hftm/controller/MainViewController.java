@@ -23,6 +23,8 @@ import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.Control;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -39,6 +41,9 @@ public class MainViewController {
     @FXML
     private GridPane gpMain;
 
+    @FXML
+    private TreeView twSchoolYearPlan;
+
     private Context _sharedContext = Context.getInstance();
 
     private Integer counter;
@@ -52,7 +57,31 @@ public class MainViewController {
         setQuartersWithWeeks();
         setClassrooms();
         setThematicAxis();
+
+        loadTreeView();
     }  
+
+    void loadTreeView() {
+        TreeItem tiSchoolName = new TreeItem(_sharedContext.schoolName);
+
+        TreeItem tiSchoolYear = new TreeItem<>(_sharedContext.schoolYear);
+        tiSchoolName.getChildren().add(tiSchoolYear);
+
+        _sharedContext.lessons.stream()
+            //.filter(l -> l.getSchoolYear().equals(_sharedContext.schoolYear))
+            .forEach(le -> {
+                TreeItem tiLesson = new TreeItem<>(le);
+                _sharedContext.thematicAxises.stream()
+                    //.filter(ta -> ta.getSchoolYear().equals(_sharedContext.schoolYear) && ta.getLesson().equals(le))
+                    .forEach(ta -> {
+                        tiLesson.getChildren().add(new TreeItem<>(ta));
+                    });
+                
+                tiSchoolYear.getChildren().add(tiLesson);
+            });
+
+        twSchoolYearPlan.setRoot(tiSchoolName);
+    }
 
     void setGridConstraints() {
         int rowCount =  4; // one for the trimestre, one for the semestres, one for the weeks and one for classes;
