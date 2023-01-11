@@ -1,6 +1,6 @@
 package ch.hftm.model;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -8,33 +8,33 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 public class SchoolYear {
-    private ObjectProperty<Date> _startDay;
-    private ObjectProperty<Date> _endDay;
+    private ObjectProperty<LocalDate> _startDay;
+    private ObjectProperty<LocalDate> _endDay;
     private BooleanProperty _archived;
 
-    public SchoolYear(Date date, Date date2) {
-        this._startDay = new SimpleObjectProperty<Date>(date);
-        this._endDay =  new SimpleObjectProperty<Date>(date2);
+    public SchoolYear(LocalDate date1, LocalDate date2) {
+        this._startDay = new SimpleObjectProperty<LocalDate>(date1);
+        this._endDay =  new SimpleObjectProperty<LocalDate>(date2);
 
         this._archived = new SimpleBooleanProperty(false);
     }
 
-    public ObjectProperty<Date> startDayProperty() {
+    public ObjectProperty<LocalDate> startDayProperty() {
         return _startDay;
     }
 
-    public SchoolYear setStartDay(Date startDay) {
-        this._startDay = new SimpleObjectProperty<Date>(startDay);
+    public SchoolYear setStartDay(LocalDate startDay) {
+        this._startDay = new SimpleObjectProperty<LocalDate>(startDay);
 
         return this;
     }
 
-    public ObjectProperty<Date> endDayProperty() {
+    public ObjectProperty<LocalDate> endDayProperty() {
         return _endDay;
     }
 
-    public SchoolYear setEndDay(Date endDay) {
-        this._endDay = new SimpleObjectProperty<Date>(endDay);
+    public SchoolYear setEndDay(LocalDate endDay) {
+        this._endDay = new SimpleObjectProperty<LocalDate>(endDay);
 
         return this;
     }
@@ -53,12 +53,16 @@ public class SchoolYear {
         return this;
     }
 
-    public Date getEndDay() {
+    public LocalDate getEndDay() {
         return _endDay.get();
     }
 
-    public Date getStartDay() {
+    public LocalDate getStartDay() {
         return _startDay.get();
+    }
+
+    public String toString() {
+        return _startDay.get().getYear() + "-" + _endDay.get().getYear();
     }
 
     @Override

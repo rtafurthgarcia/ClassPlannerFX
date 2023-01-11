@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -45,10 +47,11 @@ public class ClassPlannerFX extends Application {
     public void generateDefaultValues() throws ParseException {
 
         _sharedContext.schoolName = "Berner Primärschule";
-		_sharedContext.dateFormatUsed = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.GERMANY); //DateFormat.getDateInstance(DateFormat.MEDIUM, new Locale("fr", "CH"));
+        _sharedContext.dateFormatUsed = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+		//_sharedContext.dateFormatUsed = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.GERMANY); //DateFormat.getDateInstance(DateFormat.MEDIUM, new Locale("fr", "CH"));
 
 		_sharedContext.classrooms = new HashSet<> (Arrays.asList(new Classroom("Classe 711"), new Classroom("Classe 712")));
-		_sharedContext.schoolYear = new SchoolYear(_sharedContext.dateFormatUsed.parse("02.05.2023"), _sharedContext.dateFormatUsed.parse("29.04.2024"));
+		_sharedContext.schoolYear = new SchoolYear(LocalDate.parse("02.05.2023", _sharedContext.dateFormatUsed), LocalDate.parse("29.04.2024", _sharedContext.dateFormatUsed));
         _sharedContext.schoolYearQuarters = new HashSet<> (Arrays.asList(
             new SchoolYearQuarter(1, 4, 19), 
             new SchoolYearQuarter(2, 20, 35), 
@@ -56,12 +59,16 @@ public class ClassPlannerFX extends Application {
             new SchoolYearQuarter(4, 52, 68)
         ));
 
-        _sharedContext.lessons = new HashSet<>(Arrays.asList(new Lesson("Français"), new Lesson("Maths"), new Lesson("Géographie")));
+        Lesson lessonFrench =  new Lesson("Français", _sharedContext.schoolYear);
+        Lesson lessonGeography =  new Lesson("Geographie", _sharedContext.schoolYear);
+        Lesson lessonMaths =  new Lesson("Maths", _sharedContext.schoolYear);
+        _sharedContext.lessons = new HashSet<>(Arrays.asList(lessonFrench, lessonGeography, lessonMaths));
 
         _sharedContext.thematicAxises = new HashSet<>(Arrays.asList(
-            new ThematicAxis("Vocabulaire 1", 1, new Lesson("Français"), _sharedContext.schoolYear),
-            new ThematicAxis("Verbes irréguliers G4", 2, new Lesson("Français"), _sharedContext.schoolYear),
-            new ThematicAxis("Poésie", 2, new Lesson("Français"), _sharedContext.schoolYear)
+            new ThematicAxis("Vocabulaire 1", 1, lessonFrench, _sharedContext.schoolYear),
+            new ThematicAxis("Verbes irréguliers G4", 2, lessonFrench, _sharedContext.schoolYear),
+            new ThematicAxis("Poésie", 3, lessonFrench, _sharedContext.schoolYear),
+            new ThematicAxis("Océanie", 1, lessonGeography, _sharedContext.schoolYear)
         ));
 	}
 }

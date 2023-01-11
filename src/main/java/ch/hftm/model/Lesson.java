@@ -16,8 +16,9 @@ public class Lesson {
         this._parentSchoolYear = schoolYear;
     }
 
-    public Lesson(String name) {
+    public Lesson(String name, SchoolYear schoolYear) {
         _name = new SimpleStringProperty(name);
+        _parentSchoolYear = schoolYear;
     }
 
     public StringProperty nameProperty() {

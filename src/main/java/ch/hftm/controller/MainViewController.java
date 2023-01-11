@@ -1,8 +1,6 @@
 package ch.hftm.controller;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 import org.controlsfx.control.CheckTreeView;
 import org.controlsfx.control.spreadsheet.GridBase;
@@ -68,11 +66,11 @@ public class MainViewController {
         tiSchoolName.getChildren().add(tiSchoolYear);
 
         _sharedContext.lessons.stream()
-            //.filter(l -> l.getSchoolYear().equals(_sharedContext.schoolYear))
+            .filter(l -> l.getSchoolYear().equals(_sharedContext.schoolYear))
             .forEach(le -> {
                 TreeItem tiLesson = new TreeItem<>(le);
                 _sharedContext.thematicAxises.stream()
-                    //.filter(ta -> ta.getSchoolYear().equals(_sharedContext.schoolYear) && ta.getLesson().equals(le))
+                    .filter(ta -> ta.getSchoolYear().equals(_sharedContext.schoolYear) && ta.getLesson().equals(le))
                     .forEach(ta -> {
                         tiLesson.getChildren().add(new TreeItem<>(ta));
                     });

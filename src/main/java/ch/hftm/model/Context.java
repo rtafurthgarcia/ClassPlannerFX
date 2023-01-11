@@ -2,7 +2,9 @@ package ch.hftm.model;
 
 import java.io.IOException;
 import java.text.DateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
+import java.util.Set;
 
 import ch.hftm.ClassPlannerFX;
 import ch.hftm.controller.MainViewController;
@@ -22,14 +24,14 @@ public class Context {
 
     public String schoolName;
 
-    public HashSet<Classroom> classrooms;
-    public HashSet<Lesson> lessons;
+    public Set<Classroom> classrooms;
+    public Set<Lesson> lessons;
     public SchoolYear schoolYear;
-    public HashSet<SchoolYearQuarter> schoolYearQuarters;
-    public HashSet<ThematicAxis> thematicAxises;
-    public HashSet<CoreCompetency> coreCompetencies;
+    public Set<SchoolYearQuarter> schoolYearQuarters;
+    public Set<ThematicAxis> thematicAxises;
+    public Set<CoreCompetency> coreCompetencies;
 
-    public DateFormat dateFormatUsed;
+    public DateTimeFormatter dateFormatUsed;
 
     public void showMainView() {
         try {
