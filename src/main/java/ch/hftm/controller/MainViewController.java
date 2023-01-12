@@ -51,6 +51,8 @@ public class MainViewController {
     private Integer counter;
 
     private ImageView ivSelect = new ImageView(new Image(ClassPlannerFX.class.getResourceAsStream("resources/right-arrow.png")));
+    private ImageView ivSelect2 = new ImageView(new Image(ClassPlannerFX.class.getResourceAsStream("resources/right-arrow.png")));
+
 
     @FXML
     public void initialize() {
@@ -82,7 +84,7 @@ public class MainViewController {
                     TreeItem tiLesson = new TreeItem<>(le);
 
                     if (le.equals(_sharedContext.selectedLesson)) {
-                        tiLesson.setGraphic(ivSelect);
+                        tiLesson.setGraphic(ivSelect2);
                     }
 
                     _sharedContext.thematicAxises.stream()
