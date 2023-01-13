@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import ch.hftm.ClassPlannerFX;
@@ -29,7 +30,7 @@ public class Context {
     public Set<SchoolYear> schoolYears;
     public Set<SchoolYearQuarter> schoolYearQuarters;
     public Set<ThematicAxis> thematicAxises;
-    public Set<CoreCompetency> coreCompetencies;
+    public List<CoreCompetency> coreCompetencies;
 
     public Lesson selectedLesson;
     public SchoolYear selectedSchoolYear;

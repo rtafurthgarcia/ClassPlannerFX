@@ -1,32 +1,19 @@
 package ch.hftm;
 
-import java.io.IOException;
-import java.lang.reflect.Array;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
-
-import ch.hftm.controller.MainViewController;
-import ch.hftm.controller.SettingsController;
 import ch.hftm.model.Classroom;
 import ch.hftm.model.Context;
+import ch.hftm.model.CoreCompetency;
 import ch.hftm.model.Lesson;
 import ch.hftm.model.SchoolYear;
 import ch.hftm.model.SchoolYearQuarter;
 import ch.hftm.model.ThematicAxis;
 import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-
-import javafx.fxml.FXMLLoader;
 
 /**
  * JavaFX App
@@ -73,5 +60,10 @@ public class ClassPlannerFX extends Application {
             new ThematicAxis("Poésie", 3, lessonFrench, _sharedContext.selectedSchoolYear),
             new ThematicAxis("Océanie", 1, lessonGeography, _sharedContext.selectedSchoolYear)
         ));
+
+        _sharedContext.coreCompetencies = Arrays.asList(
+            new CoreCompetency().setName("Maîtrise des verbes en -IR ").setDescription("Les verbes terminés en -IR (comme MOURIR : mour-ant; mour-ons);"),
+            new CoreCompetency().setName("Maîtrise des verbes en -OIR").setDescription("Les verbes terminés en -OIR (comme RECEVOIR : recev-ant; recev-ons);"));
+        
 	}
 }

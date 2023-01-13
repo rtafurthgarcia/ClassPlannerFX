@@ -1,38 +1,22 @@
 package ch.hftm.controller;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.stream.Collectors;
-
-import org.controlsfx.control.CheckTreeView;
-import org.controlsfx.control.spreadsheet.GridBase;
-import org.controlsfx.control.spreadsheet.SpreadsheetCell;
-import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 import ch.hftm.ClassPlannerFX;
 import ch.hftm.model.Context;
-import ch.hftm.model.CoreCompetency;
 import ch.hftm.model.SchoolYearQuarter;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import ch.hftm.util.TextFieldTreeCellImpl;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
-import javafx.scene.control.CheckBoxTreeItem;
-import javafx.scene.control.Control;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 public class MainViewController {
@@ -69,9 +53,11 @@ public class MainViewController {
 
     void loadTreeView() {
         TreeItem tiSchoolName = new TreeItem(_sharedContext.schoolName);
+        tiSchoolName.setExpanded(true);
 
         _sharedContext.schoolYears.forEach(sy -> {
             TreeItem tiSchoolYear = new TreeItem<>(sy);
+            tiSchoolYear.setExpanded(true);
 
             if (sy.equals(_sharedContext.selectedSchoolYear)) {
                 tiSchoolYear.setGraphic(ivSelect);
@@ -82,6 +68,7 @@ public class MainViewController {
                 .filter(l -> l.getSchoolYear().equals(sy))
                 .forEach(le -> {
                     TreeItem tiLesson = new TreeItem<>(le);
+                    tiLesson.setExpanded(true);
 
                     if (le.equals(_sharedContext.selectedLesson)) {
                         tiLesson.setGraphic(ivSelect2);
@@ -92,12 +79,17 @@ public class MainViewController {
                         .forEach(ta -> {
                             tiLesson.getChildren().add(new TreeItem<>(ta));
                         });
-                    
+
                     tiSchoolYear.getChildren().add(tiLesson);
                 });
         });
 
         twSchoolYearPlan.setRoot(tiSchoolName);
+
+        twSchoolYearPlan.setEditable(true);
+        twSchoolYearPlan.setCellFactory(tw -> 
+            new TextFieldTreeCellImpl()
+        );
     }
 
     void setGridConstraints() {
