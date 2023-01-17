@@ -1,11 +1,13 @@
 package ch.hftm.util;
 
+import ch.hftm.model.CoreCompetency;
+import ch.hftm.model.ThematicAxis;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
-public class TextFieldTreeCellImpl extends TreeCell<String> {
+public class TextFieldTreeCellImpl<T> extends TreeCell<T> {
     private TextField textField;
 
     /**
@@ -13,14 +15,16 @@ public class TextFieldTreeCellImpl extends TreeCell<String> {
      */
     @Override
     public void startEdit() {
-        super.startEdit();
-
-        if (textField == null) {
-            createTextField();
+        if (getItem() instanceof ThematicAxis || getItem() instanceof CoreCompetency) {
+            super.startEdit();
+    
+            if (textField == null) {
+                createTextField();
+            }
+            setText(null);
+            setGraphic(textField);
+            textField.selectAll();
         }
-        setText(null);
-        setGraphic(textField);
-        textField.selectAll();
     }
 
     /**
@@ -34,7 +38,7 @@ public class TextFieldTreeCellImpl extends TreeCell<String> {
     }
 
     @Override
-    public void updateItem(String item, boolean empty) {
+    public void updateItem(T item, boolean empty) {
         super.updateItem(item, empty);
 
         if (empty) {
@@ -54,20 +58,29 @@ public class TextFieldTreeCellImpl extends TreeCell<String> {
         }
         setText(null);
         setGraphic(textField);
-
     }
-
+    
     private void createTextField() {
         textField = new TextField(getString());
         textField.setOnKeyReleased((KeyEvent t) -> {
             if (t.getCode() == KeyCode.ENTER) {
-                commitEdit(textField.getText());
+                if (getItem() instanceof ThematicAxis) {
+                    ThematicAxis toUpdateObject = (ThematicAxis) getItem();
+                    toUpdateObject.setName(textField.getText());
+                }
+
+                if (getItem() instanceof CoreCompetency) {
+                    CoreCompetency toUpdateObject = (CoreCompetency) getItem();
+                    toUpdateObject.setName(textField.getText());
+                }
+                
+                commitEdit(super.getItem());
             } else if (t.getCode() == KeyCode.ESCAPE) {
                 cancelEdit();
             }
         });
     }
-
+    
     private String getString() {
         return getItem() == null ? "" : getItem().toString();
     }

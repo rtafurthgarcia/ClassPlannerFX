@@ -4,6 +4,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 import ch.hftm.ClassPlannerFX;
 import ch.hftm.model.Context;
+import ch.hftm.model.SchoolYear;
 import ch.hftm.model.SchoolYearQuarter;
 import ch.hftm.util.TextFieldTreeCellImpl;
 import javafx.fxml.FXML;
@@ -52,12 +53,13 @@ public class MainViewController {
     }  
 
     void loadTreeView() {
-        TreeItem tiSchoolName = new TreeItem(_sharedContext.schoolName);
+        TreeItem<Object> tiSchoolName = new TreeItem<>(_sharedContext.schoolName);
         tiSchoolName.setExpanded(true);
 
         _sharedContext.schoolYears.forEach(sy -> {
-            TreeItem tiSchoolYear = new TreeItem<>(sy);
+            TreeItem<Object> tiSchoolYear = new TreeItem<>();
             tiSchoolYear.setExpanded(true);
+            tiSchoolYear.setValue(sy);
 
             if (sy.equals(_sharedContext.selectedSchoolYear)) {
                 tiSchoolYear.setGraphic(ivSelect);
@@ -67,7 +69,7 @@ public class MainViewController {
             _sharedContext.lessons.stream()
                 .filter(l -> l.getSchoolYear().equals(sy))
                 .forEach(le -> {
-                    TreeItem tiLesson = new TreeItem<>(le);
+                    TreeItem<Object> tiLesson = new TreeItem<>(le);
                     tiLesson.setExpanded(true);
 
                     if (le.equals(_sharedContext.selectedLesson)) {
