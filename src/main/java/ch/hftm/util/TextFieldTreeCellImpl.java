@@ -1,7 +1,12 @@
 package ch.hftm.util;
 
 import ch.hftm.model.CoreCompetency;
+import ch.hftm.model.Lesson;
 import ch.hftm.model.ThematicAxis;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeCell;
 import javafx.scene.input.KeyCode;
@@ -15,7 +20,7 @@ public class TextFieldTreeCellImpl<T> extends TreeCell<T> {
      */
     @Override
     public void startEdit() {
-        if (getItem() instanceof ThematicAxis || getItem() instanceof CoreCompetency) {
+        if (getItem() instanceof ThematicAxis || getItem() instanceof CoreCompetency || getItem() instanceof Lesson) {
             super.startEdit();
     
             if (textField == null) {
@@ -71,6 +76,11 @@ public class TextFieldTreeCellImpl<T> extends TreeCell<T> {
 
                 if (getItem() instanceof CoreCompetency) {
                     CoreCompetency toUpdateObject = (CoreCompetency) getItem();
+                    toUpdateObject.setName(textField.getText());
+                }
+
+                if (getItem() instanceof Lesson) {
+                    Lesson toUpdateObject = (Lesson) getItem();
                     toUpdateObject.setName(textField.getText());
                 }
                 

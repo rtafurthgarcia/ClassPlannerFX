@@ -4,12 +4,19 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 import ch.hftm.ClassPlannerFX;
 import ch.hftm.model.Context;
+import ch.hftm.model.CoreCompetency;
+import ch.hftm.model.Lesson;
 import ch.hftm.model.SchoolYear;
 import ch.hftm.model.SchoolYearQuarter;
+import ch.hftm.model.ThematicAxis;
 import ch.hftm.util.TextFieldTreeCellImpl;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
@@ -29,7 +36,7 @@ public class MainViewController {
     private GridPane gpMain;
 
     @FXML
-    private TreeView twSchoolYearPlan;
+    private TreeView<Object> twSchoolYearPlan;
 
     private Context _sharedContext = Context.getInstance();
 
@@ -37,6 +44,11 @@ public class MainViewController {
 
     private ImageView ivSelect = new ImageView(new Image(ClassPlannerFX.class.getResourceAsStream("resources/right-arrow.png")));
     private ImageView ivSelect2 = new ImageView(new Image(ClassPlannerFX.class.getResourceAsStream("resources/right-arrow.png")));
+    private ImageView ivSelect3 = new ImageView(new Image(ClassPlannerFX.class.getResourceAsStream("resources/right-arrow.png")));
+
+    private TreeItem<Object> tiSelectedSchoolYear;
+    private TreeItem<Object> tiSelectedLesson;
+    private TreeItem<Object> tiSelectedThematicAxis;
 
 
     @FXML
@@ -63,6 +75,7 @@ public class MainViewController {
 
             if (sy.equals(_sharedContext.selectedSchoolYear)) {
                 tiSchoolYear.setGraphic(ivSelect);
+                tiSelectedSchoolYear = tiSchoolYear;
             }
             tiSchoolName.getChildren().add(tiSchoolYear);
 
@@ -74,6 +87,7 @@ public class MainViewController {
 
                     if (le.equals(_sharedContext.selectedLesson)) {
                         tiLesson.setGraphic(ivSelect2);
+                        tiSelectedLesson = tiLesson;
                     }
 
                     _sharedContext.thematicAxises.stream()
@@ -87,8 +101,8 @@ public class MainViewController {
         });
 
         twSchoolYearPlan.setRoot(tiSchoolName);
-
         twSchoolYearPlan.setEditable(true);
+        twSchoolYearPlan.setOnContextMenuRequested(event -> twSchoolYearPlan.setContextMenu(createContextMenu()));
         twSchoolYearPlan.setCellFactory(tw -> 
             new TextFieldTreeCellImpl()
         );
@@ -224,6 +238,50 @@ public class MainViewController {
             gpMain.getChildren().add(tNewThematicAxis);
             GridPane.setConstraints(tNewThematicAxis, COLUMN_INDEX, gpMain.getRowCount(), 1, 1, HPos.CENTER, VPos.CENTER);
         });
+    }
+
+    private ContextMenu createContextMenu() {
+        ContextMenu contextMenu = new ContextMenu();
+
+        Object selectedObject = twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue();
+
+        if (selectedObject instanceof ThematicAxis) {
+            MenuItem miThematicAxis = new MenuItem("Create a new thematic axis");
+            miThematicAxis.setOnAction(new EventHandler<ActionEvent>() {
+                public void handle(ActionEvent e) {
+                    ThematicAxis thematicAxis = new ThematicAxis("new thematic axis", tiSelectedLesson.getChildren().size(), _sharedContext.selectedLesson, _sharedContext.selectedSchoolYear);                   
+                    twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getChildren().add(new TreeItem<>(thematicAxis));
+                    _sharedContext.thematicAxises.add(thematicAxis);
+                    twSchoolYearPlan.getSelectionModel().selectLast();         
+                }
+            });
+
+            contextMenu.getItems().addAll(miThematicAxis);
+        } else if (selectedObject instanceof Lesson) {
+            MenuItem miLesson = new MenuItem("Create a new lesson");
+            miLesson.setOnAction(new EventHandler<ActionEvent>() {
+                public void handle(ActionEvent e) {               
+                    Lesson newLesson = new Lesson("new lesson", _sharedContext.selectedSchoolYear);
+                    twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getChildren().add(new TreeItem<>(newLesson));
+                    _sharedContext.lessons.add(newLesson);
+                    twSchoolYearPlan.getSelectionModel().selectLast();
+                }
+            });
+
+            contextMenu.getItems().addAll(miLesson);
+        } else if (selectedObject instanceof CoreCompetency) {
+            MenuItem miCoreCompetency = new MenuItem("Create a new core competency");
+            miCoreCompetency.setOnAction(new EventHandler<ActionEvent>() {
+                public void handle(ActionEvent e) {             
+                    CoreCompetency newCoreCompetency = new CoreCompetency().setName("new core competency").setDescription("");
+                    twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getChildren().add(new TreeItem<>(newCoreCompetency));
+                    _sharedContext.coreCompetencies.add(newCoreCompetency);
+                    twSchoolYearPlan.getSelectionModel().selectLast();
+                }
+            });
+        }
+
+        return contextMenu;
     }
 
     @FXML

@@ -29,8 +29,8 @@ public class Lesson {
         return _name.get();
     }
 
-    public void setName(StringProperty name) {
-        this._name = name;
+    public void setName(String name) {
+        this._name = new SimpleStringProperty(name);
     }
 
     public String toString() {
