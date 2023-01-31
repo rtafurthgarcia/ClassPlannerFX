@@ -6,6 +6,7 @@ import ch.hftm.ClassPlannerFX;
 import ch.hftm.model.Context;
 import ch.hftm.model.CoreCompetency;
 import ch.hftm.model.Lesson;
+import ch.hftm.model.School;
 import ch.hftm.model.SchoolYear;
 import ch.hftm.model.SchoolYearQuarter;
 import ch.hftm.model.ThematicAxis;
@@ -37,15 +38,15 @@ public class MainViewController {
     private GridPane gpMain;
 
     @FXML
-    private TreeView<Object> twSchoolYearPlan;
+    private TreeView<School> twSchoolYearPlan;
 
     private Context _sharedContext = Context.getInstance();
 
     private Integer counter;
 
-    private TreeItem<Object> tiSelectedSchoolYear;
+    /*private TreeItem<Object> tiSelectedSchoolYear;
     private TreeItem<Object> tiSelectedLesson;
-    private TreeItem<Object> tiSelectedThematicAxis;
+    private TreeItem<Object> tiSelectedThematicAxis;*/
 
     //private ImageView ivSelect = new ImageView(new Image(ClassPlannerFX.class.getResourceAsStream("resources/arrow-right.png")));
 
@@ -59,12 +60,12 @@ public class MainViewController {
         setClassrooms();
         setThematicAxis();
 
-        loadTreeView();
+        //loadTreeView();
 
         //twSchoolYearPlan.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> onNewlySelectedTreeItem(newValue));
     }  
 
-    void loadTreeView() {
+    /*void loadTreeView() {
         TreeItem<Object> tiSchoolName = new TreeItem<>(_sharedContext.schoolName);
         tiSchoolName.setExpanded(true);
 
@@ -105,11 +106,11 @@ public class MainViewController {
         twSchoolYearPlan.setCellFactory(tw -> 
             new TextFieldTreeCellImpl()
         );
-    }
+    }*/
 
     void setGridConstraints() {
         int rowCount =  4; // one for the trimestre, one for the semestres, one for the weeks and one for classes;
-        int columnCount = _sharedContext.schoolYearQuarters.size() * _sharedContext.classrooms.size() + 1; // + 1 -> thematic axis column
+        int columnCount = _sharedContext.selectedSchoolYear.getQuarters().size() * _sharedContext.loadedSchool.getClassrooms().size() + 1; // + 1 -> thematic axis column
 
         gpMain.getRowConstraints().clear();
         gpMain.getColumnConstraints().clear();
@@ -170,27 +171,27 @@ public class MainViewController {
         Text tQuarter3 = new Text("");
         Text tQuarter4 = new Text("");
 
-        SchoolYearQuarter quarter1 = _sharedContext.schoolYearQuarters.stream().filter(t -> t.getQuarter() == 1).reduce((a, b) -> {
+        SchoolYearQuarter quarter1 = _sharedContext.selectedSchoolYear.getQuarters().stream().filter(t -> t.getQuarter() == 1).reduce((a, b) -> {
             throw new IllegalStateException("Multiple elements: " + a + ", " + b);
         }).get();
         tQuarter1.setText(quarter1.toString());
         tQuarter1.setUserData(quarter1);
         
-        SchoolYearQuarter quarter2 = _sharedContext.schoolYearQuarters.stream().filter(t -> t.getQuarter() == 2).reduce((a, b) -> {
+        SchoolYearQuarter quarter2 = _sharedContext.selectedSchoolYear.getQuarters().stream().filter(t -> t.getQuarter() == 2).reduce((a, b) -> {
             throw new IllegalStateException("Multiple elements: " + a + ", " + b);
         }).get();
 
         tQuarter2.setText(quarter2.toString());
         tQuarter2.setUserData(quarter2);
 
-        SchoolYearQuarter quarter3 = _sharedContext.schoolYearQuarters.stream().filter(t -> t.getQuarter() == 3).reduce((a, b) -> {
+        SchoolYearQuarter quarter3 = _sharedContext.selectedSchoolYear.getQuarters().stream().filter(t -> t.getQuarter() == 3).reduce((a, b) -> {
             throw new IllegalStateException("Multiple elements: " + a + ", " + b);
         }).get();
 
         tQuarter3.setText(quarter3.toString());
         tQuarter3.setUserData(quarter3);
         
-        SchoolYearQuarter quarter4 = _sharedContext.schoolYearQuarters.stream().filter(t -> t.getQuarter() == 4).reduce((a, b) -> {
+        SchoolYearQuarter quarter4 = _sharedContext.selectedSchoolYear.getQuarters().stream().filter(t -> t.getQuarter() == 4).reduce((a, b) -> {
             throw new IllegalStateException("Multiple elements: " + a + ", " + b);
         }).get();
 
@@ -212,7 +213,7 @@ public class MainViewController {
         counter = 1;
 
         while(counter < columnCount) {
-            _sharedContext.classrooms.forEach(c -> {
+            _sharedContext.loadedSchool.getClassrooms().forEach(c -> {
                 Text tNewClassroom = new Text(c.getName());
                 tNewClassroom.setUserData(c);
 
@@ -228,7 +229,11 @@ public class MainViewController {
     public void setThematicAxis() {
         final int COLUMN_INDEX = 0;
 
-        _sharedContext.thematicAxises.forEach(ta -> {
+        /*_sharedContext.loadedSchool.getSchoolYears().forEach(sy -> {
+            sy.get
+        });*/
+
+        _sharedContext.selectedLesson.getLessonsAxis().forEach(ta -> {
             gpMain.getRowConstraints().add(new RowConstraints());
 
             Text tNewThematicAxis = new Text(ta.getName());
@@ -239,7 +244,7 @@ public class MainViewController {
         });
     }
 
-    private ContextMenu createContextMenu() {
+    /*private ContextMenu createContextMenu() {
         ContextMenu contextMenu = new ContextMenu();
 
         Object selectedObject = twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue();
@@ -281,7 +286,7 @@ public class MainViewController {
         }
 
         return contextMenu;
-    }
+    }*/
 
     @FXML
     void onClose() {

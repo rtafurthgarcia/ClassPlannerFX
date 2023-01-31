@@ -100,7 +100,7 @@ public class TextFieldTreeCellImpl<T> extends TreeCell<T> {
         super();
         
         //this.setOnMouseClicked(event -> onSelection(event));
-        super.getTreeItem().expandedProperty().addListener((observable, oldValue, newValue) -> onTreeItemStateChanged(newValue));
+        //super.getTreeItem().expandedProperty().addListener((observable, oldValue, newValue) -> onTreeItemStateChanged(newValue));
     }
 
     private void onTreeItemStateChanged(boolean isExpanded) {

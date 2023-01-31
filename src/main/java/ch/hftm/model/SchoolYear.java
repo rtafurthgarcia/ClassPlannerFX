@@ -6,17 +6,32 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableSet;
 
 public class SchoolYear {
     private ObjectProperty<LocalDate> _startDay;
     private ObjectProperty<LocalDate> _endDay;
     private BooleanProperty _archived;
+    private ObservableSet<Lesson> _yearlyLessons;
+    private ObservableSet<SchoolYearQuarter> _quarters;
 
-    public SchoolYear(LocalDate date1, LocalDate date2) {
-        this._startDay = new SimpleObjectProperty<LocalDate>(date1);
-        this._endDay =  new SimpleObjectProperty<LocalDate>(date2);
+    public ObservableSet<Lesson> getYearsLessons() {
+        return _yearlyLessons;
+    }
+
+    public ObservableSet<SchoolYearQuarter> getQuarters() {
+        return _quarters;
+    }
+
+    public SchoolYear(LocalDate startDay, LocalDate endDay) {
+        this._startDay = new SimpleObjectProperty<LocalDate>(startDay);
+        this._endDay =  new SimpleObjectProperty<LocalDate>(endDay);
 
         this._archived = new SimpleBooleanProperty(false);
+
+        this._yearlyLessons = FXCollections.observableSet();
+        this._quarters = FXCollections.observableSet();
     }
 
     public ObjectProperty<LocalDate> startDayProperty() {

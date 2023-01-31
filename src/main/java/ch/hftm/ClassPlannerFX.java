@@ -5,10 +5,13 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
+
 import ch.hftm.model.Classroom;
 import ch.hftm.model.Context;
 import ch.hftm.model.CoreCompetency;
 import ch.hftm.model.Lesson;
+import ch.hftm.model.School;
 import ch.hftm.model.SchoolYear;
 import ch.hftm.model.SchoolYearQuarter;
 import ch.hftm.model.ThematicAxis;
@@ -33,37 +36,42 @@ public class ClassPlannerFX extends Application {
 
     public void generateDefaultValues() throws ParseException {
 
-        _sharedContext.schoolName = "Berner Primärschule";
+        _sharedContext.loadedSchool = new School("Berner Primärschule");
         _sharedContext.dateFormatUsed = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-		//_sharedContext.dateFormatUsed = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.GERMANY); //DateFormat.getDateInstance(DateFormat.MEDIUM, new Locale("fr", "CH"));
 
-		_sharedContext.classrooms = new HashSet<> (Arrays.asList(new Classroom("Classe 711"), new Classroom("Classe 712")));
-		_sharedContext.selectedSchoolYear = new SchoolYear(LocalDate.parse("02.05.2023", _sharedContext.dateFormatUsed), LocalDate.parse("29.04.2024", _sharedContext.dateFormatUsed));
-        _sharedContext.schoolYears = new HashSet<>(Arrays.asList(_sharedContext.selectedSchoolYear));
-        _sharedContext.schoolYearQuarters = new HashSet<> (Arrays.asList(
+        _sharedContext.loadedSchool.getClassrooms().addAll(Arrays.asList(new Classroom("Classe 711"), new Classroom("Classe 712")));
+
+
+        _sharedContext.selectedSchoolYear = new SchoolYear(LocalDate.parse("02.05.2023", _sharedContext.dateFormatUsed), LocalDate.parse("29.04.2024", _sharedContext.dateFormatUsed));
+        
+        _sharedContext.selectedSchoolYear.getQuarters().addAll(Arrays.asList(
             new SchoolYearQuarter(1, 4, 19), 
             new SchoolYearQuarter(2, 20, 35), 
             new SchoolYearQuarter(3, 36, 51), 
             new SchoolYearQuarter(4, 52, 68)
         ));
 
-        Lesson lessonFrench =  new Lesson("Français", _sharedContext.selectedSchoolYear);
-        Lesson lessonGeography =  new Lesson("Geographie", _sharedContext.selectedSchoolYear);
-        Lesson lessonMaths =  new Lesson("Maths", _sharedContext.selectedSchoolYear);
-        _sharedContext.lessons = new HashSet<>(Arrays.asList(lessonFrench, lessonGeography, lessonMaths));
+        _sharedContext.loadedSchool.getSchoolYears().add(_sharedContext.selectedSchoolYear);
+
+        Lesson lessonFrench =  new Lesson("Français");
+        Lesson lessonGeography =  new Lesson("Geographie");
+        Lesson lessonMaths =  new Lesson("Maths");
+        _sharedContext.selectedSchoolYear.getYearsLessons().addAll(Arrays.asList(lessonFrench, lessonGeography, lessonMaths));
 
         _sharedContext.selectedLesson = lessonFrench;
 
-        _sharedContext.thematicAxises = new HashSet<>(Arrays.asList(
-            new ThematicAxis("Vocabulaire 1", 1, lessonFrench, _sharedContext.selectedSchoolYear),
-            new ThematicAxis("Verbes irréguliers G4", 2, lessonFrench, _sharedContext.selectedSchoolYear),
-            new ThematicAxis("Poésie", 3, lessonFrench, _sharedContext.selectedSchoolYear),
-            new ThematicAxis("Océanie", 1, lessonGeography, _sharedContext.selectedSchoolYear)
+        _sharedContext.selectedLesson.getLessonsAxis().addAll(Arrays.asList(
+            new ThematicAxis("Vocabulaire 1", 1),
+            new ThematicAxis("Verbes irréguliers G4", 2),
+            new ThematicAxis("Poésie", 3)
         ));
 
-        _sharedContext.coreCompetencies = Arrays.asList(
+        lessonGeography.getLessonsAxis().add(new ThematicAxis("Océanie", 1));
+
+        
+        /*_sharedContext.coreCompetencies = Arrays.asList(
             new CoreCompetency().setName("Maîtrise des verbes en -IR ").setDescription("Les verbes terminés en -IR (comme MOURIR : mour-ant; mour-ons);"),
             new CoreCompetency().setName("Maîtrise des verbes en -OIR").setDescription("Les verbes terminés en -OIR (comme RECEVOIR : recev-ant; recev-ons);"));
-        
+        */
 	}
 }

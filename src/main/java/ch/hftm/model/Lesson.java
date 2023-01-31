@@ -2,23 +2,28 @@ package ch.hftm.model;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableSet;
 
 public class Lesson {
     private StringProperty _name;
 
-    private SchoolYear _parentSchoolYear;
+    private ObservableSet<ThematicAxis> _lessonsAxis;
 
-    public SchoolYear getSchoolYear() {
-        return _parentSchoolYear;
+    public ObservableSet<ThematicAxis> getLessonsAxis() {
+        return _lessonsAxis;
     }
 
-    public void setParentSchoolYear(SchoolYear schoolYear) {
-        this._parentSchoolYear = schoolYear;
+    public Lesson setLessonsAxis(ObservableSet<ThematicAxis> lessonsAxis) {
+        this._lessonsAxis = lessonsAxis;
+
+        return this;
     }
 
-    public Lesson(String name, SchoolYear schoolYear) {
+    public Lesson(String name) {
         _name = new SimpleStringProperty(name);
-        _parentSchoolYear = schoolYear;
+
+        _lessonsAxis = FXCollections.observableSet();
     }
 
     public StringProperty nameProperty() {
@@ -29,8 +34,10 @@ public class Lesson {
         return _name.get();
     }
 
-    public void setName(String name) {
+    public Lesson setName(String name) {
         this._name = new SimpleStringProperty(name);
+
+        return this;
     }
 
     public String toString() {

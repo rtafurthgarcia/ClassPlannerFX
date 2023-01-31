@@ -23,14 +23,7 @@ public class Context {
 
     public Stage primaryStage;
 
-    public String schoolName;
-
-    public Set<Classroom> classrooms;
-    public Set<Lesson> lessons;
-    public Set<SchoolYear> schoolYears;
-    public Set<SchoolYearQuarter> schoolYearQuarters;
-    public Set<ThematicAxis> thematicAxises;
-    public List<CoreCompetency> coreCompetencies;
+    public School loadedSchool;
 
     public Lesson selectedLesson;
     public SchoolYear selectedSchoolYear;

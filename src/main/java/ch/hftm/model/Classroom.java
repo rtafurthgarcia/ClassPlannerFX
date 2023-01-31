@@ -16,8 +16,10 @@ public class Classroom {
         return _name;
     }
 
-    public void setName(StringProperty name) {
+    public Classroom setName(StringProperty name) {
         this._name = name;
+
+        return this;
     }
 
     public String getName() {
