@@ -11,6 +11,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TreeCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 
 public class TextFieldTreeCellImpl<T> extends TreeCell<T> {
     private TextField textField;
@@ -94,4 +95,26 @@ public class TextFieldTreeCellImpl<T> extends TreeCell<T> {
     private String getString() {
         return getItem() == null ? "" : getItem().toString();
     }
+
+    public TextFieldTreeCellImpl() {
+        super();
+        
+        //this.setOnMouseClicked(event -> onSelection(event));
+        super.getTreeItem().expandedProperty().addListener((observable, oldValue, newValue) -> onTreeItemStateChanged(newValue));
+    }
+
+    private void onTreeItemStateChanged(boolean isExpanded) {
+        if (isExpanded) {
+            setStyle("-fx-font-weight: bold ;");
+        } else {
+            setStyle("");
+        }
+    }
+    /*private void setAsSelected(MouseEvent event) {
+        if (getTreeItem().getValue() instanceof Lesson && getTreeItem().isExpanded()) {
+            setStyle("-fx-font-weight: bold ;");
+        } else {
+            setStyle("");
+        }
+    }*/
 }

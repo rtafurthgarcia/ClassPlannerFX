@@ -1,0 +1,7 @@
+/*TreeItem .selected-tree-item {
+    -fx-font-weight: bold;
+}*/
+
+TreeItem:expanded {
+    -fx-font-weight: bold ;
+}

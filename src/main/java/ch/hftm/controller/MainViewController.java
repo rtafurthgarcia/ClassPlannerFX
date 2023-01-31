@@ -10,6 +10,7 @@ import ch.hftm.model.SchoolYear;
 import ch.hftm.model.SchoolYearQuarter;
 import ch.hftm.model.ThematicAxis;
 import ch.hftm.util.TextFieldTreeCellImpl;
+import javafx.beans.Observable;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -42,14 +43,11 @@ public class MainViewController {
 
     private Integer counter;
 
-    private ImageView ivSelect = new ImageView(new Image(ClassPlannerFX.class.getResourceAsStream("resources/right-arrow.png")));
-    private ImageView ivSelect2 = new ImageView(new Image(ClassPlannerFX.class.getResourceAsStream("resources/right-arrow.png")));
-    private ImageView ivSelect3 = new ImageView(new Image(ClassPlannerFX.class.getResourceAsStream("resources/right-arrow.png")));
-
     private TreeItem<Object> tiSelectedSchoolYear;
     private TreeItem<Object> tiSelectedLesson;
     private TreeItem<Object> tiSelectedThematicAxis;
 
+    //private ImageView ivSelect = new ImageView(new Image(ClassPlannerFX.class.getResourceAsStream("resources/arrow-right.png")));
 
     @FXML
     public void initialize() {
@@ -62,6 +60,8 @@ public class MainViewController {
         setThematicAxis();
 
         loadTreeView();
+
+        //twSchoolYearPlan.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> onNewlySelectedTreeItem(newValue));
     }  
 
     void loadTreeView() {
@@ -74,7 +74,6 @@ public class MainViewController {
             tiSchoolYear.setValue(sy);
 
             if (sy.equals(_sharedContext.selectedSchoolYear)) {
-                tiSchoolYear.setGraphic(ivSelect);
                 tiSelectedSchoolYear = tiSchoolYear;
             }
             tiSchoolName.getChildren().add(tiSchoolYear);
@@ -84,9 +83,9 @@ public class MainViewController {
                 .forEach(le -> {
                     TreeItem<Object> tiLesson = new TreeItem<>(le);
                     tiLesson.setExpanded(true);
+                    tiLesson.expandedProperty().addListener((observable, oldValue, newValue) -> onTreeItemStateChanged(tiLesson, newValue));
 
                     if (le.equals(_sharedContext.selectedLesson)) {
-                        tiLesson.setGraphic(ivSelect2);
                         tiSelectedLesson = tiLesson;
                     }
 
@@ -292,5 +291,25 @@ public class MainViewController {
     @FXML
     public void onOpenSettings() {
         _sharedContext.showSettingsView();
+    }
+
+    private void collapseTreeView(TreeItem<?> ti){
+        if(ti.getValue() != _sharedContext.selectedLesson && !ti.isLeaf()){
+            if (ti.getValue() instanceof Lesson) {
+                ti.setExpanded(false);
+                //ti.setGraphic(null);
+            }
+
+            for(TreeItem<?> child:ti.getChildren()){
+                collapseTreeView(child);
+            }
+        }
+    }
+
+    private void onTreeItemStateChanged(TreeItem<Object> tiLesson, boolean newValue) {
+        if (newValue) {
+            _sharedContext.selectedLesson = (Lesson) tiLesson.getValue();
+        }
+        collapseTreeView(twSchoolYearPlan.getRoot());
     }
 }
