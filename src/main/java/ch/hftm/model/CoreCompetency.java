@@ -2,9 +2,16 @@ package ch.hftm.model;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
 
-public class CoreCompetency {
-    private StringProperty _name;
+public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> {
+
+    public CoreCompetency(String name) {
+        super(name, FXCollections.observableArrayList());
+        //TODO Auto-generated constructor stub
+    }
+
+    //private StringProperty _name;
     private StringProperty _description;
 
     private Classroom _parentClassroom;
@@ -13,22 +20,8 @@ public class CoreCompetency {
 
     private Integer _order;
 
-    public StringProperty nameProperty() {
-        return _name;
-    }
-
-    public String getName() {
-        return _name.getValue();
-    }
-
     public CoreCompetency setDescription(String description) {
         _description = new SimpleStringProperty(description);
-
-        return this;
-    }
-
-    public CoreCompetency setName(String name) {
-        _name = new SimpleStringProperty(name);
 
         return this;
     }

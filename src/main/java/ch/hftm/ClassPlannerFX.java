@@ -51,22 +51,22 @@ public class ClassPlannerFX extends Application {
             new SchoolYearQuarter(4, 52, 68)
         ));
 
-        _sharedContext.loadedSchool.getSchoolYears().add(_sharedContext.selectedSchoolYear);
+        _sharedContext.loadedSchool.getSubUnits().add(_sharedContext.selectedSchoolYear);
 
         Lesson lessonFrench =  new Lesson("Français");
         Lesson lessonGeography =  new Lesson("Geographie");
         Lesson lessonMaths =  new Lesson("Maths");
-        _sharedContext.selectedSchoolYear.getYearsLessons().addAll(Arrays.asList(lessonFrench, lessonGeography, lessonMaths));
+        _sharedContext.selectedSchoolYear.getSubUnits().addAll(Arrays.asList(lessonFrench, lessonGeography, lessonMaths));
 
         _sharedContext.selectedLesson = lessonFrench;
 
-        _sharedContext.selectedLesson.getLessonsAxis().addAll(Arrays.asList(
-            new ThematicAxis("Vocabulaire 1", 1),
-            new ThematicAxis("Verbes irréguliers G4", 2),
-            new ThematicAxis("Poésie", 3)
+        _sharedContext.selectedLesson.getSubUnits().addAll(Arrays.asList(
+            new ThematicAxis("Vocabulaire 1"),
+            new ThematicAxis("Verbes irréguliers G4"),
+            new ThematicAxis("Poésie")
         ));
 
-        lessonGeography.getLessonsAxis().add(new ThematicAxis("Océanie", 1));
+        lessonGeography.getSubUnits().add(new ThematicAxis("Océanie"));
 
         
         /*_sharedContext.coreCompetencies = Arrays.asList(

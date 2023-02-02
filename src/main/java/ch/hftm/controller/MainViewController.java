@@ -2,32 +2,25 @@ package ch.hftm.controller;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
-import ch.hftm.ClassPlannerFX;
 import ch.hftm.model.Context;
-import ch.hftm.model.CoreCompetency;
 import ch.hftm.model.Lesson;
 import ch.hftm.model.School;
-import ch.hftm.model.SchoolYear;
+import ch.hftm.model.SchoolUnit;
 import ch.hftm.model.SchoolYearQuarter;
-import ch.hftm.model.ThematicAxis;
-import ch.hftm.util.TextFieldTreeCellImpl;
-import javafx.beans.Observable;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import ch.hftm.util.ModelTree;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.Text;
+
+import javafx.css.PseudoClass;
 
 public class MainViewController {
 
@@ -38,21 +31,17 @@ public class MainViewController {
     private GridPane gpMain;
 
     @FXML
-    private TreeView<School> twSchoolYearPlan;
+    private AnchorPane apTreeView;
+
+    private TreeView<SchoolUnit<?>> twSchoolYearPlan;
 
     private Context _sharedContext = Context.getInstance();
 
     private Integer counter;
 
-    /*private TreeItem<Object> tiSelectedSchoolYear;
-    private TreeItem<Object> tiSelectedLesson;
-    private TreeItem<Object> tiSelectedThematicAxis;*/
-
-    //private ImageView ivSelect = new ImageView(new Image(ClassPlannerFX.class.getResourceAsStream("resources/arrow-right.png")));
 
     @FXML
     public void initialize() {
-        //_sharedContext.primaryStage.getScene().getStylesheets().add(ClassPlannerFX.class.getResource("@../resources/css/style.css").toExternalForm());
         setGridConstraints();
         setSemestres();
         setQuarters();
@@ -60,53 +49,22 @@ public class MainViewController {
         setClassrooms();
         setThematicAxis();
 
-        //loadTreeView();
+        loadTreeView();
 
-        //twSchoolYearPlan.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> onNewlySelectedTreeItem(newValue));
     }  
 
-    /*void loadTreeView() {
-        TreeItem<Object> tiSchoolName = new TreeItem<>(_sharedContext.schoolName);
-        tiSchoolName.setExpanded(true);
+    void loadTreeView() {
+        ModelTree<SchoolUnit<?>> tree = new ModelTree<>(_sharedContext.loadedSchool, 
+        SchoolUnit::getSubUnits, 
+        SchoolUnit::nameProperty, 
+        unit -> PseudoClass.getPseudoClass(unit.getClass().getSimpleName().toLowerCase()));
 
-        _sharedContext.schoolYears.forEach(sy -> {
-            TreeItem<Object> tiSchoolYear = new TreeItem<>();
-            tiSchoolYear.setExpanded(true);
-            tiSchoolYear.setValue(sy);
+        twSchoolYearPlan = tree.getTreeView();
 
-            if (sy.equals(_sharedContext.selectedSchoolYear)) {
-                tiSelectedSchoolYear = tiSchoolYear;
-            }
-            tiSchoolName.getChildren().add(tiSchoolYear);
-
-            _sharedContext.lessons.stream()
-                .filter(l -> l.getSchoolYear().equals(sy))
-                .forEach(le -> {
-                    TreeItem<Object> tiLesson = new TreeItem<>(le);
-                    tiLesson.setExpanded(true);
-                    tiLesson.expandedProperty().addListener((observable, oldValue, newValue) -> onTreeItemStateChanged(tiLesson, newValue));
-
-                    if (le.equals(_sharedContext.selectedLesson)) {
-                        tiSelectedLesson = tiLesson;
-                    }
-
-                    _sharedContext.thematicAxises.stream()
-                        .filter(ta -> ta.getSchoolYear().equals(sy) && ta.getLesson().equals(le))
-                        .forEach(ta -> {
-                            tiLesson.getChildren().add(new TreeItem<>(ta));
-                        });
-
-                    tiSchoolYear.getChildren().add(tiLesson);
-                });
-        });
-
-        twSchoolYearPlan.setRoot(tiSchoolName);
-        twSchoolYearPlan.setEditable(true);
-        twSchoolYearPlan.setOnContextMenuRequested(event -> twSchoolYearPlan.setContextMenu(createContextMenu()));
-        twSchoolYearPlan.setCellFactory(tw -> 
-            new TextFieldTreeCellImpl()
-        );
-    }*/
+        apTreeView.getChildren().add(twSchoolYearPlan);
+        apTreeView.prefWidthProperty().bind(twSchoolYearPlan.widthProperty());
+        apTreeView.prefHeightProperty().bind(twSchoolYearPlan.heightProperty());
+    }
 
     void setGridConstraints() {
         int rowCount =  4; // one for the trimestre, one for the semestres, one for the weeks and one for classes;
@@ -229,11 +187,7 @@ public class MainViewController {
     public void setThematicAxis() {
         final int COLUMN_INDEX = 0;
 
-        /*_sharedContext.loadedSchool.getSchoolYears().forEach(sy -> {
-            sy.get
-        });*/
-
-        _sharedContext.selectedLesson.getLessonsAxis().forEach(ta -> {
+        _sharedContext.selectedLesson.getSubUnits().forEach(ta -> {
             gpMain.getRowConstraints().add(new RowConstraints());
 
             Text tNewThematicAxis = new Text(ta.getName());
@@ -302,7 +256,6 @@ public class MainViewController {
         if(ti.getValue() != _sharedContext.selectedLesson && !ti.isLeaf()){
             if (ti.getValue() instanceof Lesson) {
                 ti.setExpanded(false);
-                //ti.setGraphic(null);
             }
 
             for(TreeItem<?> child:ti.getChildren()){

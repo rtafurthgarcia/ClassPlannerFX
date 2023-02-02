@@ -1,37 +1,53 @@
 package ch.hftm.model;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableSet;
+import javafx.collections.ObservableList;
 
-public class SchoolYear {
+public class SchoolYear extends SchoolUnit<Lesson> {
     private ObjectProperty<LocalDate> _startDay;
     private ObjectProperty<LocalDate> _endDay;
     private BooleanProperty _archived;
-    private ObservableSet<Lesson> _yearlyLessons;
-    private ObservableSet<SchoolYearQuarter> _quarters;
+    private ObservableList<SchoolYearQuarter> _quarters;
 
-    public ObservableSet<Lesson> getYearsLessons() {
-        return _yearlyLessons;
-    }
+    private DateTimeFormatter _yearlyFormat = new DateTimeFormatterBuilder()
+    .appendPattern("yyyy")
+    .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
+    .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
+    .toFormatter();
 
-    public ObservableSet<SchoolYearQuarter> getQuarters() {
+    public ObservableList<SchoolYearQuarter> getQuarters() {
         return _quarters;
     }
 
     public SchoolYear(LocalDate startDay, LocalDate endDay) {
+        super(startDay.getYear() + "-" + startDay.getYear(), FXCollections.observableArrayList(), Lesson::new);
+        
         this._startDay = new SimpleObjectProperty<LocalDate>(startDay);
         this._endDay =  new SimpleObjectProperty<LocalDate>(endDay);
+        
+        this._archived = new SimpleBooleanProperty(false);
+
+        this._quarters = FXCollections.observableArrayList();
+    }
+
+    public SchoolYear(String rangeToParse) {
+        super(rangeToParse, FXCollections.observableArrayList(), Lesson::new);    
+
+        this._startDay = new SimpleObjectProperty<LocalDate>(LocalDate.parse(rangeToParse.subSequence(0, 3).toString(), _yearlyFormat));
+        this._endDay = new SimpleObjectProperty<LocalDate>(LocalDate.parse(rangeToParse.subSequence(5, 8).toString(), _yearlyFormat));
 
         this._archived = new SimpleBooleanProperty(false);
 
-        this._yearlyLessons = FXCollections.observableSet();
-        this._quarters = FXCollections.observableSet();
+        this._quarters = FXCollections.observableArrayList();
     }
 
     public ObjectProperty<LocalDate> startDayProperty() {
