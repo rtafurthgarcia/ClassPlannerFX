@@ -17,4 +17,9 @@ public class School extends SchoolUnit<SchoolYear> {
 
         _classrooms = FXCollections.observableArrayList();
     }
+
+    @Override
+    public String toString() {
+        return super.getName();
+    }
 }

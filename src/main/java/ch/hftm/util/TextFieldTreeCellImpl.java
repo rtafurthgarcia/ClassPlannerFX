@@ -69,23 +69,25 @@ public class TextFieldTreeCellImpl<T> extends TreeCell<T> {
     private void createTextField() {
         textField = new TextField(getString());
         textField.setOnKeyReleased((KeyEvent t) -> {
-            if (t.getCode() == KeyCode.ENTER) {
+            if (t.getCode() == KeyCode.ENTER) {                
                 if (getItem() instanceof ThematicAxis) {
                     ThematicAxis toUpdateObject = (ThematicAxis) getItem();
                     toUpdateObject.setName(textField.getText());
+                    commitEdit(super.getItem());
                 }
 
                 if (getItem() instanceof CoreCompetency) {
                     CoreCompetency toUpdateObject = (CoreCompetency) getItem();
                     toUpdateObject.setName(textField.getText());
+                    commitEdit(super.getItem());
                 }
 
                 if (getItem() instanceof Lesson) {
                     Lesson toUpdateObject = (Lesson) getItem();
                     toUpdateObject.setName(textField.getText());
+                    commitEdit(super.getItem());
                 }
                 
-                commitEdit(super.getItem());
             } else if (t.getCode() == KeyCode.ESCAPE) {
                 cancelEdit();
             }
