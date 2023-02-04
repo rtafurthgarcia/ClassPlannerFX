@@ -9,7 +9,7 @@ import ch.hftm.model.SchoolUnit;
 import ch.hftm.model.SchoolYearQuarter;
 import ch.hftm.model.ThematicAxis;
 import ch.hftm.util.ModelTree;
-import ch.hftm.util.TextFieldTreeCellImpl;
+import ch.hftm.util.TextFieldTreeCellFactory;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
@@ -108,11 +108,8 @@ public class MainViewController {
         apTreeView.prefHeightProperty().bind(twSchoolYearPlan.heightProperty());
 
         twSchoolYearPlan.setEditable(true);
-        twSchoolYearPlan.setCellFactory(tw -> 
-            new TextFieldTreeCellImpl()
-        );
+        twSchoolYearPlan.setCellFactory(new TextFieldTreeCellFactory<SchoolUnit<?>>());
         twSchoolYearPlan.setOnContextMenuRequested(event -> twSchoolYearPlan.setContextMenu(createContextMenu()));
-        //twSchoolYearPlan.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
 
     void setGridConstraints() {

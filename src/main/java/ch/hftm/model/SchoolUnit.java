@@ -11,7 +11,7 @@ public class SchoolUnit<T extends SchoolUnit<?>> {
     
     private final StringProperty name = new SimpleStringProperty();
     
-    private final Function<String, T> subUnitSupplier ;
+    private final Function<String, T> subUnitSupplier;
     
     private final ObservableList<T> subUnits ;
 
@@ -52,5 +52,4 @@ public class SchoolUnit<T extends SchoolUnit<?>> {
     public void createAndAddSubUnit(String name) {
         getSubUnits().add(subUnitSupplier.apply(name));
     }
-
 }
