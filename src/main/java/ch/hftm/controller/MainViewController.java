@@ -5,7 +5,6 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
 import ch.hftm.model.Context;
 import ch.hftm.model.CoreCompetency;
 import ch.hftm.model.Lesson;
-import ch.hftm.model.School;
 import ch.hftm.model.SchoolUnit;
 import ch.hftm.model.SchoolYearQuarter;
 import ch.hftm.model.ThematicAxis;
@@ -14,10 +13,15 @@ import ch.hftm.util.TextFieldTreeCellImpl;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -46,6 +50,38 @@ public class MainViewController {
 
     private Integer counter;
 
+    EventHandler<ActionEvent> onAddLesson = new EventHandler<>() {
+        public void handle(ActionEvent e) {               
+            _sharedContext.selectedSchoolYear.createAndAddSubUnit("new lesson");
+        }
+    };
+
+    EventHandler<ActionEvent> onAddThematicAxis = new EventHandler<ActionEvent>() {
+        public void handle(ActionEvent e) {
+            _sharedContext.selectedLesson.createAndAddSubUnit("new thematic axis");
+        }
+    };
+
+    EventHandler<ActionEvent> onAddCoreCompetency = new EventHandler<ActionEvent>() {
+        public void handle(ActionEvent e) {    
+            twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getValue().createAndAddSubUnit("new core competency");
+        }
+    };
+
+    EventHandler<ActionEvent> onDeleteSchoolUnit = new EventHandler<ActionEvent>() {
+        public void handle(ActionEvent e) {   
+            if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getChildren().size() == 0) { 
+                twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getValue().getSubUnits().remove(twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue()); 
+            } else {
+                Alert alert = new Alert(
+                    AlertType.INFORMATION, 
+                    "Cannot delete item when it has children. Please make sure to remove all sub items beforehand.");
+                alert.setHeaderText("Deletion impossible");
+                alert.setTitle("Item deletion");
+                alert.showAndWait();
+            }
+        }
+    };
 
     @FXML
     public void initialize() {
@@ -76,6 +112,7 @@ public class MainViewController {
             new TextFieldTreeCellImpl()
         );
         twSchoolYearPlan.setOnContextMenuRequested(event -> twSchoolYearPlan.setContextMenu(createContextMenu()));
+        //twSchoolYearPlan.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
 
     void setGridConstraints() {
@@ -212,43 +249,29 @@ public class MainViewController {
 
     private ContextMenu createContextMenu() {
         ContextMenu contextMenu = new ContextMenu();
+        MenuItem miAddThematicAxis = new MenuItem("Create a new thematic axis");
+        MenuItem miDeleteThematicAxis = new MenuItem("Delete selected thematic axis");
+        MenuItem miAddLesson = new MenuItem("Create a new lesson");
+        MenuItem miDeleteLesson = new MenuItem("Delete selected lesson");
+        MenuItem miAddCoreCompetency = new MenuItem("Create a new core competency");
+        MenuItem miDeleteCoreCompetency = new MenuItem("Delete selected core competency");
+
+        SeparatorMenuItem smiSeparator = new SeparatorMenuItem();
+
+        miAddThematicAxis.setOnAction(onAddThematicAxis);
+        miAddLesson.setOnAction(onAddLesson);
+        miAddCoreCompetency.setOnAction(onAddCoreCompetency);
+
+        miDeleteThematicAxis.setOnAction(onDeleteSchoolUnit);
+        miDeleteLesson.setOnAction(onDeleteSchoolUnit);
+        miDeleteCoreCompetency.setOnAction(onDeleteSchoolUnit);
 
         if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue() instanceof ThematicAxis) {
-            MenuItem miThematicAxis = new MenuItem("Create a new thematic axis");
-            miThematicAxis.setOnAction(new EventHandler<ActionEvent>() {
-                public void handle(ActionEvent e) {
-                    /*ThematicAxis thematicAxis = new ThematicAxis("new thematic axis");                   
-                    twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getChildren().add(new TreeItem<>(thematicAxis));*/
-                    _sharedContext.selectedLesson.createAndAddSubUnit("new thematic axis");
-                    twSchoolYearPlan.getSelectionModel().selectLast();         
-                }
-            });
-
-            contextMenu.getItems().addAll(miThematicAxis);
+            contextMenu.getItems().addAll(miAddThematicAxis, miAddCoreCompetency, smiSeparator, miDeleteThematicAxis);
         } else if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue() instanceof Lesson) {
-            MenuItem miLesson = new MenuItem("Create a new lesson");
-            miLesson.setOnAction(new EventHandler<ActionEvent>() {
-                public void handle(ActionEvent e) {               
-                    /*Lesson newLesson = new Lesson("new lesson", _sharedContext.selectedSchoolYear);
-                    twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getChildren().add(new TreeItem<>(newLesson));
-                    _sharedContext.lessons.add(newLesson);
-                    twSchoolYearPlan.getSelectionModel().selectLast();*/
-                    _sharedContext.selectedSchoolYear.createAndAddSubUnit("new lesson");
-                    twSchoolYearPlan.getSelectionModel().selectLast(); 
-                }
-            });
-
-            contextMenu.getItems().addAll(miLesson);
+            contextMenu.getItems().addAll(miAddLesson, miAddThematicAxis, smiSeparator, miDeleteLesson);
         } else if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue() instanceof CoreCompetency) {
-            MenuItem miCoreCompetency = new MenuItem("Create a new core competency");
-            miCoreCompetency.setOnAction(new EventHandler<ActionEvent>() {
-                public void handle(ActionEvent e) {             
-                    /*CoreCompetency newCoreCompetency = new CoreCompetency().setName("new core competency").setDescription("");
-                    twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getChildren().add(new TreeItem<>(newCoreCompetency));
-                    _sharedContext.coreCompetencies.add(newCoreCompetency);
-                    twSchoolYearPlan.getSelectionModel().selectLast();*/
-                }
-            });
+            contextMenu.getItems().addAll(miAddCoreCompetency, smiSeparator, miDeleteCoreCompetency);
         }
 
         return contextMenu;
