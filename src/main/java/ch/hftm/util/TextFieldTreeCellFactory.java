@@ -6,9 +6,13 @@ import org.hildan.fxgson.FxGson;
 
 import com.google.gson.Gson;
 
+import ch.hftm.model.Context;
 import ch.hftm.model.CoreCompetency;
 import ch.hftm.model.Lesson;
+import ch.hftm.model.SchoolUnit;
+import ch.hftm.model.SchoolYear;
 import ch.hftm.model.ThematicAxis;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
@@ -29,19 +33,20 @@ public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
     private TreeCell<T> dropZone;
     private TreeItem<T> draggedItem;
 
-    private TextField textField;
-
+    private Context sharedContext = Context.getInstance();    
+    
     @Override
     public TreeCell<T> call(TreeView<T> treeView) {
         TreeCell<T> cell = new TreeCell<T>() {
-
+            private TextField textField;
             /**
              * On editing, create new text field and set it using setGraphic method.
              */
             @Override
             public void startEdit() {
-                if (getItem() instanceof ThematicAxis || getItem() instanceof CoreCompetency
-                        || getItem() instanceof Lesson) {
+                if (getItem() instanceof ThematicAxis 
+                    || getItem() instanceof CoreCompetency
+                    || getItem() instanceof Lesson) {
                     super.startEdit();
 
                     if (textField == null) {
@@ -50,6 +55,9 @@ public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
                     setText(null);
                     setGraphic(textField);
                     textField.selectAll();
+
+                    setBoldIfSelected(this, sharedContext.getSelectedSchoolYear());
+                    setBoldIfSelected(this, sharedContext.getSelectedLesson());
                 }
             }
 
@@ -59,7 +67,7 @@ public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
             @Override
             public void cancelEdit() {
                 super.cancelEdit();
-                setText((String) getItem());
+                setText(((T) getItem()).toString());
                 setGraphic(getTreeItem().getGraphic());
             }
 
@@ -122,10 +130,29 @@ public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
         cell.setOnDragOver((DragEvent event) -> dragOver(event, cell));
         cell.setOnDragDropped((DragEvent event) -> drop(event, cell, treeView));
         cell.setOnDragDone((DragEvent event) -> clearDropLocation());
+        sharedContext.selectedLessonProperty().addListener((observable, oldValue, newValue) -> setBoldIfSelected(cell, newValue));
+        sharedContext.selectedSchoolYearProperty().addListener((observable, oldValue, newValue) -> setBoldIfSelected(cell, newValue));
 
         return cell;
     }
 
+    private void setBoldIfSelected(TreeCell<?> cell, Object selectedValue) {
+        if (cell.getItem() instanceof SchoolYear) {
+            if (((SchoolYear)cell.getItem()).equals(selectedValue)) {
+                cell.getStyleClass().add("selected-treeitem");
+            } else {
+                cell.getStyleClass().removeAll("selected-treeitem");
+            }
+        }
+
+        if (cell.getItem() instanceof Lesson) {
+            if (((Lesson)cell.getItem()).equals(selectedValue)) {
+                cell.getStyleClass().add("selected-treeitem");
+            } else {
+                cell.getStyleClass().removeAll("selected-treeitem");
+            }
+        }
+    }
 
     private void dragDetected(MouseEvent event, TreeCell<T> treeCell) {
         draggedItem = treeCell.getTreeItem();

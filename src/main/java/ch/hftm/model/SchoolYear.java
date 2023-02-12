@@ -13,96 +13,97 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class SchoolYear extends SchoolUnit<Lesson> {
-    private ObjectProperty<LocalDate> _startDay;
-    private ObjectProperty<LocalDate> _endDay;
-    private BooleanProperty _archived;
-    private ObservableList<SchoolYearQuarter> _quarters;
+    private ObjectProperty<LocalDate> startDay;
+    private ObjectProperty<LocalDate> endDay;
+    private BooleanProperty archived;
+    private ObservableList<SchoolYearQuarter> quarters;
 
     private DateTimeFormatter _yearlyFormat = new DateTimeFormatterBuilder()
-    .appendPattern("yyyy")
-    .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
-    .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
-    .toFormatter();
+        .appendPattern("yyyy")
+        .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
+        .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
+        .toFormatter();
 
     public ObservableList<SchoolYearQuarter> getQuarters() {
-        return _quarters;
+        return quarters;
     }
 
     public SchoolYear(LocalDate startDay, LocalDate endDay) {
         super(startDay.getYear() + "-" + startDay.getYear(), FXCollections.observableArrayList(), Lesson::new);
         
-        this._startDay = new SimpleObjectProperty<LocalDate>(startDay);
-        this._endDay =  new SimpleObjectProperty<LocalDate>(endDay);
+        this.startDay = new SimpleObjectProperty<LocalDate>(startDay);
+        this.endDay =  new SimpleObjectProperty<LocalDate>(endDay);
         
-        this._archived = new SimpleBooleanProperty(false);
+        this.archived = new SimpleBooleanProperty(false);
 
-        this._quarters = FXCollections.observableArrayList();
+        this.quarters = FXCollections.observableArrayList();
     }
 
     public SchoolYear(String rangeToParse) {
         super(rangeToParse, FXCollections.observableArrayList(), Lesson::new);    
 
-        this._startDay = new SimpleObjectProperty<LocalDate>(LocalDate.parse(rangeToParse.subSequence(0, 3).toString(), _yearlyFormat));
-        this._endDay = new SimpleObjectProperty<LocalDate>(LocalDate.parse(rangeToParse.subSequence(5, 8).toString(), _yearlyFormat));
+        this.startDay = new SimpleObjectProperty<LocalDate>(LocalDate.parse(rangeToParse.subSequence(0, 3).toString(), _yearlyFormat));
+        this.endDay = new SimpleObjectProperty<LocalDate>(LocalDate.parse(rangeToParse.subSequence(5, 8).toString(), _yearlyFormat));
 
-        this._archived = new SimpleBooleanProperty(false);
+        this.archived = new SimpleBooleanProperty(false);
 
-        this._quarters = FXCollections.observableArrayList();
+        this.quarters = FXCollections.observableArrayList();
     }
 
     public ObjectProperty<LocalDate> startDayProperty() {
-        return _startDay;
+        return startDay;
     }
 
     public SchoolYear setStartDay(LocalDate startDay) {
-        this._startDay = new SimpleObjectProperty<LocalDate>(startDay);
+        this.startDay = new SimpleObjectProperty<LocalDate>(startDay);
 
         return this;
     }
 
     public ObjectProperty<LocalDate> endDayProperty() {
-        return _endDay;
+        return endDay;
     }
 
     public SchoolYear setEndDay(LocalDate endDay) {
-        this._endDay = new SimpleObjectProperty<LocalDate>(endDay);
+        this.endDay = new SimpleObjectProperty<LocalDate>(endDay);
 
         return this;
     }
 
     public BooleanProperty archivedProperty() {
-        return _archived;
+        return archived;
     }
 
     public boolean getArchived() {
-        return _archived.get();
+        return archived.get();
     }
 
     public SchoolYear setArchived(boolean archived) {
-        this._archived = new SimpleBooleanProperty(archived);
+        this.archived = new SimpleBooleanProperty(archived);
 
         return this;
     }
 
     public LocalDate getEndDay() {
-        return _endDay.get();
+        return endDay.get();
     }
 
     public LocalDate getStartDay() {
-        return _startDay.get();
+        return startDay.get();
     }
 
+    @Override
     public String toString() {
-        return _startDay.get().getYear() + "-" + _endDay.get().getYear();
+        return startDay.get().getYear() + "-" + endDay.get().getYear();
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((_startDay == null) ? 0 : _startDay.hashCode());
-        result = prime * result + ((_endDay == null) ? 0 : _endDay.hashCode());
-        result = prime * result + ((_archived == null) ? 0 : _archived.hashCode());
+        result = prime * result + ((startDay == null) ? 0 : startDay.hashCode());
+        result = prime * result + ((endDay == null) ? 0 : endDay.hashCode());
+        result = prime * result + ((archived == null) ? 0 : archived.hashCode());
         return result;
     }
 
@@ -115,20 +116,20 @@ public class SchoolYear extends SchoolUnit<Lesson> {
         if (getClass() != obj.getClass())
             return false;
         SchoolYear other = (SchoolYear) obj;
-        if (_startDay == null) {
-            if (other._startDay != null)
+        if (startDay == null) {
+            if (other.startDay != null)
                 return false;
-        } else if (!_startDay.equals(other._startDay))
+        } else if (!startDay.equals(other.startDay))
             return false;
-        if (_endDay == null) {
-            if (other._endDay != null)
+        if (endDay == null) {
+            if (other.endDay != null)
                 return false;
-        } else if (!_endDay.equals(other._endDay))
+        } else if (!endDay.equals(other.endDay))
             return false;
-        if (_archived == null) {
-            if (other._archived != null)
+        if (archived == null) {
+            if (other.archived != null)
                 return false;
-        } else if (!_archived.equals(other._archived))
+        } else if (!archived.equals(other.archived))
             return false;
         return true;
     }

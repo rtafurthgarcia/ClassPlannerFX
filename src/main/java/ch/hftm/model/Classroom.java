@@ -4,25 +4,25 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class Classroom {
-    private StringProperty _name;
+    private StringProperty name;
 
-    private SchoolYearQuarter _parentSchoolYearQuarter;
+    private SchoolYearQuarter parentSchoolYearQuarter;
 
     public Classroom(String name) {
-        _name = new SimpleStringProperty(name);
+        this.name = new SimpleStringProperty(name);
     }
 
     public StringProperty nameProperty() {
-        return _name;
+        return name;
     }
 
     public Classroom setName(StringProperty name) {
-        this._name = name;
+        this.name = name;
 
         return this;
     }
 
     public String getName() {
-        return _name.get();
+        return name.get();
     }
 }

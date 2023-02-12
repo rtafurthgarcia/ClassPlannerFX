@@ -52,4 +52,9 @@ public class SchoolUnit<T extends SchoolUnit<?>> {
     public void createAndAddSubUnit(String name) {
         getSubUnits().add(subUnitSupplier.apply(name));
     }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

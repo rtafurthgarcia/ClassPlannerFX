@@ -10,25 +10,75 @@ import java.util.Set;
 import ch.hftm.ClassPlannerFX;
 import ch.hftm.controller.MainViewController;
 import ch.hftm.controller.SettingsController;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Context {
     private final static Context instance = new Context();
+    
+    private Stage primaryStage;
+    private School loadedSchool;
+    private DateTimeFormatter dateFormatUsed;
+
+    private ObjectProperty<Lesson> selectedLesson = new SimpleObjectProperty<>();
+    private ObjectProperty<SchoolYear> selectedSchoolYear = new SimpleObjectProperty<>();
+
+    public ObjectProperty<SchoolYear> selectedSchoolYearProperty() {
+        return selectedSchoolYear;
+    }
+
+    public void setSelectedSchoolYear(SchoolYear selectedSchoolYear) {
+        this.selectedSchoolYear.set(selectedSchoolYear);
+    }
+
+    public SchoolYear getSelectedSchoolYear() {
+        return this.selectedSchoolYear.get();
+    }
+
+    public ObjectProperty<Lesson> selectedLessonProperty() {
+        return selectedLesson;
+    }
+
+    public void setSelectedLesson(Lesson selectedLesson) {
+        this.selectedLesson.set(selectedLesson);
+    }
+
+    public Lesson getSelectedLesson() {
+        return this.selectedLesson.get();
+    }
+
+    public DateTimeFormatter getDateFormatUsed() {
+        return dateFormatUsed;
+    }
+
+    public void setDateFormatUsed(DateTimeFormatter dateFormatUsed) {
+        this.dateFormatUsed = dateFormatUsed;
+    }
 
     public static Context getInstance() {
         return instance;
     }
+    
+    public Stage getPrimaryStage() {
+        return primaryStage;
+    }
 
-    public Stage primaryStage;
+    public void setPrimaryStage(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+    }
 
-    public School loadedSchool;
 
-    public Lesson selectedLesson;
-    public SchoolYear selectedSchoolYear;
+    public School getLoadedSchool() {
+        return loadedSchool;
+    }
 
-    public DateTimeFormatter dateFormatUsed;
+    public void setLoadedSchool(School loadedSchool) {
+        this.loadedSchool = loadedSchool;
+    }
+
 
     public void showMainView() {
         try {

@@ -8,68 +8,54 @@ public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> {
 
     public CoreCompetency(String name) {
         super(name, FXCollections.observableArrayList());
-        //TODO Auto-generated constructor stub
     }
 
-    //private StringProperty _name;
-    private StringProperty _description;
+    private StringProperty description;
 
-    private Classroom _parentClassroom;
-    private ThematicAxis _parentThematicAxis;
-    private SchoolYearQuarter _parentSchoolYearQuarter;
-
-    private Integer _order;
+    private Classroom parentClassroom;
+    private ThematicAxis parentThematicAxis;
+    private SchoolYearQuarter parentSchoolYearQuarter;
 
     public CoreCompetency setDescription(String description) {
-        _description = new SimpleStringProperty(description);
+        this.description = new SimpleStringProperty(description);
 
         return this;
     }
 
     public StringProperty descriptionProperty() {
-        return _description;
+        return description;
     }
 
     public String getDescription() {
-        return _description.get(); 
+        return description.get(); 
     }
 
     public Classroom getParentClassroom() {
-        return _parentClassroom;
+        return parentClassroom;
     }
 
     public CoreCompetency setParentClassroom(Classroom parentClassroom) {
-        this._parentClassroom = parentClassroom;
+        this.parentClassroom = parentClassroom;
 
         return this;
     }
 
     public ThematicAxis getParentThematicAxis() {
-        return _parentThematicAxis;
+        return parentThematicAxis;
     }
 
     public CoreCompetency setParentThematicAxis(ThematicAxis parentThematicAxis) {
-        this._parentThematicAxis = parentThematicAxis;
+        this.parentThematicAxis = parentThematicAxis;
 
         return this;
     }
 
     public SchoolYearQuarter getParentSchoolYearQuarter() {
-        return _parentSchoolYearQuarter;
+        return parentSchoolYearQuarter;
     }
 
     public CoreCompetency setParentSchoolYearQuarter(SchoolYearQuarter parentSchoolYearQuarter) {
-        this._parentSchoolYearQuarter = parentSchoolYearQuarter;
-
-        return this;
-    }
-
-    public Integer getOrder() {
-        return _order;
-    }
-
-    public CoreCompetency setOrder(Integer order) {
-        this._order = order;
+        this.parentSchoolYearQuarter = parentSchoolYearQuarter;
 
         return this;
     }

@@ -42,6 +42,6 @@ public class SettingsController {
 
     @FXML
     void onClose() {
-        Context.getInstance().primaryStage.close();
+        Context.getInstance().getPrimaryStage().close();
     }
 }
