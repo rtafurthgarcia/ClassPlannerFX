@@ -30,6 +30,7 @@ import javafx.util.Callback;
 public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCell<T>> {
     private static final DataFormat JSON_FORMAT = new DataFormat("application/json");
     private static final String DROP_HINT_STYLE = "-fx-border-color: #eea82f; -fx-border-width: 0 0 2 0; -fx-padding: 3 3 1 3";
+    private static final String CSS_SELECTION_CLASS = "selected-treeitem";
     private TreeCell<T> dropZone;
     private TreeItem<T> draggedItem;
 
@@ -56,8 +57,8 @@ public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
                     setGraphic(textField);
                     textField.selectAll();
 
-                    setBoldIfSelected(this, sharedContext.getSelectedSchoolYear());
-                    setBoldIfSelected(this, sharedContext.getSelectedLesson());
+                    //setBoldIfSelected(this, sharedContext.getSelectedSchoolYear());
+                    //setBoldIfSelected(this, sharedContext.getSelectedLesson());
                 }
             }
 
@@ -92,6 +93,7 @@ public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
                 }
                 setText(null);
                 setGraphic(textField);
+                
             }
 
             private void createTextField() {
@@ -130,26 +132,29 @@ public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
         cell.setOnDragOver((DragEvent event) -> dragOver(event, cell));
         cell.setOnDragDropped((DragEvent event) -> drop(event, cell, treeView));
         cell.setOnDragDone((DragEvent event) -> clearDropLocation());
+
+        // sucks ass but works so ig im not gonna change anything
+        // sucks ass due to the fact it requires so many listeners. it saturates memory for nothing. 
         sharedContext.selectedLessonProperty().addListener((observable, oldValue, newValue) -> setBoldIfSelected(cell, newValue));
         sharedContext.selectedSchoolYearProperty().addListener((observable, oldValue, newValue) -> setBoldIfSelected(cell, newValue));
+        cell.itemProperty().addListener((observable, oldValue, newValue) -> {
+            setBoldIfSelected(cell, sharedContext.getSelectedLesson());
+            setBoldIfSelected(cell, sharedContext.getSelectedSchoolYear());
+        });
 
         return cell;
     }
 
     private void setBoldIfSelected(TreeCell<?> cell, Object selectedValue) {
-        if (cell.getItem() instanceof SchoolYear) {
-            if (((SchoolYear)cell.getItem()).equals(selectedValue)) {
-                cell.getStyleClass().add("selected-treeitem");
-            } else {
-                cell.getStyleClass().removeAll("selected-treeitem");
-            }
+        if (cell.getItem() == null || selectedValue == null) {
+            return;
         }
 
-        if (cell.getItem() instanceof Lesson) {
-            if (((Lesson)cell.getItem()).equals(selectedValue)) {
-                cell.getStyleClass().add("selected-treeitem");
+        if (cell.getItem().getClass().equals(selectedValue.getClass())) {
+            if (((T)cell.getItem()).equals(selectedValue)) {
+                cell.getStyleClass().add(CSS_SELECTION_CLASS);
             } else {
-                cell.getStyleClass().removeAll("selected-treeitem");
+                cell.getStyleClass().removeAll(CSS_SELECTION_CLASS);
             }
         }
     }
@@ -208,8 +213,7 @@ public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
         if (Objects.equals(droppedItemParent, thisItem)) {
             thisItem.getChildren().add(0, draggedItem);
             treeView.getSelectionModel().select(draggedItem);
-        }
-        else {
+        } else {
             // add to new location
             int indexInParent = thisItem.getParent().getChildren().indexOf(thisItem);
             thisItem.getParent().getChildren().add(indexInParent + 1, draggedItem);
