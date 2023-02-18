@@ -1,6 +1,11 @@
 package ch.hftm.controller;
 
+import java.io.IOException;
+
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
+
+import ch.hftm.ClassPlannerFX;
+import ch.hftm.component.FileViewer;
 
 import ch.hftm.model.Context;
 import ch.hftm.model.CoreCompetency;
@@ -11,9 +16,12 @@ import ch.hftm.model.SchoolYearQuarter;
 import ch.hftm.model.ThematicAxis;
 import ch.hftm.util.ModelTree;
 import ch.hftm.util.TextFieldTreeCellFactory;
+
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
+import javafx.scene.control.Accordion;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
@@ -28,6 +36,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.Text;
@@ -117,7 +126,7 @@ public class MainViewController {
     };
 
     @FXML
-    public void initialize() {
+    public void initialize() throws IOException {
         setGridConstraints();
         setSemestres();
         setQuarters();
@@ -137,6 +146,15 @@ public class MainViewController {
             
         });
 
+        FileViewer fw = new FileViewer();
+        fw.setCompetency(
+            sharedContext.getSelectedLesson().getSubUnits().get(0).getSubUnits().get(0)
+        );
+
+        gpMain.add(fw, 6, 6);
+
+        //fw.setCompetency(sharedContext.getSelectedLesson().getSubUnits().get(0).getSubUnits().get(0));
+
         /*sharedContext.getSelectedLesson().g addListener((Change<? extends > c) -> {
             while (c.next()) {
                if (c.wasUpdated()) {
@@ -148,6 +166,8 @@ public class MainViewController {
                }
            }
        });*/
+
+
     }  
 
     void loadTreeView() {
@@ -231,6 +251,8 @@ public class MainViewController {
         Text tQuarter2 = new Text("");
         Text tQuarter3 = new Text("");
         Text tQuarter4 = new Text("");
+
+        new Accordion();
 
         SchoolYearQuarter quarter1 = sharedContext.getSelectedSchoolYear().getQuarters().stream().filter(t -> t.getQuarter() == 1).reduce((a, b) -> {
             throw new IllegalStateException("Multiple elements: " + a + ", " + b);

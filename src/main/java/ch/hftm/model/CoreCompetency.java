@@ -10,7 +10,7 @@ public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> {
         super(name, FXCollections.observableArrayList());
     }
 
-    private StringProperty description;
+    private StringProperty description = new SimpleStringProperty();
 
     private Classroom parentClassroom;
     private ThematicAxis parentThematicAxis;

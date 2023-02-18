@@ -10,6 +10,7 @@ module ch.hftm {
     exports ch.hftm;
 
     opens ch.hftm.controller to javafx.fxml;
+    opens ch.hftm.component to javafx.fxml;
 
     opens ch.hftm.model to com.google.gson;
     //opens ch.hftm.model to javafx.fxml;

@@ -59,14 +59,16 @@ public class ClassPlannerFX extends Application {
 
         sharedContext.setSelectedLesson(lessonFrench);
 
+        ThematicAxis taVocabulaire = new ThematicAxis("Vocabulaire 1");
+        taVocabulaire.createAndAddSubUnit("ER, IR");
+
         sharedContext.getSelectedLesson().getSubUnits().addAll(
-            new ThematicAxis("Vocabulaire 1"),
+            taVocabulaire,
             new ThematicAxis("Verbes irréguliers G4"),
             new ThematicAxis("Poésie")
         );
 
         lessonGeography.getSubUnits().add(new ThematicAxis("Océanie"));
-
         
         /*sharedContext.coreCompetencies = Arrays.asList(
             new CoreCompetency().setName("Maîtrise des verbes en -IR ").setDescription("Les verbes terminés en -IR (comme MOURIR : mour-ant; mour-ons);"),
