@@ -15,6 +15,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Accordion;
+import javafx.scene.input.DataFormat;
 import javafx.stage.Stage;
 
 public class Context {

@@ -57,8 +57,6 @@ public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
                     setGraphic(textField);
                     textField.selectAll();
 
-                    //setBoldIfSelected(this, sharedContext.getSelectedSchoolYear());
-                    //setBoldIfSelected(this, sharedContext.getSelectedLesson());
                 }
             }
 
@@ -200,7 +198,7 @@ public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
 
     private void drop(DragEvent event, TreeCell<T> treeCell, TreeView<T> treeView) {
         Dragboard db = event.getDragboard();
-        boolean success = false;
+        boolean success = true;
         if (!db.hasContent(JSON_FORMAT)) return;
 
         TreeItem<T> thisItem = treeCell.getTreeItem();
