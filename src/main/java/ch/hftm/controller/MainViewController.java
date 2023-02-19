@@ -13,9 +13,10 @@ import ch.hftm.model.SchoolUnit;
 import ch.hftm.model.SchoolYear;
 import ch.hftm.model.SchoolYearQuarter;
 import ch.hftm.model.ThematicAxis;
+import ch.hftm.util.GridPaneHelper;
 import ch.hftm.util.ModelTree;
 import ch.hftm.util.TextFieldTreeCellFactory;
-
+import ch.hftm.util.GridPaneHelper.ComponentsRow;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
@@ -64,8 +65,6 @@ public class MainViewController {
 
     private Integer counter;
 
-    private record ComponentsRow(int gridPaneIndex, Text relatedText, ObservableList<VBox> boxes) { }
-
     private ObservableList<ComponentsRow> graphicalRows = FXCollections.observableArrayList();
 
     EventHandler<ActionEvent> onAddLesson = new EventHandler<>() {
@@ -85,14 +84,14 @@ public class MainViewController {
             ThematicAxis newThematicAxis = new ThematicAxis("new thematic axis");
 
             if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue() instanceof ThematicAxis) {
-                //twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getValue().getSubUnits().add(newThematicAxis);
                 ((Lesson)twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getValue()).getSubUnits().add(newThematicAxis);
             } 
 
             if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue() instanceof Lesson) {
                 ((Lesson)twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue()).getSubUnits().add(newThematicAxis);
-                //twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue().createAndAddSubUnit("new thematic axis");
             }
+
+            graphicalRows.add(GridPaneHelper.addGridRow(gpMain, newThematicAxis));
         }
     };
 
@@ -121,7 +120,11 @@ public class MainViewController {
     EventHandler<ActionEvent> onDeleteSchoolUnit = new EventHandler<ActionEvent>() {
         public void handle(ActionEvent e) {   
             if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getChildren().size() == 0) { 
-                twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getValue().getSubUnits().remove(twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue()); 
+                SchoolUnit<?> value = twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue();
+                if (value instanceof ThematicAxis) {
+                    GridPaneHelper.removeGridRow(gpMain, (ThematicAxis) value, graphicalRows);
+                }
+                twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getValue().getSubUnits().remove(value); 
             } else {
                 Alert alert = new Alert(
                     AlertType.INFORMATION, 
@@ -154,47 +157,9 @@ public class MainViewController {
             
         });*/
         
-        //gpMain.add(new FileViewer().setCompetency(new CoreCompetency("bullshit").setDescription("uguu")), 6, 7);
-        //;gpMain.add(fw, 6, 6);
-        //gpMain.add(new FileViewer().setCompetency(new CoreCompetency("baka").setDescription("teehee")), 5, 5);
-        graphicalRows.get(2).boxes.get(2).getChildren().add(new FileViewer().setCompetency(new CoreCompetency("bullshit").setDescription("teehe")));
-        graphicalRows.get(1).boxes.get(3).getChildren().add(new FileViewer().setCompetency(new CoreCompetency("baka stupid").setDescription("uguu")));
-
-        //fw.setCompetency(sharedContext.getSelectedLesson().getSubUnits().get(0).getSubUnits().get(0));
-
-        /*sharedContext.getSelectedLesson().g addListener((Change<? extends > c) -> {
-            while (c.next()) {
-               if (c.wasUpdated()) {
-                   int start = c.getFrom() ;
-                   int end = c.getTo() ;
-                   for (int i = start ; i < end ; i++) {
-                       System.out.println("Element at position "+i+" was updated to: " +c.getList().get(i).getName() );
-                   }
-               }
-           }
-       });*/
+        graphicalRows.get(2).boxes().get(2).getChildren().add(new FileViewer().setCompetency(new CoreCompetency("bullshit").setDescription("teehe")));
+        graphicalRows.get(1).boxes().get(3).getChildren().add(new FileViewer().setCompetency(new CoreCompetency("baka stupid").setDescription("uguu")));
     }  
-
-    /*  gotta fill our grid with "fillers" fileviewers
-        why?
-        because I need something that keeps my gridcells wide enough
-        AND that may be dropped on -> otherwise the dragged fileviewer has no idea what his target is
-    */
-    void fillGrid() {
-        final int ROW_START = 4;
-        final int COLUMN_START = 1;
-
-        /*Text tNewThematicAxis = new Text(ta.getName());
-        tNewThematicAxis.setUserData(ta);
-
-        gpMain.getChildren().add(tNewThematicAxis);
-        GridPane.setConstraints(tNewThematicAxis, COLUMN_INDEX, gpMain.getRowCount(), 1, 1, HPos.CENTER, VPos.CENTER);*/
-
-        
-
-        /*FileViewer filler = new FileViewer().setIsFiller(true);
-        gpMain.getChildren().add(filler);*/
-    }
 
     void loadTreeView() {
         ModelTree<SchoolUnit<?>> tree = new ModelTree<>(sharedContext.getLoadedSchool(), 
@@ -336,32 +301,8 @@ public class MainViewController {
     }
 
     public void setThematicAxis() {
-        final int COLUMN_INDEX = 0;
-        final int COLUMN_MAX = gpMain.getColumnCount() - 1;
-
-        sharedContext.getSelectedLesson().getSubUnits().forEach(ta -> {
-            gpMain.getRowConstraints().add(new RowConstraints());
-            
-            Text tNewThematicAxis = new Text(ta.getName());
-            tNewThematicAxis.setUserData(ta);
-            gpMain.getChildren().add(tNewThematicAxis);
-            GridPane.setConstraints(tNewThematicAxis, COLUMN_INDEX, gpMain.getRowCount(), 1, 1, HPos.CENTER, VPos.CENTER);
-            
-            ComponentsRow componentsRow = new ComponentsRow(gpMain.getRowCount(), tNewThematicAxis, FXCollections.observableArrayList());
-            
-            for (int i = COLUMN_INDEX + 1; i < COLUMN_MAX; i++) {
-                VBox vbox = new VBox();
-                vbox.setMinSize(120, 180);
-                vbox.setOnDragOver(event -> dragOver(event, vbox));
-                vbox.setOnDragDropped(event -> drop(event, vbox));
-                //vbox.setPrefSize(Pane., Pane.USE_COMPUTED_SIZE);
-                
-                gpMain.getChildren().add(vbox);
-                GridPane.setConstraints(vbox, i, gpMain.getRowCount() - 1, 1, 1, HPos.CENTER, VPos.CENTER);
-                componentsRow.boxes.add(vbox);
-            }
-
-            graphicalRows.add(componentsRow);
+        sharedContext.getSelectedLesson().getSubUnits().forEach(thematicAxis -> {
+            graphicalRows.add(GridPaneHelper.addGridRow(gpMain, thematicAxis));
         });
     }
 
@@ -404,37 +345,6 @@ public class MainViewController {
         }
 
         return contextMenu;
-    }
-
-    private void dragOver(DragEvent event, VBox overedVBox) {
-        FileViewer source = ((FileViewer) event.getGestureSource());
-
-        Dragboard db = event.getDragboard();
-        boolean success = false;
-        if (!db.hasContent(DataFormat.lookupMimeType("application/json"))) return;
-        
-        if (! overedVBox.getChildren().contains(source)) {
-            success = true;
-        }
-
-        if (success) {
-            event.acceptTransferModes(TransferMode.MOVE);
-        }
-    }
-
-    private void drop(DragEvent event, VBox target) {
-        Dragboard db = event.getDragboard();
-        if (! db.hasContent(DataFormat.lookupMimeType("application/json"))) return;
-
-        FileViewer source = ((FileViewer) event.getGestureSource());
-        VBox parent = (VBox) source.getParent();
-
-        boolean success = true;
-
-        parent.getChildren().remove(source);
-        target.getChildren().add(source);
-
-        event.setDropCompleted(success);
     }
 
     @FXML
