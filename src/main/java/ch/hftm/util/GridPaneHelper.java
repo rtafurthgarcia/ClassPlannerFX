@@ -1,25 +1,14 @@
 package ch.hftm.util;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-
-import ch.hftm.component.FileViewer;
 import ch.hftm.component.FileViewerContainer;
 import ch.hftm.model.Classroom;
 import ch.hftm.model.SchoolYearQuarter;
 import ch.hftm.model.ThematicAxis;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
-import javafx.scene.input.DataFormat;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.TransferMode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 public class GridPaneHelper {
@@ -46,7 +35,7 @@ public class GridPaneHelper {
             container.setMinSize(120, 180);
             container.setClassroom((columns.get(i - 1).classroom()));
             container.setQuarter(columns.get(i - 1).quarter());
-            container.setAxis(thematicAxis);
+            container.setThematicAxis(thematicAxis);
             
             pane.getChildren().add(container);
             GridPane.setConstraints(container, i, pane.getRowCount() - 1, 1, 1, HPos.CENTER, VPos.CENTER);

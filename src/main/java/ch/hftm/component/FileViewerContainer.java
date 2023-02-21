@@ -15,20 +15,20 @@ public class FileViewerContainer extends VBox {
 
     private ObjectProperty<Classroom> classroom = new SimpleObjectProperty<>();
     private ObjectProperty<SchoolYearQuarter> quarter = new SimpleObjectProperty<>();
-    private ObjectProperty<ThematicAxis> axis = new SimpleObjectProperty<>();
+    private ObjectProperty<ThematicAxis> thematicAxis = new SimpleObjectProperty<>();
 
-    public ThematicAxis getAxis() {
-        return axis.get();
+    public ThematicAxis getThematicAxis() {
+        return thematicAxis.get();
     }
 
-    public FileViewerContainer setAxis(ThematicAxis axis) {
-        this.axis.set(axis);
+    public FileViewerContainer setThematicAxis(ThematicAxis thematicAxis) {
+        this.thematicAxis.set(thematicAxis);
 
         return this;
     }
 
-    public ObjectProperty<ThematicAxis> axisProperty() {
-        return axis;
+    public ObjectProperty<ThematicAxis> thematicAxisProperty() {
+        return thematicAxis;
     }
     
     public SchoolYearQuarter getQuarter() {
@@ -96,7 +96,7 @@ public class FileViewerContainer extends VBox {
 
         source.getCompetency().setParentClassroom(parent.getClassroom());
         source.getCompetency().setParentSchoolYearQuarter(parent.getQuarter());
-        source.getCompetency().setParentThematicAxis(parent.getAxis());
+        source.getCompetency().setParentThematicAxis(parent.getThematicAxis());
 
         event.setDropCompleted(success);
     }

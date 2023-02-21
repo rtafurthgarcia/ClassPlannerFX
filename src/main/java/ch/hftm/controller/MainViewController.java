@@ -154,7 +154,8 @@ public class MainViewController {
             1, 
             1);
     
-        addThemmaticAxises();
+        loadThematicAxises();
+        loadCoreCompetencies();
     }  
 
     void generateGraphicalColumns() {
@@ -214,12 +215,31 @@ public class MainViewController {
         }
     }
 
-    public void addThemmaticAxises() {
+    public void loadThematicAxises() {
         sharedContext.getSelectedLesson().getSubUnits().forEach(thematicAxis -> {
-            ComponentsRow componentsRow = GridPaneHelper.addGridRow(gpMain, thematicAxis, graphicalColumns);
-            graphicalRows.add(componentsRow);
-            fileViewerContainers.addAll(componentsRow.containers());
+            ComponentsRow row = GridPaneHelper.addGridRow(gpMain, thematicAxis, graphicalColumns);
+            fileViewerContainers.addAll(row.containers());
+            graphicalRows.add(row);
         });
+    }
+
+    public void loadCoreCompetencies() {
+        fileViewerContainers.stream()
+        .filter(c -> sharedContext.getSelectedLesson().getSubUnits().stream()
+            .flatMap(t -> t.getSubUnits().stream())
+            .anyMatch(cc -> c.getThematicAxis().equals(cc.getParentThematicAxis()) && c.getClassroom().equals(cc.getParentClassroom()) && c.getQuarter().equals(cc.getParentSchoolYearQuarter()))
+        ).collect(Collectors.toList())
+        .forEach(c -> {
+            c.getChildren().add(
+                new FileViewer().setCompetency(
+                    sharedContext.getSelectedLesson().getSubUnits().stream()
+                    .flatMap(t -> t.getSubUnits().stream())
+                    .filter(cc -> c.getThematicAxis().equals(cc.getParentThematicAxis()) && c.getClassroom().equals(cc.getParentClassroom()) && c.getQuarter().equals(cc.getParentSchoolYearQuarter()))
+                    .findFirst().get()
+                )
+            );
+        }
+        );
     }
 
     private ContextMenu createContextMenu() {
