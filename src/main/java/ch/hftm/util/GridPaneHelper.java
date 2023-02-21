@@ -46,7 +46,10 @@ public class GridPaneHelper {
     }
 
     public static void removeGridRow(GridPane pane, ThematicAxis thematicAxis, ArrayList<ComponentsRow> list) {
-        ComponentsRow row = list.stream().filter(t -> t.thematicAxis().equals(thematicAxis)).findFirst().get();
+        ComponentsRow row = list.stream()
+                            .filter(t -> t.thematicAxis().equals(thematicAxis))
+                            .findFirst()
+                            .get();
 
         pane.getChildren().removeAll(row.containers());
         pane.getChildren().remove(row.relatedText());

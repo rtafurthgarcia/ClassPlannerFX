@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
@@ -27,6 +29,7 @@ import ch.hftm.util.GridPaneHelper.ComponentsRow;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
+import javafx.scene.Node;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ContextMenu;
@@ -124,7 +127,22 @@ public class MainViewController {
                 SchoolUnit<?> value = twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue();
                 if (value instanceof ThematicAxis) {
                     GridPaneHelper.removeGridRow(gpMain, (ThematicAxis) value, graphicalRows);
+                } else if (value instanceof CoreCompetency) {
+                    List<FileViewer> list = fileViewerContainers.stream()
+                        .flatMap(c -> c.getChildren().stream())
+                        .map(n -> {
+                            return (FileViewer) n;
+                        })
+                        .filter(f -> f.getCompetency().equals((CoreCompetency) value))
+                        .collect(Collectors.toList());
+                    
+                    list.forEach(f -> {
+                        FileViewerContainer fileViewerContainer = (FileViewerContainer) f.getParent();
+                        fileViewerContainer.getChildren().remove(f);
+                    });
+                    
                 }
+
                 twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getValue().getSubUnits().remove(value); 
             } else {
                 Alert alert = new Alert(
@@ -156,6 +174,7 @@ public class MainViewController {
     
         loadThematicAxises();
         loadCoreCompetencies();
+        loadTreeView();
     }  
 
     void generateGraphicalColumns() {
@@ -224,17 +243,19 @@ public class MainViewController {
     }
 
     public void loadCoreCompetencies() {
+        BiPredicate<CoreCompetency, FileViewerContainer> predicate = (cc, c) -> c.getThematicAxis().equals(cc.getParentThematicAxis()) && c.getClassroom().equals(cc.getParentClassroom()) && c.getQuarter().equals(cc.getParentSchoolYearQuarter());
+
         fileViewerContainers.stream()
         .filter(c -> sharedContext.getSelectedLesson().getSubUnits().stream()
             .flatMap(t -> t.getSubUnits().stream())
-            .anyMatch(cc -> c.getThematicAxis().equals(cc.getParentThematicAxis()) && c.getClassroom().equals(cc.getParentClassroom()) && c.getQuarter().equals(cc.getParentSchoolYearQuarter()))
+            .anyMatch(cc -> predicate.test(cc, c))
         ).collect(Collectors.toList())
         .forEach(c -> {
             c.getChildren().add(
                 new FileViewer().setCompetency(
                     sharedContext.getSelectedLesson().getSubUnits().stream()
                     .flatMap(t -> t.getSubUnits().stream())
-                    .filter(cc -> c.getThematicAxis().equals(cc.getParentThematicAxis()) && c.getClassroom().equals(cc.getParentClassroom()) && c.getQuarter().equals(cc.getParentSchoolYearQuarter()))
+                    .filter(cc -> predicate.test(cc, c))
                     .findFirst().get()
                 )
             );
