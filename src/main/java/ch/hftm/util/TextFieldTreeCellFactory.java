@@ -126,10 +126,10 @@ public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
                 return getItem() == null ? "" : getItem().toString();
             }
         };
-        cell.setOnDragDetected((MouseEvent event) -> dragDetected(event, cell));
+        /*cell.setOnDragDetected((MouseEvent event) -> dragDetected(event, cell));
         cell.setOnDragOver((DragEvent event) -> dragOver(event, cell));
         cell.setOnDragDropped((DragEvent event) -> drop(event, cell, treeView));
-        cell.setOnDragDone((DragEvent event) -> clearDropLocation());
+        cell.setOnDragDone((DragEvent event) -> clearDropLocation());*/
 
         // sucks ass but works so ig im not gonna change anything
         // sucks ass due to the fact it requires so many listeners. it saturates memory for nothing. 
@@ -211,6 +211,8 @@ public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
         if (Objects.equals(droppedItemParent, thisItem)) {
             thisItem.getChildren().add(0, draggedItem);
             treeView.getSelectionModel().select(draggedItem);
+
+            //treeView.get
         } else {
             // add to new location
             int indexInParent = thisItem.getParent().getChildren().indexOf(thisItem);

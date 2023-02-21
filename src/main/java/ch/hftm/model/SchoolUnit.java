@@ -1,10 +1,12 @@
 package ch.hftm.model;
 
+import java.util.Comparator;
 import java.util.function.Function;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 public class SchoolUnit<T extends SchoolUnit<?>> {
@@ -13,10 +15,10 @@ public class SchoolUnit<T extends SchoolUnit<?>> {
     
     private final Function<String, T> subUnitSupplier;
     
-    private final ObservableList<T> subUnits ;
+    private final ObservableList<T> subUnits;
 
     public SchoolUnit(String name, ObservableList<T> subUnits, Function<String, T> subUnitSupplier) {
-        this.subUnits = subUnits ;
+        this.subUnits = subUnits;
         this.subUnitSupplier = subUnitSupplier ;
         setName(name);
     }
@@ -51,6 +53,8 @@ public class SchoolUnit<T extends SchoolUnit<?>> {
     
     public void createAndAddSubUnit(String name) {
         getSubUnits().add(subUnitSupplier.apply(name));
+
+        //getSubUnits().sort((arg0, arg1) -> arg0.getName().compareTo(arg1.getName()));
     }
 
     @Override
