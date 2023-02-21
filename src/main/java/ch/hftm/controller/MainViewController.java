@@ -3,13 +3,15 @@ package ch.hftm.controller;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 import ch.hftm.component.FileViewer;
-
+import ch.hftm.component.FileViewerContainer;
 import ch.hftm.model.Context;
 import ch.hftm.model.CoreCompetency;
 import ch.hftm.model.Lesson;
@@ -64,6 +66,7 @@ public class MainViewController {
 
     private ArrayList<ComponentsRow> graphicalRows = new ArrayList<>();
     private ArrayList<ComponentsColumn> graphicalColumns = new ArrayList<>();
+    private ArrayList<FileViewerContainer> fileViewerContainers = new ArrayList<>();
 
     EventHandler<ActionEvent> onAddLesson = new EventHandler<>() {
         public void handle(ActionEvent e) {               
@@ -136,40 +139,23 @@ public class MainViewController {
 
     @FXML
     public void initialize() throws IOException {
+        generateColumns();
         generateGraphicalColumns();
 
-        setGridConstraints();
-        setSemestres();
-        setQuarters();
-        setQuartersWithWeeks();
-        setClassrooms();
-        setThematicAxis();
+        addHeaders(List.of("Semestre 1", "Semestre 2"), 2, 2);
+        addHeaders(List.of("Trimestre 1", "Trimestre 2", "Trimestre 3", "Trimestre 4"), 2, 1);
+        addHeaders(
+            sharedContext.getSelectedSchoolYear().getQuarters().sorted((q1, q2) -> q1.getQuarter().compareTo(q2.getQuarter())), 
+            2, 
+            1);
 
-        loadTreeView();
-
-        //loadGrid();
-
-        /*sharedContext.getSelectedSchoolYear().getSubUnits().addListener((ListChangeListener<Lesson>)(c -> {
-            sharedContext.getSelectedSchoolYear().getSubUnits().sort((firstLesson, secondLesson) -> {
-                return firstLesson.getName().compareTo(secondLesson.getName());
-            });
-        }));
-
-        sharedContext.getSelectedSchoolYear().getSubUnits().forEach(lesson -> {
-            
-        });*/
-        
-        graphicalRows.get(2).boxes().get(2).getChildren().add(new FileViewer().setCompetency(new CoreCompetency("bullshit").setDescription("teehe")));
-        graphicalRows.get(1).boxes().get(3).getChildren().add(new FileViewer().setCompetency(new CoreCompetency("baka stupid").setDescription("uguu")));
+        addHeaders(
+            sharedContext.getLoadedSchool().getClassrooms().stream().flatMap(i -> Collections.nCopies(4, i).stream()).collect(Collectors.toList()), 
+            1, 
+            1);
+    
+        addThemmaticAxises();
     }  
-
-    /*void loadGrid() {
-        sharedContext.getSelectedLesson().getSubUnits().forEach(axis -> {
-            axis.getSubUnits().forEach(competency -> {
-
-            });
-        });
-    }*/
 
     void generateGraphicalColumns() {
         counter = 0;
@@ -202,8 +188,7 @@ public class MainViewController {
         });
     }
 
-    void setGridConstraints() {
-        final int ROW_COUNT = 4; // one for the trimestre, one for the semestres, one for the weeks and one for classes;
+    void generateColumns() {
         final int COLUMN_COUNT = sharedContext.getSelectedSchoolYear().getQuarters().size() * sharedContext.getLoadedSchool().getClassrooms().size() + 1; // + 1 -> thematic axis column
 
         gpMain.getRowConstraints().clear();
@@ -216,73 +201,24 @@ public class MainViewController {
             
             gpMain.getColumnConstraints().add(cc); 
         }
-
-        
-        for(int i = 0; i < ROW_COUNT; i ++) {
-            gpMain.getRowConstraints().add(new RowConstraints(30));
-        }
-    }
-    
-    void setSemestres() {
-        final int ROW_INDEX = 0;
-        
-        Text tSemestre1 = new Text("Semestre 1");
-        Text tSemestre2 = new Text("Semestre 2");
-
-        gpMain.getChildren().addAll(tSemestre1, tSemestre2);
-        
-        GridPane.setConstraints(tSemestre1, (graphicalColumns.size() / 4) * 1, ROW_INDEX, 2, 1, HPos.CENTER, VPos.CENTER);
-        GridPane.setConstraints(tSemestre2, (graphicalColumns.size() / 4) * 3, ROW_INDEX, 2, 1, HPos.CENTER, VPos.CENTER);
     }
 
-    void setQuarters() {
-        final int ROW_INDEX = 1;
+    void addHeaders(List<?> list, int columnSpan, int columnStartOffset) {
+        gpMain.getRowConstraints().add(new RowConstraints(30));
 
-        List<String> list = List.of("Trimestre 1", "Trimestre 2", "Trimestre 3", "Trimestre 4");
         for(int i = 0; i < list.size(); i++) {
-            Text tQuarter = new Text(list.get(i));
+            Text tQuarter = new Text(list.get(i).toString());
             gpMain.getChildren().add(tQuarter);
     
-            GridPane.setConstraints(tQuarter, ((graphicalColumns.size() / 4) * i + 1), ROW_INDEX, 2, 1, HPos.CENTER, VPos.CENTER);
+            GridPane.setConstraints(tQuarter, graphicalColumns.size() / list.size() * i + columnStartOffset, gpMain.getRowCount() -1, columnSpan, 1, HPos.CENTER, VPos.CENTER);
         }
     }
 
-    void setQuartersWithWeeks() {
-        final int ROW_INDEX = 2;
-
-        SortedList<SchoolYearQuarter> list = sharedContext.getSelectedSchoolYear().getQuarters().sorted((q1, q2) -> q1.getQuarter().compareTo(q2.getQuarter()));
-        list.forEach(quarter -> {
-            Text tQuarter = new Text(quarter.toString());
-            gpMain.getChildren().add(tQuarter);
-
-            GridPane.setConstraints(tQuarter, ((graphicalColumns.size() / 4) * quarter.getQuarter()) - 1, ROW_INDEX, 2, 1, HPos.CENTER, VPos.CENTER);
-        });
-    }
-    
-    public void setClassrooms() {
-        final int ROW_INDEX = 3;
-
-        int COLUMN_COUNT = gpMain.getColumnCount() - 1;
-        counter = 1;
-
-        while(counter < COLUMN_COUNT) {
-            sharedContext.getLoadedSchool().getClassrooms().forEach(c -> {
-                Text tNewClassroom = new Text(c.getName());
-                tNewClassroom.setUserData(c);
-
-                gpMain.getChildren().add(tNewClassroom);
-                GridPane.setConstraints(tNewClassroom, counter, ROW_INDEX, 1, 1, HPos.CENTER, VPos.CENTER);
-
-                //graphicalColumns.add(counter, new ComponentsColumn(c, ))
-
-                counter ++;
-            });
-        }
-    }
-
-    public void setThematicAxis() {
+    public void addThemmaticAxises() {
         sharedContext.getSelectedLesson().getSubUnits().forEach(thematicAxis -> {
-            graphicalRows.add(GridPaneHelper.addGridRow(gpMain, thematicAxis, graphicalColumns));
+            ComponentsRow componentsRow = GridPaneHelper.addGridRow(gpMain, thematicAxis, graphicalColumns);
+            graphicalRows.add(componentsRow);
+            fileViewerContainers.addAll(componentsRow.containers());
         });
     }
 

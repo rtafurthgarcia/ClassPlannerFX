@@ -25,4 +25,9 @@ public class Classroom {
     public String getName() {
         return name.get();
     }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

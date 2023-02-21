@@ -60,7 +60,11 @@ public class ClassPlannerFX extends Application {
         sharedContext.setSelectedLesson(lessonFrench);
 
         ThematicAxis taVocabulaire = new ThematicAxis("Vocabulaire 1");
-        taVocabulaire.createAndAddSubUnit("ER, IR");
+        //taVocabulaire.createAndAddSubUnit("ER, IR");
+        taVocabulaire.getSubUnits().add(new CoreCompetency("Verbes en ER, IR").setParentClassroom(sharedContext.getLoadedSchool().getClassrooms().get(0)).setParentSchoolYearQuarter(sharedContext.getSelectedSchoolYear().getQuarters().get(0)).setParentThematicAxis(taVocabulaire));
+        taVocabulaire.getSubUnits().add(new CoreCompetency("Verbes en UIR, DRE").setParentClassroom(sharedContext.getLoadedSchool().getClassrooms().get(1)).setParentSchoolYearQuarter(sharedContext.getSelectedSchoolYear().getQuarters().get(2)).setParentThematicAxis(taVocabulaire));
+        
+        //taVocabulaire.createAndAddSubUnit();
 
         sharedContext.getSelectedLesson().getSubUnits().addAll(
             taVocabulaire,

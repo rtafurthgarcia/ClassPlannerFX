@@ -25,7 +25,7 @@ import javafx.scene.text.Text;
 public class GridPaneHelper {
     static final int COLUMN_STARTING_INDEX = 0;
 
-    public record ComponentsRow(Text relatedText, ArrayList<FileViewerContainer> boxes, ThematicAxis thematicAxis) { }
+    public record ComponentsRow(Text relatedText, ArrayList<FileViewerContainer> containers, ThematicAxis thematicAxis) { }
     public record ComponentsColumn(SchoolYearQuarter quarter, Classroom classroom) {};
 
     public static ComponentsRow addGridRow(GridPane pane, ThematicAxis thematicAxis, ArrayList<ComponentsColumn> columns) {
@@ -44,15 +44,13 @@ public class GridPaneHelper {
         for (int i = COLUMN_STARTING_INDEX + 1; i < COLUMN_MAX; i++) {
             FileViewerContainer container = new FileViewerContainer();
             container.setMinSize(120, 180);
-            container.setOnDragOver(event -> onDragOverContainer(event, container));
-            container.setOnDragDropped(event -> onDragDroppedContainer(event, container));
             container.setClassroom((columns.get(i - 1).classroom()));
             container.setQuarter(columns.get(i - 1).quarter());
             container.setAxis(thematicAxis);
             
             pane.getChildren().add(container);
             GridPane.setConstraints(container, i, pane.getRowCount() - 1, 1, 1, HPos.CENTER, VPos.CENTER);
-            componentsRow.boxes.add(container);
+            componentsRow.containers.add(container);
         }
 
         return componentsRow;
@@ -61,46 +59,10 @@ public class GridPaneHelper {
     public static void removeGridRow(GridPane pane, ThematicAxis thematicAxis, ArrayList<ComponentsRow> list) {
         ComponentsRow row = list.stream().filter(t -> t.thematicAxis().equals(thematicAxis)).findFirst().get();
 
-        pane.getChildren().removeAll(row.boxes());
+        pane.getChildren().removeAll(row.containers());
         pane.getChildren().remove(row.relatedText());
         list.remove(row);
-    }
-
-    public static void onDragOverContainer(DragEvent event, FileViewerContainer target) {
-        FileViewer source = ((FileViewer) event.getGestureSource());
-
-        Dragboard db = event.getDragboard();
-        boolean success = false;
-        if (!db.hasContent(DataFormat.lookupMimeType("application/json"))) return;
-        
-        if (! target.getChildren().contains(source)) {
-            success = true;
-        }
-
-        if (success) {
-            event.acceptTransferModes(TransferMode.MOVE);
-        }
-    }
-
-    public static void onDragDroppedContainer(DragEvent event, FileViewerContainer target) {
-        Dragboard db = event.getDragboard();
-        if (! db.hasContent(DataFormat.lookupMimeType("application/json"))) return;
-
-        FileViewer source = ((FileViewer) event.getGestureSource());
-        FileViewerContainer parent = (FileViewerContainer) source.getParent();
-
-        boolean success = true;
-
-        parent.getChildren().remove(source);
-        target.getChildren().add(source);
-
-        source.getCompetency().setParentClassroom(parent.getClassroom());
-        source.getCompetency().setParentSchoolYearQuarter(parent.getQuarter());
-        source.getCompetency().setParentThematicAxis(parent.getAxis());
-
-        event.setDropCompleted(success);
-    }
-    
+    } 
     /*public static ComponentsRow moveThematicAxisAround(GridPane pane, ThematicAxis thematicAxis) {
 
     }*/
