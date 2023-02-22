@@ -1,10 +1,12 @@
 package ch.hftm.model;
 
+import java.io.Serializable;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
-public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> {
+public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> implements Cloneable {
 
     public CoreCompetency(String name) {
         super(name, FXCollections.observableArrayList());
@@ -58,5 +60,12 @@ public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> {
         this.parentSchoolYearQuarter = parentSchoolYearQuarter;
 
         return this;
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        CoreCompetency competency = new CoreCompetency(this.getName()).setDescription(this.getDescription());
+        
+        return competency;
     }
 }

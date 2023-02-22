@@ -126,8 +126,16 @@ public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
                 return getItem() == null ? "" : getItem().toString();
             }
         };
-        /*cell.setOnDragDetected((MouseEvent event) -> dragDetected(event, cell));
-        cell.setOnDragOver((DragEvent event) -> dragOver(event, cell));
+        cell.setOnDragDetected((MouseEvent event) -> {
+            try {
+                dragDetected(event, cell);
+            } catch (CloneNotSupportedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        });
+        cell.setOnDragDone((DragEvent event) -> clearDropLocation());
+        /*cell.setOnDragOver((DragEvent event) -> dragOver(event, cell));
         cell.setOnDragDropped((DragEvent event) -> drop(event, cell, treeView));
         cell.setOnDragDone((DragEvent event) -> clearDropLocation());*/
 
@@ -157,17 +165,19 @@ public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
         }
     }
 
-    private void dragDetected(MouseEvent event, TreeCell<T> treeCell) {
+    private void dragDetected(MouseEvent event, TreeCell<T> treeCell) throws CloneNotSupportedException {
         draggedItem = treeCell.getTreeItem();
 
         // root can't be dragged
-        if (draggedItem.getParent() == null) return;
+        if (draggedItem.getParent() == null && !(draggedItem.getValue() instanceof CoreCompetency)) return;
         Dragboard db = treeCell.startDragAndDrop(TransferMode.MOVE);
+
+        CoreCompetency clone = (CoreCompetency)((CoreCompetency)draggedItem.getValue()).clone();
 
         // to also handle the Color & Font classes
         //Gson fxGsonWithExtras = FxGson.createWithExtras();
         Gson gson = FxGson.coreBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-        String json = gson.toJson(draggedItem.getValue());
+        String json = gson.toJson(clone);
 
         ClipboardContent content = new ClipboardContent();
         content.put(JSON_FORMAT, json);
