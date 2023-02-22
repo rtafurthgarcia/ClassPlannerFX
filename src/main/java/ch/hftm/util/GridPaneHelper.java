@@ -23,7 +23,7 @@ public class GridPaneHelper {
         pane.getRowConstraints().add(new RowConstraints());
             
         Text tNewThematicAxis = new Text();
-        tNewThematicAxis.textProperty().bind(thematicAxis.nameProperty());
+        tNewThematicAxis.textProperty().bindBidirectional(thematicAxis.nameProperty());
 
         pane.getChildren().add(tNewThematicAxis);
         GridPane.setConstraints(tNewThematicAxis, COLUMN_STARTING_INDEX, pane.getRowCount(), 1, 1, HPos.CENTER, VPos.CENTER);

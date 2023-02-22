@@ -65,6 +65,8 @@ public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> implements Cloneab
     @Override
     public Object clone() throws CloneNotSupportedException {
         CoreCompetency competency = new CoreCompetency(this.getName()).setDescription(this.getDescription());
+        competency.nameProperty().bindBidirectional(this.nameProperty());
+        competency.descriptionProperty().bindBidirectional(descriptionProperty());
         
         return competency;
     }

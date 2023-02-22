@@ -252,7 +252,7 @@ public class MainViewController {
         ).collect(Collectors.toList())
         .forEach(c -> {
             c.getChildren().add(
-                new FileViewer().setCompetency(
+                new FileViewer(
                     sharedContext.getSelectedLesson().getSubUnits().stream()
                     .flatMap(t -> t.getSubUnits().stream())
                     .filter(cc -> predicate.test(cc, c))

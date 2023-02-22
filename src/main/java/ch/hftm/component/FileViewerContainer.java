@@ -117,7 +117,7 @@ public class FileViewerContainer extends VBox {
         } else if (event.getGestureSource() instanceof TreeCell) {
             CoreCompetency source = (CoreCompetency) ((TreeCell) event.getGestureSource()).getItem();
             
-            target.getChildren().add(new FileViewer().setCompetency(source));
+            target.getChildren().add(new FileViewer(source));
 
             source.setParentClassroom(target.getClassroom());
             source.setParentSchoolYearQuarter(target.getQuarter());

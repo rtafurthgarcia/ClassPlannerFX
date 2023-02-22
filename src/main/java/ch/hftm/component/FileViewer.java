@@ -34,7 +34,7 @@ public class FileViewer extends Accordion {
 
     private ObjectProperty<CoreCompetency> competency = new SimpleObjectProperty<>();
 
-    public FileViewer() {
+    public FileViewer(CoreCompetency competency) {
         super();
 
         FXMLLoader loader = new FXMLLoader();
@@ -45,13 +45,10 @@ public class FileViewer extends Accordion {
 
         try {
             loader.load();
+            this.setCompetency(competency);
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
-    }
-
-    public BooleanProperty isFillerProperty() {
-        return this.isFillerProperty();
     }
 
     public CoreCompetency getCompetency() {
@@ -61,8 +58,8 @@ public class FileViewer extends Accordion {
     public FileViewer setCompetency(CoreCompetency competency) {
         this.competency.set(competency);
 
-        tpDescription.setText(competency.getName());
-        taDescription.setText(competency.getDescription());
+        tpDescription.textProperty().bindBidirectional(this.competency.get().nameProperty());
+        taDescription.textProperty().bindBidirectional(this.competency.get().descriptionProperty());
 
         return this;
     }
