@@ -204,7 +204,7 @@ public class MainViewController {
         twSchoolYearPlan.setEditable(true);
         twSchoolYearPlan.setCellFactory(new TextFieldTreeCellFactory<SchoolUnit<?>>());
         twSchoolYearPlan.setOnMouseClicked(event -> {
-            twSchoolYearPlan.setContextMenu(createContextMenu());
+            twSchoolYearPlan.setContextMenu(createTreeViewContextMenu());
         });
     }
 
@@ -263,7 +263,7 @@ public class MainViewController {
         );
     }
 
-    private ContextMenu createContextMenu() {
+    private ContextMenu createTreeViewContextMenu() {
         ContextMenu contextMenu = new ContextMenu();
 
         if (twSchoolYearPlan.getSelectionModel().getSelectedItem() != null) {

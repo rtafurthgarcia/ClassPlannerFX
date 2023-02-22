@@ -7,12 +7,18 @@ import com.google.gson.Gson;
 
 import ch.hftm.ClassPlannerFX;
 import ch.hftm.model.CoreCompetency;
+import ch.hftm.model.Lesson;
+import ch.hftm.model.SchoolYear;
+import ch.hftm.model.ThematicAxis;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Accordion;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TitledPane;
 import javafx.scene.input.ClipboardContent;
@@ -46,6 +52,7 @@ public class FileViewer extends Accordion {
         try {
             loader.load();
             this.setCompetency(competency);
+            this.setContextMenu(createContextMenu());
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
@@ -83,6 +90,21 @@ public class FileViewer extends Accordion {
         db.setContent(content);
         db.setDragView(draggedFileViewer.snapshot(null, null));
         event.consume();
+    }
+
+    private ContextMenu createContextMenu() {
+        ContextMenu contextMenu = new ContextMenu();
+
+        MenuItem miDelete = new MenuItem("Delete this one core competency");
+
+        miDelete.setOnAction(event -> {
+            FileViewerContainer fileViewerContainer = (FileViewerContainer) this.getParent();
+            fileViewerContainer.getChildren().remove(this);
+        });
+        
+        contextMenu.getItems().add(miDelete);
+
+        return contextMenu;
     }
 
     @FXML
