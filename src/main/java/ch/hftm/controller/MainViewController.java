@@ -167,18 +167,41 @@ public class MainViewController {
         generateColumns();
         generateGraphicalColumns();
 
-        addHeaders(List.of("Semestre 1", "Semestre 2"), 2, 2);
-        addHeaders(List.of("Trimestre 1", "Trimestre 2", "Trimestre 3", "Trimestre 4"), 2, 1);
-        addHeaders(
+        GridPaneHelper.addGridHeaderRow(gpMain, List.of("Semestre 1", "Semestre 2"), 4, 1);
+        GridPaneHelper.addGridHeaderRow(gpMain, List.of("Trimestre 1", "Trimestre 2", "Trimestre 3", "Trimestre 4"), 2, 1);
+        GridPaneHelper.addGridHeaderRow(
+            gpMain, 
             sharedContext.getSelectedSchoolYear().getQuarters().sorted((q1, q2) -> q1.getQuarter().compareTo(q2.getQuarter())), 
             2, 
             1);
 
-        addHeaders(
+        /* 
+        GridPaneHelper.addGridHeaderRow(
+            gpMain, 
             sharedContext.getLoadedSchool().getClassrooms().stream().flatMap(i -> Collections.nCopies(4, i).stream()).collect(Collectors.toList()), 
             1, 
-            1);
-    
+            1,
+            gpMain.getRowCount() -2);
+        */
+        int i = 0;
+        int rowIndex = gpMain.getRowCount();
+        gpMain.getRowConstraints().add(new RowConstraints(30));
+        while (i < sharedContext.getLoadedSchool().getClassrooms().size() * sharedContext.getSelectedSchoolYear().getQuarters().size()){
+            for(int j = 0; j < sharedContext.getLoadedSchool().getClassrooms().size(); j++) {
+                GridPaneHelper.addGridHeaderRow(
+                    gpMain, 
+                    List.of(sharedContext.getLoadedSchool().getClassrooms().get(j)), 
+                    1, 
+                    1 + i,
+                    rowIndex
+                    );
+                    
+                    i++;
+            }
+        }
+
+        gpMain.getStyleClass().add("grid");
+
         loadThematicAxises();
         loadCoreCompetencies();
 
@@ -232,20 +255,6 @@ public class MainViewController {
             cc.setHgrow(Priority.ALWAYS);
             
             gpMain.getColumnConstraints().add(cc); 
-        }
-    }
-
-    void addHeaders(List<?> list, int columnSpan, int columnStartOffset) {
-        gpMain.getRowConstraints().add(new RowConstraints(30));
-
-        for(int i = 0; i < list.size(); i++) {
-            Label lHeader = new Label(list.get(i).toString());
-            lHeader.getStyleClass().add("header");
-            lHeader.setMaxWidth(Double.MAX_VALUE);
-            lHeader.setMaxHeight(Double.MAX_VALUE);    
-            gpMain.getChildren().add(lHeader);
-    
-            GridPane.setConstraints(lHeader, graphicalColumns.size() / list.size() * i + columnStartOffset, gpMain.getRowCount() -1, columnSpan, 1, HPos.CENTER, VPos.CENTER);
         }
     }
 

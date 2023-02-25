@@ -1,6 +1,8 @@
 package ch.hftm.util;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import ch.hftm.component.FileViewerContainer;
 import ch.hftm.model.Classroom;
 import ch.hftm.model.SchoolYearQuarter;
@@ -16,6 +18,12 @@ import javafx.scene.text.Text;
 public class GridPaneHelper {
     static final int COLUMN_STARTING_INDEX = 0;
 
+    static final String CSS_CLASS_FIRST = "header-first";
+    static final String CSS_CLASS = "header"; 
+    static final String CSS_CLASS_RIGHT = "header-right"; 
+    static final String CSS_CLASS_THEMATIC_AXIS = "thematic-axis";
+    static final String CSS_CLASS_THEMATIC_AXIS_FIRST = "thematic-axis-first";
+
     public record ComponentsRow(Label relatedLabel, ArrayList<FileViewerContainer> containers, ThematicAxis thematicAxis) { }
     public record ComponentsColumn(SchoolYearQuarter quarter, Classroom classroom) {};
 
@@ -25,7 +33,12 @@ public class GridPaneHelper {
         pane.getRowConstraints().add(new RowConstraints());
             
         Label lThematicAxis = new Label();
-        lThematicAxis.getStyleClass().add("thematic-axis");
+        // after the first 4 headers
+        if (pane.getRowCount() == 5) {
+            lThematicAxis.getStyleClass().add(CSS_CLASS_THEMATIC_AXIS_FIRST);
+        } else {
+            lThematicAxis.getStyleClass().add(CSS_CLASS_THEMATIC_AXIS);
+        }
         lThematicAxis.textProperty().bindBidirectional(thematicAxis.nameProperty());
         lThematicAxis.setMaxWidth(Double.MAX_VALUE);
         lThematicAxis.setMaxHeight(Double.MAX_VALUE);
@@ -35,11 +48,9 @@ public class GridPaneHelper {
         
         ComponentsRow componentsRow = new ComponentsRow(lThematicAxis, new ArrayList<>(), thematicAxis);
         
-        for (int i = COLUMN_STARTING_INDEX + 1; i < COLUMN_MAX; i++) {
+        for (int i = COLUMN_STARTING_INDEX + 1; i < COLUMN_MAX + 1; i++) {
             FileViewerContainer container = new FileViewerContainer();
             container.setMinSize(120, 180);
-            //container.setMaxSize(, i);
-            //container.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE );
             container.setClassroom((columns.get(i - 1).classroom()));
             container.setQuarter(columns.get(i - 1).quarter());
             container.setThematicAxis(thematicAxis);
@@ -48,6 +59,9 @@ public class GridPaneHelper {
             GridPane.setConstraints(container, i, pane.getRowCount() - 1, 1, 1, HPos.CENTER, VPos.CENTER);
             componentsRow.containers.add(container);
         }
+
+        pane.getChildren().get(pane.getChildren().size() - 1).getStyleClass().remove(FileViewerContainer.CSS_CLASS);
+        pane.getChildren().get(pane.getChildren().size() - 1).getStyleClass().add(FileViewerContainer.CSS_CLASS_RIGHT);
 
         return componentsRow;
     }
@@ -63,7 +77,29 @@ public class GridPaneHelper {
         pane.getChildren().remove(row.relatedLabel());
         list.remove(row);
     } 
-    /*public static ComponentsRow moveThematicAxisAround(GridPane pane, ThematicAxis thematicAxis) {
 
-    }*/
+    public static void addGridHeaderRow(GridPane pane, List<?> list, int columnSpan, int columnStartOffset) {
+        pane.getRowConstraints().add(new RowConstraints(30));
+        addGridHeaderRow(pane, list, columnSpan, columnStartOffset, pane.getRowCount() -1);
+    }
+
+    public static void addGridHeaderRow(GridPane pane, List<?> list, int columnSpan, int columnStartOffset, int rowIndex) {
+        for(int i = 0; i < list.size(); i++) {
+            Label lHeader = new Label(list.get(i).toString());
+            if (pane.getRowCount() == 1) {
+                lHeader.getStyleClass().add(CSS_CLASS_FIRST);
+            } else if (i == list.size() - 1) {
+                lHeader.getStyleClass().add(CSS_CLASS);
+            } else {
+                lHeader.getStyleClass().add(CSS_CLASS);
+            }
+
+            lHeader.setMaxWidth(Double.MAX_VALUE);
+            lHeader.setMaxHeight(Double.MAX_VALUE);    
+            pane.getChildren().add(lHeader);
+    
+            GridPane.setConstraints(lHeader, pane.getColumnCount() / list.size() * i + columnStartOffset, rowIndex, columnSpan, 1, HPos.CENTER, VPos.CENTER);
+        }
+    }
+
 }

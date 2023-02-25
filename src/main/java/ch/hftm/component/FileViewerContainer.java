@@ -29,6 +29,9 @@ public class FileViewerContainer extends VBox {
     private ObjectProperty<SchoolYearQuarter> quarter = new SimpleObjectProperty<>();
     private ObjectProperty<ThematicAxis> thematicAxis = new SimpleObjectProperty<>();
 
+    public static final String CSS_CLASS = "file-viewer-container";
+    public static final String CSS_CLASS_RIGHT = "file-viewer-container-right";
+
     public ThematicAxis getThematicAxis() {
         return thematicAxis.get();
     }
@@ -78,7 +81,7 @@ public class FileViewerContainer extends VBox {
         this.setOnDragDropped(event -> onDragDroppedContainer(event, this));
         //this.getBorder().getStrokes().
         //this.getBorder(). 
-        this.getStyleClass().add("file-viewer-container");
+        this.getStyleClass().add(CSS_CLASS);
     }
 
     private static void onDragOverContainer(DragEvent event, FileViewerContainer target) {
