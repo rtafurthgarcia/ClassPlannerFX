@@ -53,7 +53,7 @@ public class FileViewer extends Accordion {
             loader.load();
             this.setCompetency(competency);
             this.setContextMenu(createContextMenu());
-        } catch (IOException exception) {
+        } catch (IOException | CloneNotSupportedException exception) {
             throw new RuntimeException(exception);
         }
     }
@@ -62,7 +62,7 @@ public class FileViewer extends Accordion {
         return competency.get();
     }
 
-    public FileViewer setCompetency(CoreCompetency competency) {
+    public FileViewer setCompetency(CoreCompetency competency) throws CloneNotSupportedException {
         this.competency.set(competency);
 
         tpDescription.textProperty().bindBidirectional(this.competency.get().nameProperty());

@@ -11,11 +11,11 @@ import javafx.collections.ObservableList;
 
 public class SchoolUnit<T extends SchoolUnit<?>> {
     
-    private final StringProperty name = new SimpleStringProperty();
+    protected final StringProperty name = new SimpleStringProperty("");
     
-    private final Function<String, T> subUnitSupplier;
+    protected final Function<String, T> subUnitSupplier;
     
-    private final ObservableList<T> subUnits;
+    protected final ObservableList<T> subUnits;
 
     public SchoolUnit(String name, ObservableList<T> subUnits, Function<String, T> subUnitSupplier) {
         this.subUnits = subUnits;
@@ -51,10 +51,10 @@ public class SchoolUnit<T extends SchoolUnit<?>> {
         return subUnits;
     }
     
-    public void createAndAddSubUnit(String name) {
+    public SchoolUnit<?> createAndAddSubUnit(String name) {
         getSubUnits().add(subUnitSupplier.apply(name));
 
-        //getSubUnits().sort((arg0, arg1) -> arg0.getName().compareTo(arg1.getName()));
+        return this;
     }
 
     @Override
@@ -80,9 +80,9 @@ public class SchoolUnit<T extends SchoolUnit<?>> {
             return false;
         SchoolUnit other = (SchoolUnit) obj;
         if (name == null) {
-            if (other.name != null)
+            if (other.getName() != null)
                 return false;
-        } else if (!name.equals(other.name))
+        } else if (!getName().equals(other.getName()))
             return false;
         return true;
     }

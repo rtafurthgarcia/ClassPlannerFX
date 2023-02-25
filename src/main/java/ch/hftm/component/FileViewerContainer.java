@@ -1,6 +1,9 @@
 package ch.hftm.component;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.function.BiPredicate;
+import java.util.stream.Collectors;
 
 import ch.hftm.model.Classroom;
 import ch.hftm.model.CoreCompetency;
@@ -9,6 +12,9 @@ import ch.hftm.model.ThematicAxis;
 import ch.hftm.util.TextFieldTreeCellFactory;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.cell.TextFieldTreeCell;
 import javafx.scene.input.DataFormat;
@@ -36,7 +42,7 @@ public class FileViewerContainer extends VBox {
     public ObjectProperty<ThematicAxis> thematicAxisProperty() {
         return thematicAxis;
     }
-    
+
     public SchoolYearQuarter getQuarter() {
         return quarter.get();
     }
@@ -57,10 +63,10 @@ public class FileViewerContainer extends VBox {
 
     public FileViewerContainer setClassroom(Classroom classroom) {
         this.classroom.set(classroom);
-        
+
         return this;
     }
-    
+
     public ObjectProperty<Classroom> classroomProperty() {
         return classroom;
     }
@@ -71,27 +77,28 @@ public class FileViewerContainer extends VBox {
         this.setOnDragOver(event -> onDragOverContainer(event, this));
         this.setOnDragDropped(event -> onDragDroppedContainer(event, this));
     }
-    
+
     private static void onDragOverContainer(DragEvent event, FileViewerContainer target) {
         Dragboard db = event.getDragboard();
         boolean success = false;
-        if (!db.hasContent(DataFormat.lookupMimeType("application/json"))) return;
-        
+        if (!db.hasContent(DataFormat.lookupMimeType("application/json")))
+            return;
+
         if (event.getGestureSource() instanceof FileViewer) {
             FileViewer source = ((FileViewer) event.getGestureSource());
-            if (! target.getChildren().contains(source)) {
+            if (!target.getChildren().contains(source)) {
                 success = true;
             }
         } else if (event.getGestureSource() instanceof TreeCell) {
             CoreCompetency source = (CoreCompetency) ((TreeCell) event.getGestureSource()).getItem();
-            
+
             success = !target.getChildren().stream()
-            .map(n -> {
-                return ((FileViewer) n).getCompetency();
-            })
-            .anyMatch(f -> f.equals(source));
+                    .map(n -> {
+                        return ((FileViewer) n).getCompetency();
+                    })
+                    .anyMatch(f -> f.equals(source));
         }
-        
+
         if (success) {
             event.acceptTransferModes(TransferMode.MOVE);
         }
@@ -99,34 +106,63 @@ public class FileViewerContainer extends VBox {
 
     private static void onDragDroppedContainer(DragEvent event, FileViewerContainer target) {
         Dragboard db = event.getDragboard();
-        if (! db.hasContent(DataFormat.lookupMimeType("application/json"))) return;
+        if (!db.hasContent(DataFormat.lookupMimeType("application/json")))
+            return;
         boolean success = false;
 
+        // when moving core competency between tiles
         if (event.getGestureSource() instanceof FileViewer) {
             FileViewer source = ((FileViewer) event.getGestureSource());
             FileViewerContainer parent = (FileViewerContainer) source.getParent();
-    
-            parent.getChildren().remove(source);
-            target.getChildren().add(source);
-    
-            source.getCompetency().setParentClassroom(parent.getClassroom());
-            source.getCompetency().setParentSchoolYearQuarter(parent.getQuarter());
-            source.getCompetency().setParentThematicAxis(parent.getThematicAxis());
 
-            success = true;
-        } else if (event.getGestureSource() instanceof TreeCell) {
-            CoreCompetency source = (CoreCompetency) ((TreeCell) event.getGestureSource()).getItem();
+            boolean shouldContinue = true;
+            if (!target.getThematicAxis().isEqualCoreCompetencyInside(source.getCompetency()) && !target.getThematicAxis().equals(source.getCompetency().getParentThematicAxis())) {
+                shouldContinue = target.getThematicAxis().copyInsideIfNecessary(source.getCompetency());
+            }
+
+            if (shouldContinue) {
+                shouldContinue = ! target.getChildren().stream()
+                    .map(n -> {
+                        return ((FileViewer) n).getCompetency();
+                    })
+                    .anyMatch(f -> (f.equals(source.getCompetency())));
+            }
             
-            target.getChildren().add(new FileViewer(source));
+            if (shouldContinue) {
+                parent.getChildren().remove(source);
+                source.getCompetency().getParentThematicAxis().getSubUnits().removeIf(
+                    c -> (c.equals(source.getCompetency()) && ! c.isPartOfTreeView())
+                );
 
-            source.setParentClassroom(target.getClassroom());
-            source.setParentSchoolYearQuarter(target.getQuarter());
-            source.setParentThematicAxis(target.getThematicAxis());
+                target.getChildren().add(source);
+    
+                source.getCompetency().setParentThematicAxis(target.getThematicAxis());
+                source.getCompetency().setParentClassroom(target.getClassroom());
+                source.getCompetency().setParentSchoolYearQuarter(target.getQuarter());
+                success = true;
+            }
+        // when drag and dropping a core competency from the treeview to the grid
+        } else if (event.getGestureSource() instanceof TreeCell) {
+            CoreCompetency source = ((CoreCompetency) ((TreeCell) event.getGestureSource()).getItem()).clone();
+            
+            boolean shouldContinue = true;
+            if (! target.getThematicAxis().isEqualCoreCompetencyInside(source) && !target.getThematicAxis().equals(source.getParentThematicAxis())) {
+                shouldContinue = target.getThematicAxis().copyInsideIfNecessary(source);
+            }
 
-            success = true;
+            if (shouldContinue) {
+                source.setParentThematicAxis(target.getThematicAxis());
+                source.setParentClassroom(target.getClassroom());
+                source.setParentSchoolYearQuarter(target.getQuarter());
+                source.setPartOfTreeView(false);
+
+                target.getChildren().add(new FileViewer(source));
+
+                success = true;
+            }
         }
 
         event.setDropCompleted(success);
     }
-   
+
 }

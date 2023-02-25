@@ -2,12 +2,9 @@ package ch.hftm.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.function.BiPredicate;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
@@ -19,7 +16,6 @@ import ch.hftm.model.CoreCompetency;
 import ch.hftm.model.Lesson;
 import ch.hftm.model.SchoolUnit;
 import ch.hftm.model.SchoolYear;
-import ch.hftm.model.SchoolYearQuarter;
 import ch.hftm.model.ThematicAxis;
 import ch.hftm.util.GridPaneHelper;
 import ch.hftm.util.ModelTree;
@@ -29,8 +25,6 @@ import ch.hftm.util.GridPaneHelper.ComponentsRow;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
-import javafx.scene.Node;
-import javafx.scene.control.Accordion;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -43,9 +37,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.Text;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.collections.transformation.SortedList;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -101,12 +92,16 @@ public class MainViewController {
 
     EventHandler<ActionEvent> onAddCoreCompetency = new EventHandler<ActionEvent>() {
         public void handle(ActionEvent e) {    
+            CoreCompetency newCoreCompetency = new CoreCompetency("new core competency");
+
             if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue() instanceof CoreCompetency) {
-                twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getValue().createAndAddSubUnit("new core competency");
+                ThematicAxis selectedThematicAxis = ((ThematicAxis)twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getValue());
+                selectedThematicAxis.getSubUnits().add(newCoreCompetency);
             } 
 
             if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue() instanceof ThematicAxis) {
-                twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue().createAndAddSubUnit("new core competency");
+                ThematicAxis selectedThematicAxis = ((ThematicAxis)twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue());
+                selectedThematicAxis.getSubUnits().add(newCoreCompetency);
             }
         }
     };
@@ -128,21 +123,24 @@ public class MainViewController {
                 if (value instanceof ThematicAxis) {
                     GridPaneHelper.removeGridRow(gpMain, (ThematicAxis) value, graphicalRows);
                 } else if (value instanceof CoreCompetency) {
+                    ThematicAxis parentThematicAxis = (ThematicAxis) twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getValue();
+                    // we have to delete all core components 
                     List<FileViewer> list = fileViewerContainers.stream()
                         .flatMap(c -> c.getChildren().stream())
                         .map(n -> {
                             return (FileViewer) n;
                         })
-                        .filter(f -> f.getCompetency().equals((CoreCompetency) value))
+                        .filter(f -> f.getCompetency().equals((CoreCompetency) value) && f.getCompetency().getParentThematicAxis().equals(parentThematicAxis))
                         .collect(Collectors.toList());
                     
                     list.forEach(f -> {
                         FileViewerContainer fileViewerContainer = (FileViewerContainer) f.getParent();
-                        fileViewerContainer.getChildren().remove(f);
+                        fileViewerContainer.getChildren().removeAll(list);
                     });
                     
                 }
-
+                // TODO: should I really keep it???
+                // wont it remove things I dont want to???
                 twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getValue().getSubUnits().remove(value); 
             } else {
                 Alert alert = new Alert(
@@ -256,7 +254,9 @@ public class MainViewController {
                     sharedContext.getSelectedLesson().getSubUnits().stream()
                     .flatMap(t -> t.getSubUnits().stream())
                     .filter(cc -> predicate.test(cc, c))
-                    .findFirst().get()
+                    .findFirst()
+                    .get()
+                    .cloneForGrid()
                 )
             );
         }

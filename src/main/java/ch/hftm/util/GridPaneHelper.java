@@ -51,6 +51,7 @@ public class GridPaneHelper {
                             .findFirst()
                             .get();
 
+        thematicAxis.getSubUnits().clear();
         pane.getChildren().removeAll(row.containers());
         pane.getChildren().remove(row.relatedText());
         list.remove(row);

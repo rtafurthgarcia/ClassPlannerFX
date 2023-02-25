@@ -10,13 +10,27 @@ public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> implements Cloneab
 
     public CoreCompetency(String name) {
         super(name, FXCollections.observableArrayList());
+
+        isPartOfTreeView = true;
     }
 
-    private StringProperty description = new SimpleStringProperty();
+    private StringProperty description = new SimpleStringProperty("");
 
     private Classroom parentClassroom;
     private ThematicAxis parentThematicAxis;
     private SchoolYearQuarter parentSchoolYearQuarter;
+
+    private boolean isPartOfTreeView;
+
+    public boolean isPartOfTreeView() {
+        return isPartOfTreeView;
+    }
+
+    public CoreCompetency setPartOfTreeView(boolean isPartOfTreeView) {
+        this.isPartOfTreeView = isPartOfTreeView;
+
+        return this;
+    }
 
     public CoreCompetency setDescription(String description) {
         this.description = new SimpleStringProperty(description);
@@ -63,11 +77,55 @@ public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> implements Cloneab
     }
 
     @Override
-    public Object clone() throws CloneNotSupportedException {
-        CoreCompetency competency = new CoreCompetency(this.getName()).setDescription(this.getDescription());
+    public CoreCompetency clone() {
+        CoreCompetency competency = new CoreCompetency(this.getName());
         competency.nameProperty().bindBidirectional(this.nameProperty());
-        competency.descriptionProperty().bindBidirectional(descriptionProperty());
-        
+        competency.descriptionProperty().bindBidirectional(this.descriptionProperty());
+
         return competency;
+    }
+
+    public CoreCompetency cloneForGrid() {
+        CoreCompetency competency = new CoreCompetency(this.getName());
+        competency.nameProperty().bindBidirectional(this.nameProperty());
+        competency.descriptionProperty().bindBidirectional(this.descriptionProperty());
+        competency.parentClassroom = this.parentClassroom;
+        competency.parentThematicAxis = this.parentThematicAxis;
+        competency.parentSchoolYearQuarter = this.parentSchoolYearQuarter;
+        competency.isPartOfTreeView = false;
+
+        return competency;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((description.get() == null) ? 0 : description.get().hashCode());
+        result = prime * result + ((super.name.get() == null) ? 0 : super.name.get().hashCode());
+        result = prime * result + (isPartOfTreeView ? 1231 : 1237);
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        CoreCompetency other = (CoreCompetency) obj;
+        if (description == null) {
+            if (other.description != null)
+                return false;
+        } else if (!description.get().equals(other.description.get()))
+            return false;
+        if (name.get() == null) {
+            if (other.name.get() != null)
+                return false;
+        } else if (!name.get().equals(other.name.get()))
+            return false;
+        return true;
     }
 }
