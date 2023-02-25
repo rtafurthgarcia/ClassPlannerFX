@@ -27,6 +27,7 @@ import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TreeView;
@@ -42,10 +43,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 
 public class MainViewController {
-
-    @FXML
-    private SpreadsheetView svMain;
-
     @FXML
     private GridPane gpMain;
 
@@ -57,6 +54,8 @@ public class MainViewController {
     private Context sharedContext = Context.getInstance();
 
     private Integer counter;
+
+    private boolean alreadyInitializedOnce = false;
 
     private ArrayList<ComponentsRow> graphicalRows = new ArrayList<>();
     private ArrayList<ComponentsColumn> graphicalColumns = new ArrayList<>();
@@ -112,6 +111,14 @@ public class MainViewController {
                 sharedContext.setSelectedLesson((Lesson) twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue());
             } else if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue() instanceof SchoolYear) {
                 sharedContext.setSelectedSchoolYear((SchoolYear) twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue());
+                sharedContext.setSelectedLesson(null);
+            }
+            clear();
+
+            try {
+                initialize();
+            } catch (IOException e1) {
+                e1.printStackTrace();
             }
         }
     };
@@ -155,6 +162,8 @@ public class MainViewController {
 
     @FXML
     public void initialize() throws IOException {
+        gpMain.setGridLinesVisible(false);
+
         generateColumns();
         generateGraphicalColumns();
 
@@ -172,7 +181,12 @@ public class MainViewController {
     
         loadThematicAxises();
         loadCoreCompetencies();
-        loadTreeView();
+
+        if (! alreadyInitializedOnce) {
+            loadTreeView();
+        }
+
+        alreadyInitializedOnce = true;
     }  
 
     void generateGraphicalColumns() {
@@ -215,7 +229,7 @@ public class MainViewController {
         for(int i = 0; i < COLUMN_COUNT; i ++) {
             ColumnConstraints cc = new ColumnConstraints();
             cc.setFillWidth(true);
-            cc.setHgrow(Priority.SOMETIMES);
+            cc.setHgrow(Priority.ALWAYS);
             
             gpMain.getColumnConstraints().add(cc); 
         }
@@ -225,10 +239,13 @@ public class MainViewController {
         gpMain.getRowConstraints().add(new RowConstraints(30));
 
         for(int i = 0; i < list.size(); i++) {
-            Text tQuarter = new Text(list.get(i).toString());
-            gpMain.getChildren().add(tQuarter);
+            Label lHeader = new Label(list.get(i).toString());
+            lHeader.getStyleClass().add("header");
+            lHeader.setMaxWidth(Double.MAX_VALUE);
+            lHeader.setMaxHeight(Double.MAX_VALUE);    
+            gpMain.getChildren().add(lHeader);
     
-            GridPane.setConstraints(tQuarter, graphicalColumns.size() / list.size() * i + columnStartOffset, gpMain.getRowCount() -1, columnSpan, 1, HPos.CENTER, VPos.CENTER);
+            GridPane.setConstraints(lHeader, graphicalColumns.size() / list.size() * i + columnStartOffset, gpMain.getRowCount() -1, columnSpan, 1, HPos.CENTER, VPos.CENTER);
         }
     }
 
@@ -302,6 +319,19 @@ public class MainViewController {
         }
 
         return contextMenu;
+    }
+
+    void clear() {
+        //gpMain.setGridLinesVisible(false);
+
+        gpMain.getChildren().clear();
+        gpMain.getRowConstraints().clear();
+        gpMain.getColumnConstraints().clear();
+        graphicalRows.clear();
+        graphicalColumns.clear();
+        fileViewerContainers.clear();
+
+        //gpMain.setGridLinesVisible(true);
     }
 
     @FXML

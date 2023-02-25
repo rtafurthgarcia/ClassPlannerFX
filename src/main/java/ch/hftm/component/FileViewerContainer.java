@@ -76,6 +76,9 @@ public class FileViewerContainer extends VBox {
 
         this.setOnDragOver(event -> onDragOverContainer(event, this));
         this.setOnDragDropped(event -> onDragDroppedContainer(event, this));
+        //this.getBorder().getStrokes().
+        //this.getBorder(). 
+        this.getStyleClass().add("file-viewer-container");
     }
 
     private static void onDragOverContainer(DragEvent event, FileViewerContainer target) {
