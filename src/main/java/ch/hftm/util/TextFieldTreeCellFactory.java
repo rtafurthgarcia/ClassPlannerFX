@@ -21,25 +21,27 @@ import javafx.scene.input.TransferMode;
 import javafx.util.Callback;
 
 public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCell<T>> {
-    private static final DataFormat JSON_FORMAT = new DataFormat("application/json");
+    // private static final DataFormat JSON_FORMAT = new
+    // DataFormat("application/json");
     private static final String CSS_SELECTION_CLASS = "selected-treeitem";
     private TreeCell<T> dropZone;
     private TreeItem<T> draggedItem;
 
-    private Context sharedContext = Context.getInstance();    
-    
+    private Context sharedContext = Context.getInstance();
+
     @Override
     public TreeCell<T> call(TreeView<T> treeView) {
         TreeCell<T> cell = new TreeCell<T>() {
             private TextField textField;
+
             /**
              * On editing, create new text field and set it using setGraphic method.
              */
             @Override
             public void startEdit() {
-                if (getItem() instanceof ThematicAxis 
-                    || getItem() instanceof CoreCompetency
-                    || getItem() instanceof Lesson) {
+                if (getItem() instanceof ThematicAxis
+                        || getItem() instanceof CoreCompetency
+                        || getItem() instanceof Lesson) {
                     super.startEdit();
 
                     if (textField == null) {
@@ -83,7 +85,7 @@ public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
                 }
                 setText(null);
                 setGraphic(textField);
-                
+
             }
 
             private void createTextField() {
@@ -128,9 +130,12 @@ public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
         cell.setOnDragDone((DragEvent event) -> clearDropLocation());
 
         // sucks ass but works so ig im not gonna change anything
-        // sucks ass due to the fact it requires so many listeners. it saturates memory for nothing. 
-        sharedContext.selectedLessonProperty().addListener((observable, oldValue, newValue) -> setBoldIfSelected(cell, newValue));
-        sharedContext.selectedSchoolYearProperty().addListener((observable, oldValue, newValue) -> setBoldIfSelected(cell, newValue));
+        // sucks ass due to the fact it requires so many listeners. it saturates memory
+        // for nothing.
+        sharedContext.selectedLessonProperty()
+                .addListener((observable, oldValue, newValue) -> setBoldIfSelected(cell, newValue));
+        sharedContext.selectedSchoolYearProperty()
+                .addListener((observable, oldValue, newValue) -> setBoldIfSelected(cell, newValue));
         cell.itemProperty().addListener((observable, oldValue, newValue) -> {
             setBoldIfSelected(cell, sharedContext.getSelectedLesson());
             setBoldIfSelected(cell, sharedContext.getSelectedSchoolYear());
@@ -145,7 +150,7 @@ public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
         }
 
         if (cell.getItem().getClass().equals(selectedValue.getClass())) {
-            if (((T)cell.getItem()).equals(selectedValue)) {
+            if (((T) cell.getItem()).equals(selectedValue)) {
                 cell.getStyleClass().add(CSS_SELECTION_CLASS);
             } else {
                 cell.getStyleClass().removeAll(CSS_SELECTION_CLASS);
@@ -157,17 +162,19 @@ public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
         draggedItem = treeCell.getTreeItem();
 
         // root can't be dragged
-        if (draggedItem.getParent() == null && !(draggedItem.getValue() instanceof CoreCompetency)) return;
+        if (draggedItem.getParent() == null && !(draggedItem.getValue() instanceof CoreCompetency))
+            return;
         Dragboard db = treeCell.startDragAndDrop(TransferMode.MOVE);
 
-        CoreCompetency clone = (CoreCompetency)((CoreCompetency)draggedItem.getValue()).clone();
+        CoreCompetency clone = (CoreCompetency) ((CoreCompetency) draggedItem.getValue()).clone();
 
         // to also handle the Color & Font classes
-        //Gson gson = FxGson.coreBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-        //String json = gson.toJson(clone);
+        // Gson gson =
+        // FxGson.coreBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+        // String json = gson.toJson(clone);
 
         ClipboardContent content = new ClipboardContent();
-        //content.put(JSON_FORMAT, json);
+        // content.put(JSON_FORMAT, json);
         content.put(DataFormat.PLAIN_TEXT, clone.getName());
         db.setContent(content);
         db.setDragView(treeCell.snapshot(null, null));
@@ -175,6 +182,7 @@ public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
     }
 
     private void clearDropLocation() {
-        if (dropZone != null) dropZone.setStyle("");
+        if (dropZone != null)
+            dropZone.setStyle("");
     }
 }

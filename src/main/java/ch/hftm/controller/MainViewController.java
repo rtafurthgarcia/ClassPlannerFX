@@ -5,17 +5,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-import org.hildan.fxgson.FxGson;
-
-import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.stream.JsonReader;
 
@@ -32,7 +27,6 @@ import ch.hftm.util.GridPaneHelper;
 import ch.hftm.util.GridPaneHelper.ComponentsColumn;
 import ch.hftm.util.GridPaneHelper.ComponentsRow;
 import ch.hftm.util.ModelTree;
-import ch.hftm.util.SerializationHelper;
 import ch.hftm.util.TextFieldTreeCellFactory;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
@@ -74,10 +68,11 @@ public class MainViewController {
     private MenuItem miSave;
 
     EventHandler<ActionEvent> onAddLesson = new EventHandler<>() {
-        public void handle(ActionEvent e) {               
+        public void handle(ActionEvent e) {
             if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue() instanceof Lesson) {
-                twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getValue().createAndAddSubUnit("new lesson");
-            } 
+                twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getValue()
+                        .createAndAddSubUnit("new lesson");
+            }
 
             if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue() instanceof SchoolYear) {
                 twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue().createAndAddSubUnit("new lesson");
@@ -90,11 +85,13 @@ public class MainViewController {
             ThematicAxis newThematicAxis = new ThematicAxis("new thematic axis");
 
             if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue() instanceof ThematicAxis) {
-                ((Lesson)twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getValue()).getSubUnits().add(newThematicAxis);
-            } 
+                ((Lesson) twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getValue()).getSubUnits()
+                        .add(newThematicAxis);
+            }
 
             if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue() instanceof Lesson) {
-                ((Lesson)twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue()).getSubUnits().add(newThematicAxis);
+                ((Lesson) twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue()).getSubUnits()
+                        .add(newThematicAxis);
             }
 
             graphicalRows.add(GridPaneHelper.addGridRow(gpMain, newThematicAxis, componentsColumns));
@@ -102,16 +99,18 @@ public class MainViewController {
     };
 
     EventHandler<ActionEvent> onAddCoreCompetency = new EventHandler<ActionEvent>() {
-        public void handle(ActionEvent e) {    
+        public void handle(ActionEvent e) {
             CoreCompetency newCoreCompetency = new CoreCompetency("new core competency");
 
             if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue() instanceof CoreCompetency) {
-                ThematicAxis selectedThematicAxis = ((ThematicAxis)twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getValue());
+                ThematicAxis selectedThematicAxis = ((ThematicAxis) twSchoolYearPlan.getSelectionModel()
+                        .getSelectedItem().getParent().getValue());
                 selectedThematicAxis.getSubUnits().add(newCoreCompetency);
-            } 
+            }
 
             if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue() instanceof ThematicAxis) {
-                ThematicAxis selectedThematicAxis = ((ThematicAxis)twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue());
+                ThematicAxis selectedThematicAxis = ((ThematicAxis) twSchoolYearPlan.getSelectionModel()
+                        .getSelectedItem().getValue());
                 selectedThematicAxis.getSubUnits().add(newCoreCompetency);
             }
         }
@@ -120,9 +119,11 @@ public class MainViewController {
     EventHandler<ActionEvent> onLoadSelection = new EventHandler<ActionEvent>() {
         public void handle(ActionEvent e) {
             if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue() instanceof Lesson) {
-                sharedContext.setSelectedLesson((Lesson) twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue());
+                sharedContext
+                        .setSelectedLesson((Lesson) twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue());
             } else if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue() instanceof SchoolYear) {
-                sharedContext.setSelectedSchoolYear((SchoolYear) twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue());
+                sharedContext.setSelectedSchoolYear(
+                        (SchoolYear) twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue());
                 sharedContext.setSelectedLesson(null);
             }
             clear();
@@ -135,49 +136,57 @@ public class MainViewController {
         }
     };
 
-    /* 
-    EventHandler<ActionEvent> onAddNewYear = new EventHandler<>() {
-        public void handle(ActionEvent e) {                   
-            if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue() instanceof SchoolYear) {
-                //twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getValue().createAndAddSubUnit("new school year");
-            } 
-
-            if (twSchoolYearPlan.getSelectionModel().getSelectedItem() == twSchoolYearPlan.getRoot()) {
-                //twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue().createAndAddSubUnit("new school year");
-            }
-        }
-    };*/
+    /*
+     * EventHandler<ActionEvent> onAddNewYear = new EventHandler<>() {
+     * public void handle(ActionEvent e) {
+     * if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue()
+     * instanceof SchoolYear) {
+     * //twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getValue
+     * ().createAndAddSubUnit("new school year");
+     * }
+     * 
+     * if (twSchoolYearPlan.getSelectionModel().getSelectedItem() ==
+     * twSchoolYearPlan.getRoot()) {
+     * //twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue().
+     * createAndAddSubUnit("new school year");
+     * }
+     * }
+     * };
+     */
 
     EventHandler<ActionEvent> onDeleteSchoolUnit = new EventHandler<ActionEvent>() {
-        public void handle(ActionEvent e) {   
-            if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getChildren().size() == 0) { 
+        public void handle(ActionEvent e) {
+            if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getChildren().size() == 0) {
                 SchoolUnit<?> value = twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue();
                 if (value instanceof ThematicAxis) {
                     GridPaneHelper.removeGridRow(gpMain, (ThematicAxis) value, graphicalRows);
                 } else if (value instanceof CoreCompetency) {
-                    ThematicAxis parentThematicAxis = (ThematicAxis) twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getValue();
-                    // we have to delete all core components 
+                    ThematicAxis parentThematicAxis = (ThematicAxis) twSchoolYearPlan.getSelectionModel()
+                            .getSelectedItem().getParent().getValue();
+                    // we have to delete all core components
                     List<FileViewer> list = fileViewerContainers.stream()
-                        .flatMap(c -> c.getChildren().stream())
-                        .map(n -> {
-                            return (FileViewer) n;
-                        })
-                        .filter(f -> f.getCompetency().equals((CoreCompetency) value) && f.getCompetency().getParentThematicAxis().equals(parentThematicAxis))
-                        .collect(Collectors.toList());
-                    
+                            .flatMap(c -> c.getChildren().stream())
+                            .map(n -> {
+                                return (FileViewer) n;
+                            })
+                            .filter(f -> f.getCompetency().equals((CoreCompetency) value)
+                                    && f.getCompetency().getParentThematicAxis().equals(parentThematicAxis))
+                            .collect(Collectors.toList());
+
                     list.forEach(f -> {
                         FileViewerContainer fileViewerContainer = (FileViewerContainer) f.getParent();
                         fileViewerContainer.getChildren().removeAll(list);
                     });
-                    
+
                 }
                 // TODO: should I really keep it???
                 // wont it remove things I dont want to???
-                twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getValue().getSubUnits().remove(value); 
+                twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getValue().getSubUnits()
+                        .remove(value);
             } else {
                 Alert alert = new Alert(
-                    AlertType.INFORMATION, 
-                    "Cannot delete item when it has children. Please make sure to remove all sub items beforehand.");
+                        AlertType.INFORMATION,
+                        "Cannot delete item when it has children. Please make sure to remove all sub items beforehand.");
                 alert.setHeaderText("Deletion impossible");
                 alert.setTitle("Item deletion");
                 alert.showAndWait();
@@ -188,49 +197,51 @@ public class MainViewController {
     @FXML
     public void initialize() throws IOException {
         gpMain.setGridLinesVisible(false);
-        
+
         generateColumns();
 
         GridPaneHelper.addGridHeaderRow(gpMain, List.of("Semestre 1", "Semestre 2"), 4, 1);
-        GridPaneHelper.addGridHeaderRow(gpMain, List.of("Trimestre 1", "Trimestre 2", "Trimestre 3", "Trimestre 4"), 2, 1);
+        GridPaneHelper.addGridHeaderRow(gpMain, List.of("Trimestre 1", "Trimestre 2", "Trimestre 3", "Trimestre 4"), 2,
+                1);
         GridPaneHelper.addGridHeaderRow(
-            gpMain, 
-            sharedContext.getSelectedSchoolYear().getQuarters().sorted((q1, q2) -> q1.getQuarter().compareTo(q2.getQuarter())), 
-            2, 
-            1);
+                gpMain,
+                sharedContext.getSelectedSchoolYear().getQuarters()
+                        .sorted((q1, q2) -> q1.getQuarter().compareTo(q2.getQuarter())),
+                2,
+                1);
 
         int i = 0;
         int rowIndex = gpMain.getRowCount();
         gpMain.getRowConstraints().add(new RowConstraints(30));
-        while (i < sharedContext.getLoadedSchool().getClassrooms().size() * sharedContext.getSelectedSchoolYear().getQuarters().size()){
-            for(int j = 0; j < sharedContext.getLoadedSchool().getClassrooms().size(); j++) {
+        while (i < sharedContext.getLoadedSchool().getClassrooms().size()
+                * sharedContext.getSelectedSchoolYear().getQuarters().size()) {
+            for (int j = 0; j < sharedContext.getLoadedSchool().getClassrooms().size(); j++) {
                 GridPaneHelper.addGridHeaderRow(
-                    gpMain, 
-                    List.of(sharedContext.getLoadedSchool().getClassrooms().get(j)), 
-                    1, 
-                    1 + i,
-                    rowIndex
-                    );
-                    
-                    i++;
+                        gpMain,
+                        List.of(sharedContext.getLoadedSchool().getClassrooms().get(j)),
+                        1,
+                        1 + i,
+                        rowIndex);
+
+                i++;
             }
         }
         loadThematicAxises();
         loadCoreCompetencies();
 
-        if (! alreadyInitializedOnce) {
+        if (!alreadyInitializedOnce) {
             loadTreeView();
         }
 
         alreadyInitializedOnce = true;
-    }  
+    }
 
     void generateColumns() {
         counter = 0;
         sharedContext.getSelectedSchoolYear().getQuarters().forEach(quarter -> {
             sharedContext.getLoadedSchool().getClassrooms().forEach(classroom -> {
                 componentsColumns.add(counter, new ComponentsColumn(quarter, classroom));
-                counter ++;
+                counter++;
             });
         });
 
@@ -241,20 +252,20 @@ public class MainViewController {
         gpMain.getRowConstraints().clear();
         gpMain.getColumnConstraints().clear();
 
-        for(int i = 0; i < COLUMN_COUNT; i ++) {
+        for (int i = 0; i < COLUMN_COUNT; i++) {
             ColumnConstraints cc = new ColumnConstraints();
             cc.setFillWidth(true);
             cc.setHgrow(Priority.ALWAYS);
-            
-            gpMain.getColumnConstraints().add(cc); 
+
+            gpMain.getColumnConstraints().add(cc);
         }
     }
 
     void loadTreeView() {
-        ModelTree<SchoolUnit<?>> tree = new ModelTree<>(sharedContext.getLoadedSchool(), 
-        SchoolUnit::getSubUnits, 
-        SchoolUnit::nameProperty, 
-        unit -> PseudoClass.getPseudoClass(unit.getClass().getSimpleName().toLowerCase()));
+        ModelTree<SchoolUnit<?>> tree = new ModelTree<>(sharedContext.getLoadedSchool(),
+                SchoolUnit::getSubUnits,
+                SchoolUnit::nameProperty,
+                unit -> PseudoClass.getPseudoClass(unit.getClass().getSimpleName().toLowerCase()));
 
         twSchoolYearPlan = tree.getTreeView();
 
@@ -277,26 +288,26 @@ public class MainViewController {
     }
 
     void loadCoreCompetencies() {
-        BiPredicate<CoreCompetency, FileViewerContainer> predicate = (cc, c) -> c.getThematicAxis().equals(cc.getParentThematicAxis()) && c.getClassroom().equals(cc.getParentClassroom()) && c.getQuarter().equals(cc.getParentSchoolYearQuarter());
+        BiPredicate<CoreCompetency, FileViewerContainer> predicate = (cc,
+                c) -> c.getThematicAxis().equals(cc.getParentThematicAxis())
+                        && c.getClassroom().equals(cc.getParentClassroom())
+                        && c.getQuarter().equals(cc.getParentSchoolYearQuarter());
 
         fileViewerContainers.stream()
-        .filter(c -> sharedContext.getSelectedLesson().getSubUnits().stream()
-            .flatMap(t -> t.getSubUnits().stream())
-            .anyMatch(cc -> predicate.test(cc, c))
-        ).collect(Collectors.toList())
-        .forEach(c -> {
-            c.getChildren().add(
-                new FileViewer(
-                    sharedContext.getSelectedLesson().getSubUnits().stream()
-                    .flatMap(t -> t.getSubUnits().stream())
-                    .filter(cc -> predicate.test(cc, c))
-                    .findFirst()
-                    .get()
-                    .cloneForGrid()
-                )
-            );
-        }
-        );
+                .filter(c -> sharedContext.getSelectedLesson().getSubUnits().stream()
+                        .flatMap(t -> t.getSubUnits().stream())
+                        .anyMatch(cc -> predicate.test(cc, c)))
+                .collect(Collectors.toList())
+                .forEach(c -> {
+                    c.getChildren().add(
+                            new FileViewer(
+                                    sharedContext.getSelectedLesson().getSubUnits().stream()
+                                            .flatMap(t -> t.getSubUnits().stream())
+                                            .filter(cc -> predicate.test(cc, c))
+                                            .findFirst()
+                                            .get()
+                                            .cloneForGrid()));
+                });
     }
 
     private ContextMenu createTreeViewContextMenu() {
@@ -327,16 +338,19 @@ public class MainViewController {
             miLoadLesson.setOnAction(onLoadSelection);
             miLoadSchoolYear.setOnAction(onLoadSelection);
 
-            //miCreateNewYear.setOnAction(onAddNewYear);
+            // miCreateNewYear.setOnAction(onAddNewYear);
 
             if (twSchoolYearPlan.getSelectionModel().getSelectedItem() == twSchoolYearPlan.getRoot()) {
                 contextMenu.getItems().addAll(miCreateNewYear);
             } else if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue() instanceof SchoolYear) {
-                contextMenu.getItems().addAll(miCreateNewYear, smiSeparator2, miLoadSchoolYear, smiSeparator, miAddLesson);
+                contextMenu.getItems().addAll(miCreateNewYear, smiSeparator2, miLoadSchoolYear, smiSeparator,
+                        miAddLesson);
             } else if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue() instanceof Lesson) {
-                contextMenu.getItems().addAll(miLoadLesson, smiSeparator2, miAddLesson, miAddThematicAxis, smiSeparator, miDeleteLesson);
+                contextMenu.getItems().addAll(miLoadLesson, smiSeparator2, miAddLesson, miAddThematicAxis, smiSeparator,
+                        miDeleteLesson);
             } else if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue() instanceof ThematicAxis) {
-                contextMenu.getItems().addAll(miAddThematicAxis, miAddCoreCompetency, smiSeparator, miDeleteThematicAxis);
+                contextMenu.getItems().addAll(miAddThematicAxis, miAddCoreCompetency, smiSeparator,
+                        miDeleteThematicAxis);
             } else if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue() instanceof CoreCompetency) {
                 contextMenu.getItems().addAll(miAddCoreCompetency, smiSeparator, miDeleteCoreCompetency);
             }
@@ -358,7 +372,7 @@ public class MainViewController {
     void onQuit() {
         Context.getInstance().getPrimaryStage().close();
     }
-    
+
     @FXML
     public void onOpenSettings() {
         sharedContext.showSettingsView();
@@ -371,7 +385,8 @@ public class MainViewController {
         File selectedFile = fileChooser.showOpenDialog(sharedContext.getPrimaryStage());
         if (selectedFile != null) {
             try {
-                School loadedSchool = sharedContext.getSerializer().fromJson(new JsonReader(new FileReader(selectedFile.getAbsolutePath())), School.class);
+                School loadedSchool = sharedContext.getSerializer()
+                        .fromJson(new JsonReader(new FileReader(selectedFile.getAbsolutePath())), School.class);
                 sharedContext.setSaveFilePath(selectedFile.getAbsolutePath());
 
                 clear();
@@ -386,8 +401,9 @@ public class MainViewController {
     @FXML
     public void onSaveAs() {
         FileChooser fileChooser = new FileChooser();
- 
-        FileChooser.ExtensionFilter extensions = new FileChooser.ExtensionFilter("ClassPlannerFX files (*.cpf)", "*.cpf");
+
+        FileChooser.ExtensionFilter extensions = new FileChooser.ExtensionFilter("ClassPlannerFX files (*.cpf)",
+                "*.cpf");
         fileChooser.getExtensionFilters().add(extensions);
         fileChooser.setTitle("Chose the directory and the filename of your savefile");
         fileChooser.setInitialFileName("school.cpf");

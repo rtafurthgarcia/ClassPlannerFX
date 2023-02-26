@@ -7,7 +7,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-public class SchoolUnit<T extends SchoolUnit<?>> {
+abstract public class SchoolUnit<T extends SchoolUnit<?>> {
     
     protected final StringProperty name = new SimpleStringProperty("");
     
@@ -15,21 +15,21 @@ public class SchoolUnit<T extends SchoolUnit<?>> {
     
     protected final ObservableList<T> subUnits;
 
-    public SchoolUnit(String name, ObservableList<T> subUnits, Function<String, T> subUnitSupplier) {
+    protected SchoolUnit(String name, ObservableList<T> subUnits, Function<String, T> subUnitSupplier) {
         this.subUnits = subUnits;
         this.subUnitSupplier = subUnitSupplier ;
         setName(name);
     }
 
-    public SchoolUnit(String name, ObservableList<T> subUnits) {
+    protected SchoolUnit(String name, ObservableList<T> subUnits) {
         this(name, subUnits, n -> null);
     }
     
-    public SchoolUnit(String name, Function<String, T> subUnitSupplier) {
+    protected SchoolUnit(String name, Function<String, T> subUnitSupplier) {
         this(name, FXCollections.observableArrayList(), subUnitSupplier);
     }
     
-    public SchoolUnit(String name) {
+    protected SchoolUnit(String name) {
         this(name, FXCollections.observableArrayList(), n -> null) ;
     }
 
