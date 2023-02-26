@@ -17,8 +17,10 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.TreeCell;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
+import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
@@ -112,23 +114,55 @@ public class FileViewer extends Accordion {
         return contextMenu;
     }
 
+    private void onMouseClicked(MouseEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Resource File");
+        File selectedFile = fileChooser.showOpenDialog(this.getScene().getWindow());
+        if (selectedFile != null) {
+            try {
+                tpFileArea.getChildren().remove(tIndication);
+                tpFileArea.getChildren().add(new FileItem(selectedFile));
+
+                getCompetency().getFiles().add(selectedFile);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void onDragOverFileArea(DragEvent event) {
+        Dragboard db = event.getDragboard();
+        boolean success = db.hasFiles();
+
+        if (success) {
+            event.acceptTransferModes(TransferMode.MOVE);
+        }
+    }
+
+    private void onDragDroppedFileArea(DragEvent event) {
+        Dragboard db = event.getDragboard();
+        boolean success = db.hasFiles();
+
+        db.getFiles().forEach(f -> {
+            tpFileArea.getChildren().remove(tIndication);
+            try {
+                tpFileArea.getChildren().add(new FileItem(f));
+                getCompetency().getFiles().add(f);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        });
+        
+        event.setDropCompleted(success);
+    }
+
     @FXML
     private void initialize() {
         tpDescription.setOnDragDetected(event -> dragDetected(event, this));
-        tpFileArea.setOnMouseClicked(event -> {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Open Resource File");
-            File selectedFile = fileChooser.showOpenDialog(this.getScene().getWindow());
-            if (selectedFile != null) {
-                try {
-                    tpFileArea.getChildren().remove(tIndication);
-                    tpFileArea.getChildren().add(new FileItem(selectedFile));
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
- 
-        });
+        tpFileArea.setOnMouseClicked(event -> onMouseClicked(event));
+        tpFileArea.setOnDragOver(event -> onDragOverFileArea(event));
+        tpFileArea.setOnDragDropped(event -> onDragDroppedFileArea(event));
     }
 }

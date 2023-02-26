@@ -1,6 +1,8 @@
 package ch.hftm.model;
 
-import java.io.Serializable;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -20,7 +22,12 @@ public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> implements Cloneab
     private ThematicAxis parentThematicAxis;
     private SchoolYearQuarter parentSchoolYearQuarter;
 
+    private List<File> files = new ArrayList<>();
     private boolean isPartOfTreeView;
+
+    public List<File> getFiles() {
+        return files;
+    }
 
     public boolean isPartOfTreeView() {
         return isPartOfTreeView;

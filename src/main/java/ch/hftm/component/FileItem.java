@@ -22,7 +22,6 @@ public class FileItem extends VBox {
     @FXML
     Label lFileName;
 
-    //SVGPath icon = new SVGPath();
     private File file;
     private FileType fileType;
 
@@ -53,7 +52,7 @@ public class FileItem extends VBox {
 
         public static FileType getByExtension(String extension) {
             return EXTENSION_LIST.stream()
-                .filter(t -> t.extensions.matches(extension))
+                .filter(t -> t.extensions.contains(extension))
                 .findFirst()
                 .orElse(UNDEFINED);
         }
@@ -76,10 +75,6 @@ public class FileItem extends VBox {
         svgImage.setScaleX(1.5);
         svgImage.setScaleY(1.5);
         getChildren().add(0, svgImage);
-       /*SVGContent content = SVGLoader.load(url);
-        icon.setContent(readFromInputStream(ClassPlannerFX.class.getResourceAsStream(fileType.ressource)));
-        icon.setFill(Color.TRANSPARENT);
-        this.getChildren().add(icon);*/
     }
 
     public final File getFile() {

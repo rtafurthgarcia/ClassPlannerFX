@@ -189,7 +189,7 @@ public class FileViewerContainer extends VBox {
                 success = true;
             }
         }
-
+        
         event.setDropCompleted(success);
     }
 

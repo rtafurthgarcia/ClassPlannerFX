@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.TilePane?>
@@ -15,15 +16,20 @@
          </content>
       </TitledPane>
       <TitledPane fx:id="tpFiles" animated="false" layoutX="10.0" layoutY="10.0" text="associated files" wrapText="true">
-         <content>
-            <TilePane fx:id="tpFileArea" alignment="CENTER">
-               <children>
-                  <Text fx:id="tIndication" nodeOrientation="RIGHT_TO_LEFT" strokeType="OUTSIDE" strokeWidth="0.0" text="Drag and drop files here..." textAlignment="CENTER" wrappingWidth="150.0" TilePane.alignment="CENTER" />
-               </children></TilePane>
-         </content>
          <font>
             <Font name="System Italic" size="13.0" />
          </font>
+         <content>
+            <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" pannable="true" vbarPolicy="ALWAYS">
+               <content>
+                  <TilePane fx:id="tpFileArea" alignment="CENTER" hgap="12.0" vgap="12.0">
+                     <children>
+                        <Text fx:id="tIndication" nodeOrientation="LEFT_TO_RIGHT" strokeType="OUTSIDE" strokeWidth="0.0" text="Drag and drop files here..." textAlignment="CENTER" wrappingWidth="150.0" TilePane.alignment="CENTER" />
+                     </children>
+                  </TilePane>
+               </content>
+            </ScrollPane>
+         </content>
       </TitledPane>
    </panes>
 </fx:root>
