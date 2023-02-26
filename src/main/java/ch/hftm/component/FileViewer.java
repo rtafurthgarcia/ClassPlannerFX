@@ -2,20 +2,27 @@ package ch.hftm.component;
 
 import java.io.File;
 import java.io.IOException;
-import org.hildan.fxgson.FxGson;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-import com.google.gson.Gson;
 
 import ch.hftm.ClassPlannerFX;
 import ch.hftm.model.CoreCompetency;
+import ch.hftm.util.OSHelper;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener.Change;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Accordion;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TitledPane;
 import javafx.scene.input.ClipboardContent;
@@ -42,6 +49,8 @@ public class FileViewer extends Accordion {
     private Text tIndication;
 
     private ObjectProperty<CoreCompetency> competency = new SimpleObjectProperty<>();
+
+    private List<FileItem> selectedFileItems = new ArrayList<>();
 
     public FileViewer(CoreCompetency competency) {
         super();
@@ -124,14 +133,28 @@ public class FileViewer extends Accordion {
     private ContextMenu createContextMenu() {
         ContextMenu contextMenu = new ContextMenu();
 
-        MenuItem miDelete = new MenuItem("Delete this one core competency");
+        MenuItem miAddfile = new MenuItem("Add a file");
+        MenuItem miOpenFile = new MenuItem("Open the selected file(s)");
+        MenuItem miDeleteFile = new MenuItem("Remove the selected file(s) from this core competency");
+        MenuItem miDelete = new MenuItem("Delete the core competency");
 
-        //MenuItem miDeleteFile = new MenuItem("Delete this file");
+        SeparatorMenuItem smi = new SeparatorMenuItem();
+        SeparatorMenuItem smi2 = new SeparatorMenuItem();
 
+        miAddfile.setOnAction(event -> addFilePerFileChooser());
+        miDeleteFile.setOnAction(event -> onDeleteSelectedFiles());
+        miOpenFile.setOnAction(event -> openFileWithAssociatedProgram());
+        
         miDelete.setOnAction(event -> {
             FileViewerContainer fileViewerContainer = (FileViewerContainer) this.getParent();
             fileViewerContainer.getChildren().remove(this);
         });
+
+        if (! selectedFileItems.isEmpty()) {
+            contextMenu.getItems().addAll(miAddfile, smi2, miOpenFile, miDeleteFile, smi);
+        } else {
+            contextMenu.getItems().addAll(miAddfile, smi2);
+        }
         
         contextMenu.getItems().add(miDelete);
 
@@ -140,23 +163,60 @@ public class FileViewer extends Accordion {
 
     private void onMouseClicked(MouseEvent event) {
         if (event.getButton().equals(MouseButton.PRIMARY)) {
-            if (getCompetency().getFiles().size() == 0) {
-                FileChooser fileChooser = new FileChooser();
-                fileChooser.setTitle("Select a file you want to add to this core competency");
-                File selectedFile = fileChooser.showOpenDialog(this.getScene().getWindow());
-                if (selectedFile != null) {
-                    try {
-                        tpFileArea.getChildren().add(new FileItem(selectedFile));
-        
-                        getCompetency().getFiles().add(selectedFile);
-                    } catch (IOException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
+            if (getCompetency().getFiles().isEmpty()) {
+                addFilePerFileChooser();
+            } else {
+                selectedFileItems = tpFileArea.getChildren().stream()
+                    .filter(n -> n instanceof FileItem) 
+                    .map(n -> ((FileItem) n))
+                    .filter(n -> n.isSelected())
+                    .collect(Collectors.toList());
             }
         }
 
+        setContextMenu(createContextMenu());
+    }
+
+    private void openFileWithAssociatedProgram() {
+        selectedFileItems.forEach(f -> {
+            OSHelper.run(f.getFile());
+        });
+    }
+
+    private void addFilePerFileChooser() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select a file you want to add to this core competency");
+        File selectedFile = fileChooser.showOpenDialog(this.getScene().getWindow());
+        if (selectedFile != null) {
+            try {
+                tpFileArea.getChildren().add(new FileItem(selectedFile));
+
+                getCompetency().getFiles().add(selectedFile);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void onDeleteSelectedFiles() {
+        Alert alert = new Alert(
+                AlertType.CONFIRMATION,
+                "Do you really want to remove the selected files from this core competency?",
+                ButtonType.YES,
+                ButtonType.NO);
+        alert.setHeaderText("File removal");
+        alert.setTitle("Core competency: removal?");
+        Optional<ButtonType> result = alert.showAndWait();
+        
+        if(result.isPresent() && result.get() == ButtonType.YES) {
+            selectedFileItems.forEach(f -> {
+                tpFileArea.getChildren().remove(f);
+                getCompetency().getFiles().remove(f);
+            });
+    
+            selectedFileItems.clear();
+        }
     }
 
     private void onDragOverFileArea(DragEvent event) {
@@ -191,5 +251,6 @@ public class FileViewer extends Accordion {
         tpFileArea.setOnMouseClicked(event -> onMouseClicked(event));
         tpFileArea.setOnDragOver(event -> onDragOverFileArea(event));
         tpFileArea.setOnDragDropped(event -> onDragDroppedFileArea(event));
+        //tpFileArea.setOnMouseEntered(event -> setContextMenu(createContextMenu()));
     }
 }
