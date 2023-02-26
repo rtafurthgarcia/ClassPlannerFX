@@ -248,12 +248,6 @@ public class MainViewController {
             
             gpMain.getColumnConstraints().add(cc); 
         }
-
-        /*gpMain.widthProperty().addListener((observable, oldValue, newValue) -> {
-            gpMain.getColumnConstraints().forEach(c -> {
-                c.setMaxWidth(newValue.intValue() / gpMain.getColumnCount());
-            });
-        });*/
     }
 
     void loadTreeView() {
@@ -282,7 +276,7 @@ public class MainViewController {
         });
     }
 
-    public void loadCoreCompetencies() {
+    void loadCoreCompetencies() {
         BiPredicate<CoreCompetency, FileViewerContainer> predicate = (cc, c) -> c.getThematicAxis().equals(cc.getParentThematicAxis()) && c.getClassroom().equals(cc.getParentClassroom()) && c.getQuarter().equals(cc.getParentSchoolYearQuarter());
 
         fileViewerContainers.stream()
@@ -351,7 +345,7 @@ public class MainViewController {
         return contextMenu;
     }
 
-    void clear() {
+    public void clear() {
         gpMain.getChildren().clear();
         gpMain.getRowConstraints().clear();
         gpMain.getColumnConstraints().clear();
@@ -377,8 +371,12 @@ public class MainViewController {
         File selectedFile = fileChooser.showOpenDialog(sharedContext.getPrimaryStage());
         if (selectedFile != null) {
             try {
-                sharedContext.getSerializer().fromJson(new JsonReader(new FileReader(selectedFile.getAbsolutePath())), School.class);
+                School loadedSchool = sharedContext.getSerializer().fromJson(new JsonReader(new FileReader(selectedFile.getAbsolutePath())), School.class);
                 sharedContext.setSaveFilePath(selectedFile.getAbsolutePath());
+
+                clear();
+                sharedContext.setLoadedSchool(loadedSchool);
+                initialize();
             } catch (IOException exception) {
                 sharedContext.getLogger().log(Level.SEVERE, exception.toString());
             }

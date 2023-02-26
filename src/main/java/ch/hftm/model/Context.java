@@ -26,7 +26,9 @@ import javafx.stage.Stage;
 
 public class Context {
     private final static Context instance = new Context();
-    
+
+    private MainViewController mainController;
+
     private Stage primaryStage;
     private School loadedSchool;
     private DateTimeFormatter dateFormatUsed;
@@ -127,6 +129,9 @@ public class Context {
         this.loadedSchool = loadedSchool;
     }
 
+    public MainViewController getMainController() {
+        return mainController;
+    }
 
     public void showMainView() {
         try {
@@ -138,7 +143,7 @@ public class Context {
             instance.primaryStage.setScene(scene);
             instance.primaryStage.show();
 
-            MainViewController controller = loader.getController();
+            mainController = loader.getController();
         } catch (IOException exception) {
             logger.log(Level.SEVERE, exception.toString());
         }

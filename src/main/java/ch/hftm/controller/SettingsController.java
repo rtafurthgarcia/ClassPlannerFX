@@ -20,9 +20,9 @@ public class SettingsController {
     @FXML
     Pane pClassrooms;
 
-    private Stage _stage;
+    private Stage stage;
 
-    private Context _sharedContext = Context.getInstance();
+    private Context sharedContext = Context.getInstance();
 
     public void setApp() throws IOException {
         this.pGeneral = FXMLLoader.load(ClassPlannerFX.class.getResource("view/GeneralView.fxml"));
@@ -31,7 +31,7 @@ public class SettingsController {
     }
 
     public void setStage(Stage stage) {
-        this._stage = stage;
+        this.stage = stage;
     }
 
 

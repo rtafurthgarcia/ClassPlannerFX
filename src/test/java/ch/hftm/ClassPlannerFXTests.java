@@ -2,12 +2,13 @@ package ch.hftm;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.HashSet;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -15,6 +16,8 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
+
+import com.google.gson.stream.JsonReader;
 
 import ch.hftm.model.Classroom;
 import ch.hftm.model.Context;
@@ -96,6 +99,24 @@ class ClassPlannerFXTests {
 	public void shouldBeCorrectlySetup() {
 		assertTrue(sharedContext.getLoadedSchool().getClassrooms().size() == 2);
         assertTrue(sharedContext.getLoadedSchool().getSubUnits().size() == 2);
+
+
 	}
 
+    @Test
+    public void isAbleToSaveFile() throws IOException {
+        String json = sharedContext.getSerializer().toJson(sharedContext.getLoadedSchool());
+        BufferedWriter writer = new BufferedWriter(new FileWriter("test.cpf"));
+        writer.write(json);
+        writer.close();
+    }
+
+    @Test
+    public void isAbleToReadASaveFile() throws IOException {
+        School loadedSchool = sharedContext.getSerializer().fromJson(new JsonReader(new FileReader("test.cpf")), School.class);
+
+        sharedContext.getMainController().clear();
+        sharedContext.setLoadedSchool(loadedSchool);
+        sharedContext.setLoadedSchool(loadedSchool);
+    }
 }
