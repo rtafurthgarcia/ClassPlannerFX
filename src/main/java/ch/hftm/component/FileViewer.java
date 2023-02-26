@@ -1,5 +1,6 @@
 package ch.hftm.component;
 
+import java.io.File;
 import java.io.IOException;
 import org.hildan.fxgson.FxGson;
 
@@ -7,10 +8,6 @@ import com.google.gson.Gson;
 
 import ch.hftm.ClassPlannerFX;
 import ch.hftm.model.CoreCompetency;
-import ch.hftm.model.Lesson;
-import ch.hftm.model.SchoolYear;
-import ch.hftm.model.ThematicAxis;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
@@ -18,7 +15,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TitledPane;
 import javafx.scene.input.ClipboardContent;
@@ -26,10 +22,10 @@ import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.TilePane;
-import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 public class FileViewer extends Accordion {
     @FXML
@@ -40,6 +36,8 @@ public class FileViewer extends Accordion {
     private TitledPane tpFiles;
     @FXML
     private TilePane tpFileArea;
+    @FXML
+    private Text tIndication;
 
     private ObjectProperty<CoreCompetency> competency = new SimpleObjectProperty<>();
 
@@ -57,8 +55,9 @@ public class FileViewer extends Accordion {
             this.setCompetency(competency);
 
             taDescription.setPrefHeight(Integer.MAX_VALUE);
-            //taDescription.setPrefWidth(Integer.MAX_VALUE);
             tpFileArea.setPrefHeight(Integer.MAX_VALUE);
+
+            this.setContextMenu(createContextMenu());
         } catch (IOException | CloneNotSupportedException exception) {
             throw new RuntimeException(exception);
         }
@@ -116,5 +115,20 @@ public class FileViewer extends Accordion {
     @FXML
     private void initialize() {
         tpDescription.setOnDragDetected(event -> dragDetected(event, this));
+        tpFileArea.setOnMouseClicked(event -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Open Resource File");
+            File selectedFile = fileChooser.showOpenDialog(this.getScene().getWindow());
+            if (selectedFile != null) {
+                try {
+                    tpFileArea.getChildren().remove(tIndication);
+                    tpFileArea.getChildren().add(new FileItem(selectedFile));
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+ 
+        });
     }
 }

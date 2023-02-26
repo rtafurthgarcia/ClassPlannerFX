@@ -6,6 +6,7 @@ module ch.hftm {
     requires org.controlsfx.controls;
     requires org.hildan.fxgson;
     requires com.google.gson;
+    requires org.girod.javafx.svgimage;
 
     exports ch.hftm;
 

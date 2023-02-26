@@ -240,7 +240,7 @@ public class MainViewController {
         twSchoolYearPlan = tree.getTreeView();
 
         apTreeView.getChildren().add(twSchoolYearPlan);
-        
+
         twSchoolYearPlan.prefHeightProperty().bind(gpMain.heightProperty());
         twSchoolYearPlan.setEditable(true);
         twSchoolYearPlan.setCellFactory(new TextFieldTreeCellFactory<SchoolUnit<?>>());
