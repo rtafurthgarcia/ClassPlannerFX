@@ -165,11 +165,12 @@ public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
         CoreCompetency clone = (CoreCompetency)((CoreCompetency)draggedItem.getValue()).clone();
 
         // to also handle the Color & Font classes
-        Gson gson = FxGson.coreBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-        String json = gson.toJson(clone);
+        //Gson gson = FxGson.coreBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+        //String json = gson.toJson(clone);
 
         ClipboardContent content = new ClipboardContent();
-        content.put(JSON_FORMAT, json);
+        //content.put(JSON_FORMAT, json);
+        content.put(DataFormat.PLAIN_TEXT, clone.getName());
         db.setContent(content);
         db.setDragView(treeCell.snapshot(null, null));
         event.consume();

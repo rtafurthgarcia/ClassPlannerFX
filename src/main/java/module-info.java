@@ -14,5 +14,6 @@ module ch.hftm {
     opens ch.hftm.component to javafx.fxml;
 
     opens ch.hftm.model to com.google.gson;
+    //opens java.java to com.google.gson;
     //opens ch.hftm.model to javafx.fxml;
 }

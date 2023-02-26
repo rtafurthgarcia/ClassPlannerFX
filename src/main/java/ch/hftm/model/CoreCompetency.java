@@ -4,9 +4,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> implements Cloneable {
 
@@ -22,10 +25,21 @@ public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> implements Cloneab
     private ThematicAxis parentThematicAxis;
     private SchoolYearQuarter parentSchoolYearQuarter;
 
-    private List<File> files = new ArrayList<>();
+    private ListProperty<File> files = new SimpleListProperty<File>(FXCollections.observableArrayList());
+
     private boolean isPartOfTreeView;
 
-    public List<File> getFiles() {
+    public ObservableList<File> getFiles() {
+        return files;
+    }
+
+    public CoreCompetency setFiles(ObservableList<File> files) {
+        this.files.set(files);
+
+        return this;
+    }
+
+    public ListProperty<File> filesProperty() {
         return files;
     }
 
@@ -88,6 +102,8 @@ public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> implements Cloneab
         CoreCompetency competency = new CoreCompetency(this.getName());
         competency.nameProperty().bindBidirectional(this.nameProperty());
         competency.descriptionProperty().bindBidirectional(this.descriptionProperty());
+        competency.filesProperty().bindBidirectional(this.filesProperty());
+        //competency.files.addAll(this.files);
 
         return competency;
     }
@@ -99,6 +115,7 @@ public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> implements Cloneab
         competency.parentClassroom = this.parentClassroom;
         competency.parentThematicAxis = this.parentThematicAxis;
         competency.parentSchoolYearQuarter = this.parentSchoolYearQuarter;
+        competency.filesProperty().bindBidirectional(this.filesProperty());
         competency.isPartOfTreeView = false;
 
         return competency;

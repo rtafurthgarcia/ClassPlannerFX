@@ -88,8 +88,8 @@ public class FileViewerContainer extends VBox {
     private static void onDragOverContainer(DragEvent event, FileViewerContainer target) {
         Dragboard db = event.getDragboard();
         boolean success = false;
-        if (!db.hasContent(DataFormat.lookupMimeType("application/json")))
-            return;
+        /*if (!db.hasContent(DataFormat.lookupMimeType("application/json")))
+            return;*/
 
         if (event.getGestureSource() instanceof FileViewer) {
             FileViewer source = ((FileViewer) event.getGestureSource());
@@ -111,38 +111,19 @@ public class FileViewerContainer extends VBox {
         }
     }
 
-    private static void onMouseEntered(MouseEvent event, FileViewerContainer target) {
-        if (target.getChildren().size() > 0) {
-            int columnIndex = GridPane.getColumnIndex(target);
-            if (((GridPane) target.getParent()).getColumnCount() > columnIndex + 1) {
-                int rowIndex = GridPane.getRowIndex(target);
-                target.toFront();
-        
-                GridPane.setConstraints(target, columnIndex, rowIndex, 2, 1, HPos.CENTER, VPos.CENTER);
-            }
-        }
-    }
-
-    private static void onMouseExited(MouseEvent event, FileViewerContainer target) {
-        if (target.getChildren().size() > 0) {
-            int columnIndex = GridPane.getColumnIndex(target);
-            int rowIndex = GridPane.getRowIndex(target);
-
-            GridPane.setConstraints(target, columnIndex, rowIndex, 1, 1, HPos.CENTER, VPos.CENTER);
-        }
-    }
-
+    
     private static void onDragDroppedContainer(DragEvent event, FileViewerContainer target) {
         Dragboard db = event.getDragboard();
-        if (!db.hasContent(DataFormat.lookupMimeType("application/json")))
-            return;
+        /*if (!db.hasContent(DataFormat.lookupMimeType("application/json")))
+            return;*/
+        
         boolean success = false;
 
         // when moving core competency between tiles
         if (event.getGestureSource() instanceof FileViewer) {
             FileViewer source = ((FileViewer) event.getGestureSource());
             FileViewerContainer parent = (FileViewerContainer) source.getParent();
-
+            
             boolean shouldContinue = true;
             if (!target.getThematicAxis().isEqualCoreCompetencyInside(source.getCompetency()) && !target.getThematicAxis().equals(source.getCompetency().getParentThematicAxis())) {
                 shouldContinue = target.getThematicAxis().copyInsideIfNecessary(source.getCompetency());
@@ -161,15 +142,15 @@ public class FileViewerContainer extends VBox {
                 source.getCompetency().getParentThematicAxis().getSubUnits().removeIf(
                     c -> (c.equals(source.getCompetency()) && ! c.isPartOfTreeView())
                 );
-
+                
                 target.getChildren().add(source);
-    
+                
                 source.getCompetency().setParentThematicAxis(target.getThematicAxis());
                 source.getCompetency().setParentClassroom(target.getClassroom());
                 source.getCompetency().setParentSchoolYearQuarter(target.getQuarter());
                 success = true;
             }
-        // when drag and dropping a core competency from the treeview to the grid
+            // when drag and dropping a core competency from the treeview to the grid
         } else if (event.getGestureSource() instanceof TreeCell) {
             CoreCompetency source = ((CoreCompetency) ((TreeCell) event.getGestureSource()).getItem()).clone();
             
@@ -183,14 +164,34 @@ public class FileViewerContainer extends VBox {
                 source.setParentClassroom(target.getClassroom());
                 source.setParentSchoolYearQuarter(target.getQuarter());
                 source.setPartOfTreeView(false);
-
+                
                 target.getChildren().add(new FileViewer(source));
-
+                
                 success = true;
             }
         }
-        
+
         event.setDropCompleted(success);
     }
 
+    private static void onMouseEntered(MouseEvent event, FileViewerContainer target) {
+        if (target.getChildren().size() > 0) {
+            int columnIndex = GridPane.getColumnIndex(target);
+            if (((GridPane) target.getParent()).getColumnCount() > columnIndex + 1) {
+                int rowIndex = GridPane.getRowIndex(target);
+                target.toFront();
+        
+                GridPane.setConstraints(target, columnIndex, rowIndex, 2, 1, HPos.CENTER, VPos.CENTER);
+            }
+        }
+    }
+    
+    private static void onMouseExited(MouseEvent event, FileViewerContainer target) {
+        if (target.getChildren().size() > 0) {
+            int columnIndex = GridPane.getColumnIndex(target);
+            int rowIndex = GridPane.getRowIndex(target);
+    
+            GridPane.setConstraints(target, columnIndex, rowIndex, 1, 1, HPos.CENTER, VPos.CENTER);
+        }
+    }
 }
