@@ -1,8 +1,6 @@
 package ch.hftm.util;
 
-import org.hildan.fxgson.FxGson;
-
-import com.google.gson.Gson;
+import java.util.logging.Level;
 
 import ch.hftm.model.Context;
 import ch.hftm.model.CoreCompetency;
@@ -123,8 +121,8 @@ public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
         cell.setOnDragDetected((MouseEvent event) -> {
             try {
                 dragDetected(event, cell);
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
+            } catch (CloneNotSupportedException exception) {
+                sharedContext.getLogger().log(Level.WARNING, exception.toString());
             }
         });
         cell.setOnDragDone((DragEvent event) -> clearDropLocation());

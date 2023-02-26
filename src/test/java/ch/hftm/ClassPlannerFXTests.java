@@ -18,7 +18,9 @@ import org.testfx.framework.junit5.Start;
 
 import ch.hftm.model.Classroom;
 import ch.hftm.model.Context;
+import ch.hftm.model.CoreCompetency;
 import ch.hftm.model.Lesson;
+import ch.hftm.model.School;
 import ch.hftm.model.SchoolYear;
 import ch.hftm.model.SchoolYearQuarter;
 import ch.hftm.model.ThematicAxis;
@@ -28,7 +30,7 @@ import javafx.stage.Stage;
 @ExtendWith(ApplicationExtension.class)
 class ClassPlannerFXTests {
 
-    private Context _sharedContext = Context.getInstance();
+    private Context sharedContext = Context.getInstance();
 
     /**
      * Will be called with {@code @Before} semantics, i. e. before each test method.
@@ -37,46 +39,63 @@ class ClassPlannerFXTests {
      */
     @Start
 	public void start(Stage stage) {
-        _sharedContext.primaryStage = stage;
+        sharedContext.setPrimaryStage(stage);
         
-        _sharedContext.primaryStage.setTitle("ClassPlannerFX");
+        sharedContext.getPrimaryStage().setTitle("ClassPlannerFX");
 
-        _sharedContext.showMainView();
+        sharedContext.showMainView();
     }
 	
 	@BeforeAll
-	public void setup() throws ParseException {
-        _sharedContext.schoolName = "Berner Primärschule";
-        _sharedContext.dateFormatUsed = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-		//_sharedContext.dateFormatUsed = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.GERMANY); //DateFormat.getDateInstance(DateFormat.MEDIUM, new Locale("fr", "CH"));
+	public void generateDefaultValues() throws ParseException {
+        sharedContext.setLoadedSchool(new School("Berner Primärschule"));
+        sharedContext.setDateFormatUsed(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
 
-		_sharedContext.classrooms = new HashSet<> (Arrays.asList(new Classroom("Classe 711"), new Classroom("Classe 712")));
-		_sharedContext.selectedSchoolYear = new SchoolYear(LocalDate.parse("02.05.2023", _sharedContext.dateFormatUsed), LocalDate.parse("29.04.2024", _sharedContext.dateFormatUsed));
-        _sharedContext.schoolYearQuarters = new HashSet<> (Arrays.asList(
+        sharedContext.getLoadedSchool().getClassrooms().addAll(new Classroom("Classe 711"), new Classroom("Classe 712"));
+
+        sharedContext.setSelectedSchoolYear(new SchoolYear(LocalDate.parse("02.05.2023", sharedContext.getDateFormatUsed()), LocalDate.parse("29.04.2024", sharedContext.getDateFormatUsed())));
+        
+        sharedContext.getSelectedSchoolYear().getQuarters().addAll(
             new SchoolYearQuarter(1, 4, 19), 
             new SchoolYearQuarter(2, 20, 35), 
             new SchoolYearQuarter(3, 36, 51), 
             new SchoolYearQuarter(4, 52, 68)
-        ));
+        );
 
-        Lesson lessonFrench =  new Lesson("Français", _sharedContext.selectedSchoolYear);
-        Lesson lessonGeography =  new Lesson("Geographie", _sharedContext.selectedSchoolYear);
-        Lesson lessonMaths =  new Lesson("Maths", _sharedContext.selectedSchoolYear);
-        _sharedContext.lessons = new HashSet<>(Arrays.asList(lessonFrench, lessonGeography, lessonMaths));
-        _sharedContext.selectedLesson = lessonFrench;
+        SchoolYear schoolYear2025 = new SchoolYear(LocalDate.parse("02.05.2024", sharedContext.getDateFormatUsed()), LocalDate.parse("29.04.2025", sharedContext.getDateFormatUsed()));
+        schoolYear2025.getQuarters().addAll(
+            new SchoolYearQuarter(1, 4, 19), 
+            new SchoolYearQuarter(2, 20, 35), 
+            new SchoolYearQuarter(3, 36, 51), 
+            new SchoolYearQuarter(4, 52, 68)
+        );
 
-        _sharedContext.thematicAxises = new HashSet<>(Arrays.asList(
-            new ThematicAxis("Vocabulaire 1", 1, lessonFrench, _sharedContext.selectedSchoolYear),
-            new ThematicAxis("Verbes irréguliers G4", 2, lessonFrench, _sharedContext.selectedSchoolYear),
-            new ThematicAxis("Poésie", 3, lessonFrench, _sharedContext.selectedSchoolYear),
-            new ThematicAxis("Océanie", 1, lessonGeography, _sharedContext.selectedSchoolYear)
-        ));
+        sharedContext.getLoadedSchool().getSubUnits().addAll(sharedContext.getSelectedSchoolYear(), schoolYear2025);
+
+        Lesson lessonFrench =  new Lesson("Français");
+        Lesson lessonGeography =  new Lesson("Geographie");
+        Lesson lessonMaths =  new Lesson("Maths");
+        sharedContext.getSelectedSchoolYear().getSubUnits().addAll(lessonFrench, lessonGeography, lessonMaths);
+
+        sharedContext.setSelectedLesson(lessonFrench);
+
+        ThematicAxis taVocabulaire = new ThematicAxis("Vocabulaire 1");
+        taVocabulaire.getSubUnits().add(new CoreCompetency("Verbes en ER, IR").setParentClassroom(sharedContext.getLoadedSchool().getClassrooms().get(0)).setParentSchoolYearQuarter(sharedContext.getSelectedSchoolYear().getQuarters().get(0)).setParentThematicAxis(taVocabulaire));
+        taVocabulaire.getSubUnits().add(new CoreCompetency("Verbes en UIR, DRE").setParentClassroom(sharedContext.getLoadedSchool().getClassrooms().get(1)).setParentSchoolYearQuarter(sharedContext.getSelectedSchoolYear().getQuarters().get(2)).setParentThematicAxis(taVocabulaire));
+        
+        sharedContext.getSelectedLesson().getSubUnits().addAll(
+            taVocabulaire,
+            new ThematicAxis("Verbes irréguliers G4"),
+            new ThematicAxis("Poésie")
+        );
+
+        lessonGeography.getSubUnits().add(new ThematicAxis("Océanie"));
 	}
 
 	@Test
 	public void shouldBeCorrectlySetup() {
-		assertTrue(_sharedContext.schoolYearQuarters.size() == 4);
-        assertTrue(_sharedContext.classrooms.size() == 2);
+		assertTrue(sharedContext.getLoadedSchool().getClassrooms().size() == 2);
+        assertTrue(sharedContext.getLoadedSchool().getSubUnits().size() == 2);
 	}
 
 }

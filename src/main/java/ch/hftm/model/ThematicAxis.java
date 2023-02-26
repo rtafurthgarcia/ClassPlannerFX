@@ -7,7 +7,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 
-public class ThematicAxis extends SchoolUnit<CoreCompetency>  {
+public class ThematicAxis extends SchoolUnit<CoreCompetency> implements Cloneable {
     public ThematicAxis(String name) {
         super(name, FXCollections.observableArrayList(), CoreCompetency::new);
     }
@@ -44,5 +44,14 @@ public class ThematicAxis extends SchoolUnit<CoreCompetency>  {
             .anyMatch(c -> c.equals(source));
 
         return isPresent;
+    }
+
+    @Override
+    protected ThematicAxis clone()  {
+        ThematicAxis thematicAxis = new ThematicAxis(this.getName());
+        thematicAxis.nameProperty().bindBidirectional(this.nameProperty());
+        //competency.files.addAll(this.files);
+
+        return thematicAxis;
     }
 }

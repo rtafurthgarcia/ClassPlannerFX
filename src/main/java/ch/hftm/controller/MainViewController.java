@@ -1,46 +1,55 @@
 package ch.hftm.controller;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.BiPredicate;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-import org.controlsfx.control.spreadsheet.SpreadsheetView;
+import org.hildan.fxgson.FxGson;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
+import com.google.gson.stream.JsonReader;
 
 import ch.hftm.component.FileViewer;
 import ch.hftm.component.FileViewerContainer;
 import ch.hftm.model.Context;
 import ch.hftm.model.CoreCompetency;
 import ch.hftm.model.Lesson;
+import ch.hftm.model.School;
 import ch.hftm.model.SchoolUnit;
 import ch.hftm.model.SchoolYear;
 import ch.hftm.model.ThematicAxis;
 import ch.hftm.util.GridPaneHelper;
-import ch.hftm.util.ModelTree;
-import ch.hftm.util.TextFieldTreeCellFactory;
 import ch.hftm.util.GridPaneHelper.ComponentsColumn;
 import ch.hftm.util.GridPaneHelper.ComponentsRow;
+import ch.hftm.util.ModelTree;
+import ch.hftm.util.SerializationHelper;
+import ch.hftm.util.TextFieldTreeCellFactory;
+import javafx.css.PseudoClass;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.geometry.HPos;
-import javafx.geometry.VPos;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
-import javafx.scene.text.Text;
-import javafx.css.PseudoClass;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import javafx.stage.FileChooser;
 
 public class MainViewController {
     @FXML
@@ -60,6 +69,9 @@ public class MainViewController {
     private ArrayList<ComponentsRow> graphicalRows = new ArrayList<>();
     private ArrayList<ComponentsColumn> componentsColumns = new ArrayList<>();
     private ArrayList<FileViewerContainer> fileViewerContainers = new ArrayList<>();
+
+    @FXML
+    private MenuItem miSave;
 
     EventHandler<ActionEvent> onAddLesson = new EventHandler<>() {
         public void handle(ActionEvent e) {               
@@ -117,11 +129,24 @@ public class MainViewController {
 
             try {
                 initialize();
-            } catch (IOException e1) {
-                e1.printStackTrace();
+            } catch (NullPointerException | IOException exception) {
+                sharedContext.getLogger().log(Level.SEVERE, exception.toString());
             }
         }
     };
+
+    /* 
+    EventHandler<ActionEvent> onAddNewYear = new EventHandler<>() {
+        public void handle(ActionEvent e) {                   
+            if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue() instanceof SchoolYear) {
+                //twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getValue().createAndAddSubUnit("new school year");
+            } 
+
+            if (twSchoolYearPlan.getSelectionModel().getSelectedItem() == twSchoolYearPlan.getRoot()) {
+                //twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue().createAndAddSubUnit("new school year");
+            }
+        }
+    };*/
 
     EventHandler<ActionEvent> onDeleteSchoolUnit = new EventHandler<ActionEvent>() {
         public void handle(ActionEvent e) {   
@@ -292,6 +317,7 @@ public class MainViewController {
             MenuItem miAddCoreCompetency = new MenuItem("Create a new core competency");
             MenuItem miDeleteCoreCompetency = new MenuItem("Delete selected core competency");
             MenuItem miLoadSchoolYear = new MenuItem("Load selected school year");
+            MenuItem miCreateNewYear = new MenuItem("Create a new school year");
 
             SeparatorMenuItem smiSeparator = new SeparatorMenuItem();
             SeparatorMenuItem smiSeparator2 = new SeparatorMenuItem();
@@ -307,8 +333,12 @@ public class MainViewController {
             miLoadLesson.setOnAction(onLoadSelection);
             miLoadSchoolYear.setOnAction(onLoadSelection);
 
-            if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue() instanceof SchoolYear) {
-                contextMenu.getItems().addAll(miLoadSchoolYear, smiSeparator, miAddLesson);
+            //miCreateNewYear.setOnAction(onAddNewYear);
+
+            if (twSchoolYearPlan.getSelectionModel().getSelectedItem() == twSchoolYearPlan.getRoot()) {
+                contextMenu.getItems().addAll(miCreateNewYear);
+            } else if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue() instanceof SchoolYear) {
+                contextMenu.getItems().addAll(miCreateNewYear, smiSeparator2, miLoadSchoolYear, smiSeparator, miAddLesson);
             } else if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue() instanceof Lesson) {
                 contextMenu.getItems().addAll(miLoadLesson, smiSeparator2, miAddLesson, miAddThematicAxis, smiSeparator, miDeleteLesson);
             } else if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue() instanceof ThematicAxis) {
@@ -331,12 +361,63 @@ public class MainViewController {
     }
 
     @FXML
-    void onClose() {
+    void onQuit() {
         Context.getInstance().getPrimaryStage().close();
     }
     
     @FXML
     public void onOpenSettings() {
         sharedContext.showSettingsView();
+    }
+
+    @FXML
+    public void onOpenFile() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select a ClassPlannerFX school file");
+        File selectedFile = fileChooser.showOpenDialog(sharedContext.getPrimaryStage());
+        if (selectedFile != null) {
+            try {
+                sharedContext.getSerializer().fromJson(new JsonReader(new FileReader(selectedFile.getAbsolutePath())), School.class);
+                sharedContext.setSaveFilePath(selectedFile.getAbsolutePath());
+            } catch (IOException exception) {
+                sharedContext.getLogger().log(Level.SEVERE, exception.toString());
+            }
+        }
+    }
+
+    @FXML
+    public void onSaveAs() {
+        FileChooser fileChooser = new FileChooser();
+ 
+        FileChooser.ExtensionFilter extensions = new FileChooser.ExtensionFilter("ClassPlannerFX files (*.cpf)", "*.cpf");
+        fileChooser.getExtensionFilters().add(extensions);
+        fileChooser.setTitle("Chose the directory and the filename of your savefile");
+        fileChooser.setInitialFileName("school.cpf");
+
+        File file = fileChooser.showSaveDialog(sharedContext.getPrimaryStage());
+        String filePath = file.getAbsolutePath();
+
+        saveCurrentSchoolFile(filePath);
+        sharedContext.setSaveFilePath(filePath);
+    }
+
+    @FXML
+    public void onSave() {
+        if (sharedContext.getSaveFilePath().isEmpty()) {
+            onSaveAs();
+        } else {
+            saveCurrentSchoolFile(sharedContext.getSaveFilePath());
+        }
+    }
+
+    public void saveCurrentSchoolFile(String filePath) {
+        try {
+            String json = sharedContext.getSerializer().toJson(sharedContext.getLoadedSchool());
+            BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
+            writer.write(json);
+            writer.close();
+        } catch (JsonIOException | IOException exception) {
+            sharedContext.getLogger().log(Level.SEVERE, exception.toString());
+        }
     }
 }

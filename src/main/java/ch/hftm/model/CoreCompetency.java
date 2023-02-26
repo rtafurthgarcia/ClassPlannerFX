@@ -1,9 +1,6 @@
 package ch.hftm.model;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -82,7 +79,7 @@ public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> implements Cloneab
     }
 
     public CoreCompetency setParentThematicAxis(ThematicAxis parentThematicAxis) {
-        this.parentThematicAxis = parentThematicAxis;
+        this.parentThematicAxis = parentThematicAxis.clone();
 
         return this;
     }

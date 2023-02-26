@@ -3,21 +3,16 @@ package ch.hftm.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.controlsfx.control.spreadsheet.Grid;
-
 import ch.hftm.component.FileViewerContainer;
 import ch.hftm.model.Classroom;
 import ch.hftm.model.SchoolYearQuarter;
 import ch.hftm.model.ThematicAxis;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
-import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
-import javafx.scene.text.Text;
 
 public class GridPaneHelper {
     static final int COLUMN_STARTING_INDEX = 0;

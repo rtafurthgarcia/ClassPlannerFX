@@ -1,12 +1,10 @@
 package ch.hftm.model;
 
-import java.util.Comparator;
 import java.util.function.Function;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 public class SchoolUnit<T extends SchoolUnit<?>> {

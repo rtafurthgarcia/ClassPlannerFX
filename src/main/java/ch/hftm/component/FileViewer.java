@@ -5,10 +5,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 
 import ch.hftm.ClassPlannerFX;
+import ch.hftm.model.Context;
 import ch.hftm.model.CoreCompetency;
 import ch.hftm.util.OSHelper;
 import javafx.beans.property.ObjectProperty;
@@ -37,6 +39,8 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 
 public class FileViewer extends Accordion {
+    private Context sharedContext = Context.getInstance();
+
     @FXML
     private TitledPane tpDescription;
     @FXML
@@ -78,7 +82,7 @@ public class FileViewer extends Accordion {
                 }
            });
         } catch (IOException | CloneNotSupportedException exception) {
-            throw new RuntimeException(exception);
+            sharedContext.getLogger().log(Level.SEVERE, exception.toString());
         }
     }
 
@@ -96,9 +100,8 @@ public class FileViewer extends Accordion {
             competency.getFiles().forEach(f -> {
                 try {
                     tpFileArea.getChildren().add(new FileItem(f));
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                } catch (IOException exception) {
+                    sharedContext.getLogger().log(Level.SEVERE, exception.toString());
                 }
             });
 
@@ -192,9 +195,8 @@ public class FileViewer extends Accordion {
                 tpFileArea.getChildren().add(new FileItem(selectedFile));
 
                 getCompetency().getFiles().add(selectedFile);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+            } catch (IOException exception) {
+                sharedContext.getLogger().log(Level.SEVERE, exception.toString());
             }
         }
     }
@@ -236,9 +238,8 @@ public class FileViewer extends Accordion {
             try {
                 tpFileArea.getChildren().add(new FileItem(f));
                 getCompetency().getFiles().add(f);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+            } catch (IOException exception) {
+                sharedContext.getLogger().log(Level.INFO, exception.toString());
             }
         });
         

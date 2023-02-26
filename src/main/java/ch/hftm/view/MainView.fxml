@@ -50,15 +50,14 @@
         <Menu mnemonicParsing="false" text="File">
           <items>
             <MenuItem mnemonicParsing="false" text="New Yearly Planning" />
-            <MenuItem mnemonicParsing="false" text="Open…" />
+            <MenuItem mnemonicParsing="false" onAction="#onOpenFile" text="Open…" />
             <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem fx:id="btnPlanningSettings" mnemonicParsing="false" onAction="#onOpenSettings" text="Planning settings" />
                   <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" text="Close" />
-            <MenuItem mnemonicParsing="false" text="Save" />
-            <MenuItem mnemonicParsing="false" text="Save As…" />
+            <MenuItem fx:id="miSave" mnemonicParsing="false" onAction="#onSave" text="Save" />
+            <MenuItem mnemonicParsing="false" onAction="#onSaveAs" text="Save As…" />
             <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" text="Quit" />
+            <MenuItem mnemonicParsing="false" onAction="#onQuit" text="Quit" />
           </items>
         </Menu>
         <Menu mnemonicParsing="false" text="Help">

@@ -3,8 +3,6 @@ package ch.hftm.model;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.time.temporal.ChronoField;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -18,10 +16,9 @@ public class SchoolYear extends SchoolUnit<Lesson> {
     private BooleanProperty archived;
     private ObservableList<SchoolYearQuarter> quarters;
 
-    private DateTimeFormatter _yearlyFormat = new DateTimeFormatterBuilder()
-        .appendPattern("yyyy")
-        .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
-        .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
+    private final String YEAR_PATTERN = "yyyy"; 
+    transient private DateTimeFormatter yearlyFormat = new DateTimeFormatterBuilder()
+        .appendPattern(YEAR_PATTERN)
         .toFormatter();
 
     public ObservableList<SchoolYearQuarter> getQuarters() {
@@ -42,8 +39,8 @@ public class SchoolYear extends SchoolUnit<Lesson> {
     public SchoolYear(String rangeToParse) {
         super(rangeToParse, FXCollections.observableArrayList(), Lesson::new);    
 
-        this.startDay = new SimpleObjectProperty<LocalDate>(LocalDate.parse(rangeToParse.subSequence(0, 3).toString(), _yearlyFormat));
-        this.endDay = new SimpleObjectProperty<LocalDate>(LocalDate.parse(rangeToParse.subSequence(5, 8).toString(), _yearlyFormat));
+        this.startDay = new SimpleObjectProperty<LocalDate>(LocalDate.parse(rangeToParse.subSequence(0, 3).toString(), yearlyFormat));
+        this.endDay = new SimpleObjectProperty<LocalDate>(LocalDate.parse(rangeToParse.subSequence(5, 8).toString(), yearlyFormat));
 
         this.archived = new SimpleBooleanProperty(false);
 

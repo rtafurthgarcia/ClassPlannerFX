@@ -1,21 +1,27 @@
 package ch.hftm.model;
 
+import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+
+import org.hildan.fxgson.FxGson;
+
+import com.google.gson.Gson;
 
 import ch.hftm.ClassPlannerFX;
 import ch.hftm.controller.MainViewController;
 import ch.hftm.controller.SettingsController;
+import ch.hftm.util.SerializationHelper;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Accordion;
-import javafx.scene.input.DataFormat;
 import javafx.stage.Stage;
 
 public class Context {
@@ -27,6 +33,46 @@ public class Context {
 
     private ObjectProperty<Lesson> selectedLesson = new SimpleObjectProperty<>();
     private ObjectProperty<SchoolYear> selectedSchoolYear = new SimpleObjectProperty<>();
+
+    private StringProperty saveFilePath = new SimpleStringProperty("");
+
+    private Gson serializer = FxGson.fullBuilder()
+        .registerTypeAdapter(File.class, new SerializationHelper.FileAdapter())
+        .registerTypeAdapter(LocalDate.class, new SerializationHelper.LocalDateAdapter())
+        .registerTypeAdapter(DateTimeFormatter.class, new SerializationHelper.DateTimeFormatterAdapter())
+        .setPrettyPrinting()
+        .create();
+
+    private LogManager logManager = LogManager.getLogManager();
+    private Logger logger;
+
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public void setLogger(Logger logger) {
+        this.logger = logger;
+    }
+
+    public LogManager getLogManager() {
+        return logManager;
+    }
+
+    public Gson getSerializer() {
+        return serializer;
+    }
+
+    public String getSaveFilePath() {
+        return saveFilePath.get();
+    }
+
+    public void setSaveFilePath(String saveFilePath) {
+        this.saveFilePath.set(saveFilePath);
+    }
+
+    public StringProperty saveFilePathProperty(){
+        return saveFilePath;
+    }
 
     public ObjectProperty<SchoolYear> selectedSchoolYearProperty() {
         return selectedSchoolYear;
@@ -93,8 +139,8 @@ public class Context {
             instance.primaryStage.show();
 
             MainViewController controller = loader.getController();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException exception) {
+            logger.log(Level.SEVERE, exception.toString());
         }
     }
 

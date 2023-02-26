@@ -1,8 +1,13 @@
 package ch.hftm.util;
 
 import java.io.File;
+import java.util.logging.Level;
+
+import ch.hftm.model.Context;
 
 public class OSHelper {
+    private static Context sharedContext = Context.getInstance();
+
     public enum OS {
         WINDOWS, LINUX, MAC, SOLARIS, UNKNOWN
     };
@@ -48,8 +53,8 @@ public class OSHelper {
             }
 
             new ProcessBuilder(command, file.getAbsolutePath()).start();
-        } catch (Exception e) {
-            // TODO: handle exception
+        } catch (Exception exception) {
+            sharedContext.getLogger().log(Level.INFO, exception.toString());
         }
     }
 }

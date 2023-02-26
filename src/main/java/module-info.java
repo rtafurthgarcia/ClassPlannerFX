@@ -1,4 +1,5 @@
 module ch.hftm {
+    requires java.logging;
     requires javafx.controls;
     requires javafx.base;
     requires javafx.fxml;
@@ -14,4 +15,5 @@ module ch.hftm {
     opens ch.hftm.component to javafx.fxml;
 
     opens ch.hftm.model to com.google.gson;
+    //opens java.base to com.google.gson;
 }
