@@ -26,7 +26,10 @@ import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.TilePane;
+import javafx.scene.layout.VBox;
 
 public class FileViewer extends Accordion {
     @FXML
@@ -52,7 +55,10 @@ public class FileViewer extends Accordion {
         try {
             loader.load();
             this.setCompetency(competency);
-            this.setContextMenu(createContextMenu());
+
+            taDescription.setPrefHeight(Integer.MAX_VALUE);
+            //taDescription.setPrefWidth(Integer.MAX_VALUE);
+            tpFileArea.setPrefHeight(Integer.MAX_VALUE);
         } catch (IOException | CloneNotSupportedException exception) {
             throw new RuntimeException(exception);
         }

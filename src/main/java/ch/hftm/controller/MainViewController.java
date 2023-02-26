@@ -58,7 +58,7 @@ public class MainViewController {
     private boolean alreadyInitializedOnce = false;
 
     private ArrayList<ComponentsRow> graphicalRows = new ArrayList<>();
-    private ArrayList<ComponentsColumn> graphicalColumns = new ArrayList<>();
+    private ArrayList<ComponentsColumn> componentsColumns = new ArrayList<>();
     private ArrayList<FileViewerContainer> fileViewerContainers = new ArrayList<>();
 
     EventHandler<ActionEvent> onAddLesson = new EventHandler<>() {
@@ -85,7 +85,7 @@ public class MainViewController {
                 ((Lesson)twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue()).getSubUnits().add(newThematicAxis);
             }
 
-            graphicalRows.add(GridPaneHelper.addGridRow(gpMain, newThematicAxis, graphicalColumns));
+            graphicalRows.add(GridPaneHelper.addGridRow(gpMain, newThematicAxis, componentsColumns));
         }
     };
 
@@ -163,9 +163,8 @@ public class MainViewController {
     @FXML
     public void initialize() throws IOException {
         gpMain.setGridLinesVisible(false);
-
+        
         generateColumns();
-        generateGraphicalColumns();
 
         GridPaneHelper.addGridHeaderRow(gpMain, List.of("Semestre 1", "Semestre 2"), 4, 1);
         GridPaneHelper.addGridHeaderRow(gpMain, List.of("Trimestre 1", "Trimestre 2", "Trimestre 3", "Trimestre 4"), 2, 1);
@@ -175,14 +174,6 @@ public class MainViewController {
             2, 
             1);
 
-        /* 
-        GridPaneHelper.addGridHeaderRow(
-            gpMain, 
-            sharedContext.getLoadedSchool().getClassrooms().stream().flatMap(i -> Collections.nCopies(4, i).stream()).collect(Collectors.toList()), 
-            1, 
-            1,
-            gpMain.getRowCount() -2);
-        */
         int i = 0;
         int rowIndex = gpMain.getRowCount();
         gpMain.getRowConstraints().add(new RowConstraints(30));
@@ -199,9 +190,6 @@ public class MainViewController {
                     i++;
             }
         }
-
-        gpMain.getStyleClass().add("grid");
-
         loadThematicAxises();
         loadCoreCompetencies();
 
@@ -212,39 +200,18 @@ public class MainViewController {
         alreadyInitializedOnce = true;
     }  
 
-    void generateGraphicalColumns() {
+    void generateColumns() {
         counter = 0;
         sharedContext.getSelectedSchoolYear().getQuarters().forEach(quarter -> {
             sharedContext.getLoadedSchool().getClassrooms().forEach(classroom -> {
-                graphicalColumns.add(counter, new ComponentsColumn(quarter, classroom));
+                componentsColumns.add(counter, new ComponentsColumn(quarter, classroom));
                 counter ++;
             });
         });
 
         counter = 0;
-    }
 
-    void loadTreeView() {
-        ModelTree<SchoolUnit<?>> tree = new ModelTree<>(sharedContext.getLoadedSchool(), 
-        SchoolUnit::getSubUnits, 
-        SchoolUnit::nameProperty, 
-        unit -> PseudoClass.getPseudoClass(unit.getClass().getSimpleName().toLowerCase()));
-
-        twSchoolYearPlan = tree.getTreeView();
-
-        apTreeView.getChildren().add(twSchoolYearPlan);
-        apTreeView.prefWidthProperty().bind(twSchoolYearPlan.widthProperty());
-        apTreeView.prefHeightProperty().bind(twSchoolYearPlan.heightProperty());
-
-        twSchoolYearPlan.setEditable(true);
-        twSchoolYearPlan.setCellFactory(new TextFieldTreeCellFactory<SchoolUnit<?>>());
-        twSchoolYearPlan.setOnMouseClicked(event -> {
-            twSchoolYearPlan.setContextMenu(createTreeViewContextMenu());
-        });
-    }
-
-    void generateColumns() {
-        final int COLUMN_COUNT = sharedContext.getSelectedSchoolYear().getQuarters().size() * sharedContext.getLoadedSchool().getClassrooms().size() + 1; // + 1 -> thematic axis column
+        final int COLUMN_COUNT = componentsColumns.size() + 1; // + 1 -> thematic axis column
 
         gpMain.getRowConstraints().clear();
         gpMain.getColumnConstraints().clear();
@@ -256,11 +223,35 @@ public class MainViewController {
             
             gpMain.getColumnConstraints().add(cc); 
         }
+
+        /*gpMain.widthProperty().addListener((observable, oldValue, newValue) -> {
+            gpMain.getColumnConstraints().forEach(c -> {
+                c.setMaxWidth(newValue.intValue() / gpMain.getColumnCount());
+            });
+        });*/
+    }
+
+    void loadTreeView() {
+        ModelTree<SchoolUnit<?>> tree = new ModelTree<>(sharedContext.getLoadedSchool(), 
+        SchoolUnit::getSubUnits, 
+        SchoolUnit::nameProperty, 
+        unit -> PseudoClass.getPseudoClass(unit.getClass().getSimpleName().toLowerCase()));
+
+        twSchoolYearPlan = tree.getTreeView();
+
+        apTreeView.getChildren().add(twSchoolYearPlan);
+        
+        twSchoolYearPlan.prefHeightProperty().bind(gpMain.heightProperty());
+        twSchoolYearPlan.setEditable(true);
+        twSchoolYearPlan.setCellFactory(new TextFieldTreeCellFactory<SchoolUnit<?>>());
+        twSchoolYearPlan.setOnMouseClicked(event -> {
+            twSchoolYearPlan.setContextMenu(createTreeViewContextMenu());
+        });
     }
 
     public void loadThematicAxises() {
         sharedContext.getSelectedLesson().getSubUnits().forEach(thematicAxis -> {
-            ComponentsRow row = GridPaneHelper.addGridRow(gpMain, thematicAxis, graphicalColumns);
+            ComponentsRow row = GridPaneHelper.addGridRow(gpMain, thematicAxis, componentsColumns);
             fileViewerContainers.addAll(row.containers());
             graphicalRows.add(row);
         });
@@ -331,16 +322,12 @@ public class MainViewController {
     }
 
     void clear() {
-        //gpMain.setGridLinesVisible(false);
-
         gpMain.getChildren().clear();
         gpMain.getRowConstraints().clear();
         gpMain.getColumnConstraints().clear();
         graphicalRows.clear();
-        graphicalColumns.clear();
+        componentsColumns.clear();
         fileViewerContainers.clear();
-
-        //gpMain.setGridLinesVisible(true);
     }
 
     @FXML

@@ -1,27 +1,22 @@
 package ch.hftm.component;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.function.BiPredicate;
-import java.util.stream.Collectors;
-
 import ch.hftm.model.Classroom;
 import ch.hftm.model.CoreCompetency;
 import ch.hftm.model.SchoolYearQuarter;
 import ch.hftm.model.ThematicAxis;
-import ch.hftm.util.TextFieldTreeCellFactory;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonType;
+import javafx.geometry.HPos;
+import javafx.geometry.VPos;
 import javafx.scene.control.TreeCell;
-import javafx.scene.control.cell.TextFieldTreeCell;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Window;
 
 public class FileViewerContainer extends VBox {
 
@@ -79,9 +74,15 @@ public class FileViewerContainer extends VBox {
 
         this.setOnDragOver(event -> onDragOverContainer(event, this));
         this.setOnDragDropped(event -> onDragDroppedContainer(event, this));
-        //this.getBorder().getStrokes().
-        //this.getBorder(). 
         this.getStyleClass().add(CSS_CLASS);
+
+        this.setOnMouseEntered(event -> onMouseEntered(event, this));
+        this.setOnMouseExited(event -> onMouseExited(event, this));
+        // oddity I dont quite understand: I cant use calculated values such as USE_COMPUTED_SIZE & co
+        // had to set weird values aswell in the pref heights from my controls aswell
+        this.setPrefHeight(Integer.MAX_VALUE);
+        this.setPrefWidth(Integer.MAX_VALUE);
+        this.setMinWidth(10);
     }
 
     private static void onDragOverContainer(DragEvent event, FileViewerContainer target) {
@@ -107,6 +108,27 @@ public class FileViewerContainer extends VBox {
 
         if (success) {
             event.acceptTransferModes(TransferMode.MOVE);
+        }
+    }
+
+    private static void onMouseEntered(MouseEvent event, FileViewerContainer target) {
+        if (target.getChildren().size() > 0) {
+            int columnIndex = GridPane.getColumnIndex(target);
+            if (((GridPane) target.getParent()).getColumnCount() > columnIndex + 1) {
+                int rowIndex = GridPane.getRowIndex(target);
+                target.toFront();
+        
+                GridPane.setConstraints(target, columnIndex, rowIndex, 2, 1, HPos.CENTER, VPos.CENTER);
+            }
+        }
+    }
+
+    private static void onMouseExited(MouseEvent event, FileViewerContainer target) {
+        if (target.getChildren().size() > 0) {
+            int columnIndex = GridPane.getColumnIndex(target);
+            int rowIndex = GridPane.getRowIndex(target);
+
+            GridPane.setConstraints(target, columnIndex, rowIndex, 1, 1, HPos.CENTER, VPos.CENTER);
         }
     }
 

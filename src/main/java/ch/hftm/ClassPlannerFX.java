@@ -28,6 +28,7 @@ public class ClassPlannerFX extends Application {
     public void start(Stage primaryStage) throws ParseException {
         generateDefaultValues();
 
+        primaryStage.setMaximized(true);
         sharedContext.setPrimaryStage(primaryStage);
         sharedContext.getPrimaryStage().setTitle("ClassPlannerFX");
 

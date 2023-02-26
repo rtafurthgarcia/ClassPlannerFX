@@ -3,14 +3,18 @@ package ch.hftm.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.controlsfx.control.spreadsheet.Grid;
+
 import ch.hftm.component.FileViewerContainer;
 import ch.hftm.model.Classroom;
 import ch.hftm.model.SchoolYearQuarter;
 import ch.hftm.model.ThematicAxis;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
+import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.Text;
@@ -30,7 +34,10 @@ public class GridPaneHelper {
     public static ComponentsRow addGridRow(GridPane pane, ThematicAxis thematicAxis, ArrayList<ComponentsColumn> columns) {
         final int COLUMN_MAX = pane.getColumnCount() - 1;
 
-        pane.getRowConstraints().add(new RowConstraints());
+        RowConstraints rc =  new RowConstraints();
+        rc.setFillHeight(true);
+        rc.setVgrow(Priority.SOMETIMES);
+        pane.getRowConstraints().add(rc);
             
         Label lThematicAxis = new Label();
         // after the first 4 headers
@@ -42,21 +49,24 @@ public class GridPaneHelper {
         lThematicAxis.textProperty().bindBidirectional(thematicAxis.nameProperty());
         lThematicAxis.setMaxWidth(Double.MAX_VALUE);
         lThematicAxis.setMaxHeight(Double.MAX_VALUE);
+        lThematicAxis.setMinWidth(100);
+        lThematicAxis.setWrapText(true);
 
         pane.getChildren().add(lThematicAxis);
-        GridPane.setConstraints(lThematicAxis, COLUMN_STARTING_INDEX, pane.getRowCount(), 1, 1, HPos.CENTER, VPos.CENTER);
+        GridPane.setConstraints(lThematicAxis, COLUMN_STARTING_INDEX, pane.getRowCount() - 1, 1, 1, HPos.CENTER, VPos.CENTER);
         
         ComponentsRow componentsRow = new ComponentsRow(lThematicAxis, new ArrayList<>(), thematicAxis);
         
         for (int i = COLUMN_STARTING_INDEX + 1; i < COLUMN_MAX + 1; i++) {
             FileViewerContainer container = new FileViewerContainer();
-            container.setMinSize(120, 180);
+            
             container.setClassroom((columns.get(i - 1).classroom()));
             container.setQuarter(columns.get(i - 1).quarter());
             container.setThematicAxis(thematicAxis);
-            
+           
             pane.getChildren().add(container);
             GridPane.setConstraints(container, i, pane.getRowCount() - 1, 1, 1, HPos.CENTER, VPos.CENTER);
+
             componentsRow.containers.add(container);
         }
 
