@@ -1,8 +1,12 @@
 package ch.hftm.model;
 
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 
+@XmlRootElement(name = "quarter")
 public class SchoolYearQuarter {
     private IntegerProperty _quarter;
     private IntegerProperty _startWeek;
@@ -13,11 +17,18 @@ public class SchoolYearQuarter {
         this._startWeek = new SimpleIntegerProperty(startWeek);
         this._endWeek = new SimpleIntegerProperty(endWeek);
     }
+
+    public SchoolYearQuarter() {
+        this._quarter = new SimpleIntegerProperty(0);
+        this._startWeek = new SimpleIntegerProperty(0);
+        this._endWeek = new SimpleIntegerProperty(0);
+    }
     
     public Integer getStartWeek() {
         return _startWeek.get();
     }
     
+    @XmlElement(name = "startweek")
     public void setStartWeek(Integer startWeek) {
         this._startWeek = new SimpleIntegerProperty(startWeek);
     }
@@ -34,6 +45,7 @@ public class SchoolYearQuarter {
         return _endWeek.get();
     }
 
+    @XmlElement(name = "endweek")
     public void setEndWeek(Integer endWeek) {
         this._endWeek = new SimpleIntegerProperty(endWeek);
     }
@@ -42,6 +54,7 @@ public class SchoolYearQuarter {
         return _quarter.get();
     }
 
+    @XmlAttribute(name = "quarterid")
     public void setQuarter(Integer quarter) {
         this._quarter = new SimpleIntegerProperty(quarter);
     }

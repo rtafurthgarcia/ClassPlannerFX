@@ -5,6 +5,7 @@ import java.util.List;
 
 import ch.hftm.component.FileViewerContainer;
 import ch.hftm.model.Classroom;
+import ch.hftm.model.SchoolUnit;
 import ch.hftm.model.SchoolYearQuarter;
 import ch.hftm.model.ThematicAxis;
 import javafx.geometry.HPos;
@@ -91,6 +92,11 @@ public class GridPaneHelper {
     public static void addGridHeaderRow(GridPane pane, List<?> list, int columnSpan, int columnStartOffset, int rowIndex) {
         for(int i = 0; i < list.size(); i++) {
             Label lHeader = new Label(list.get(i).toString());
+
+            if (list.get(i) instanceof Classroom) {
+                lHeader.textProperty().bind(((Classroom) list.get(i)).nameProperty());
+            }
+
             if (pane.getRowCount() == 1) {
                 lHeader.getStyleClass().add(CSS_CLASS_FIRST);
             } else if (i == list.size() - 1) {

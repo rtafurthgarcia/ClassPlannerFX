@@ -1,6 +1,12 @@
 package ch.hftm.model;
 
 import java.io.File;
+
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlElements;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -8,10 +14,17 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+@XmlRootElement(name = "corecompetency")
 public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> implements Cloneable {
 
     public CoreCompetency(String name) {
         super(name, FXCollections.observableArrayList());
+
+        isPartOfTreeView = true;
+    }
+
+    public CoreCompetency() {
+        super("null", FXCollections.observableArrayList());
 
         isPartOfTreeView = true;
     }
@@ -26,6 +39,10 @@ public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> implements Cloneab
 
     private boolean isPartOfTreeView;
 
+    @XmlElementWrapper(name="files")
+    @XmlElements({
+            @XmlElement(name="file", type=File.class),
+    })
     public ObservableList<File> getFiles() {
         return files;
     }
@@ -44,12 +61,14 @@ public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> implements Cloneab
         return isPartOfTreeView;
     }
 
+    @XmlAttribute(name = "treeview")
     public CoreCompetency setPartOfTreeView(boolean isPartOfTreeView) {
         this.isPartOfTreeView = isPartOfTreeView;
 
         return this;
     }
 
+    @XmlElement(name = "description")
     public CoreCompetency setDescription(String description) {
         this.description = new SimpleStringProperty(description);
 
@@ -68,6 +87,7 @@ public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> implements Cloneab
         return parentClassroom;
     }
 
+    @XmlElement(type = Classroom.class, name = "classroom")
     public CoreCompetency setParentClassroom(Classroom parentClassroom) {
         this.parentClassroom = parentClassroom;
 
@@ -78,6 +98,7 @@ public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> implements Cloneab
         return parentThematicAxis;
     }
 
+    @XmlElement(type = ThematicAxis.class, name = "thematicaxis")
     public CoreCompetency setParentThematicAxis(ThematicAxis parentThematicAxis) {
         this.parentThematicAxis = parentThematicAxis.clone();
 
@@ -88,6 +109,7 @@ public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> implements Cloneab
         return parentSchoolYearQuarter;
     }
 
+    @XmlElement(type = SchoolYearQuarter.class, name = "quarter")
     public CoreCompetency setParentSchoolYearQuarter(SchoolYearQuarter parentSchoolYearQuarter) {
         this.parentSchoolYearQuarter = parentSchoolYearQuarter;
 

@@ -8,14 +8,9 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-import org.hildan.fxgson.FxGson;
-
-import com.google.gson.Gson;
-
 import ch.hftm.ClassPlannerFX;
 import ch.hftm.controller.MainViewController;
 import ch.hftm.controller.SettingsController;
-import ch.hftm.util.SerializationHelper;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -38,13 +33,6 @@ public class Context {
 
     private StringProperty saveFilePath = new SimpleStringProperty("");
 
-    private Gson serializer = FxGson.fullBuilder()
-        .registerTypeAdapter(File.class, new SerializationHelper.FileAdapter())
-        .registerTypeAdapter(LocalDate.class, new SerializationHelper.LocalDateAdapter())
-        .registerTypeAdapter(DateTimeFormatter.class, new SerializationHelper.DateTimeFormatterAdapter())
-        .setPrettyPrinting()
-        .create();
-
     private LogManager logManager = LogManager.getLogManager();
     private Logger logger;
 
@@ -58,10 +46,6 @@ public class Context {
 
     public LogManager getLogManager() {
         return logManager;
-    }
-
-    public Gson getSerializer() {
-        return serializer;
     }
 
     public String getSaveFilePath() {

@@ -1,8 +1,15 @@
 package ch.hftm.model;
 
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlValue;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+@XmlRootElement(name = "classroom")
 public class Classroom {
     private StringProperty name;
 
@@ -10,12 +17,17 @@ public class Classroom {
         this.name = new SimpleStringProperty(name);
     }
 
+    public Classroom() {
+        this.name = new SimpleStringProperty("null");
+    }
+
     public StringProperty nameProperty() {
         return name;
     }
 
-    public Classroom setName(StringProperty name) {
-        this.name = name;
+    @XmlValue()
+    public Classroom setName(String name) {
+        this.name.set(name);
 
         return this;
     }
