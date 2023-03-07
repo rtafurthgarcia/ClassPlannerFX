@@ -129,7 +129,7 @@ public class MainViewController {
             try {
                 initialize();
             } catch (NullPointerException | IOException exception) {
-                sharedContext.getLogger().log(Level.SEVERE, exception.toString());
+                sharedContext.getLogger().log(Level.SEVERE, exception.getLocalizedMessage());
             }
         }
     };
@@ -389,7 +389,7 @@ public class MainViewController {
          * sharedContext.setLoadedSchool(loadedSchool);
          * initialize();
          * } catch (IOException exception) {
-         * sharedContext.getLogger().log(Level.SEVERE, exception.toString());
+         * sharedContext.getLogger().log(Level.SEVERE, exception.getLocalizedMessage());
          * }
          * }
          */
@@ -405,7 +405,14 @@ public class MainViewController {
                 initialize();
 
             } catch (IOException | JAXBException exception) {
-                sharedContext.getLogger().log(Level.SEVERE, exception.toString());
+                sharedContext.getLogger().log(Level.SEVERE, exception.getLocalizedMessage());
+
+                Alert alert = new Alert(
+                        AlertType.ERROR,
+                        exception.getLocalizedMessage());
+                alert.setHeaderText("Impossible to open school file");
+                alert.setTitle("File opening failed");
+                alert.showAndWait();
             }
         }
     }
@@ -445,7 +452,7 @@ public class MainViewController {
          * writer.write(json);
          * writer.close();
          * } catch (JsonIOException | IOException exception) {
-         * sharedContext.getLogger().log(Level.SEVERE, exception.toString());
+         * sharedContext.getLogger().log(Level.SEVERE, exception.getLocalizedMessage());
          * }
          */
         try {
@@ -454,7 +461,14 @@ public class MainViewController {
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             marshaller.marshal(sharedContext.getLoadedSchool(), new File(filePath));
         } catch (JAXBException exception) {
-            sharedContext.getLogger().log(Level.SEVERE, exception.toString());
+            sharedContext.getLogger().log(Level.SEVERE, exception.getLocalizedMessage());
+
+            Alert alert = new Alert(
+                        AlertType.ERROR,
+                        exception.getLocalizedMessage());
+                alert.setHeaderText("Impossible to save school file");
+                alert.setTitle("File saving failed");
+                alert.showAndWait();
         }
     }
 }

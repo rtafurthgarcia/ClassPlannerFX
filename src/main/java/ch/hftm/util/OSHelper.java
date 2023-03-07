@@ -54,7 +54,7 @@ public class OSHelper {
 
             new ProcessBuilder(command, file.getAbsolutePath()).start();
         } catch (Exception exception) {
-            sharedContext.getLogger().log(Level.INFO, exception.toString());
+            sharedContext.getLogger().log(Level.INFO, exception.getLocalizedMessage());
         }
     }
 }

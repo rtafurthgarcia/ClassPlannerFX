@@ -124,7 +124,7 @@ public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
             try {
                 dragDetected(event, cell);
             } catch (CloneNotSupportedException exception) {
-                sharedContext.getLogger().log(Level.WARNING, exception.toString());
+                sharedContext.getLogger().log(Level.WARNING, exception.getLocalizedMessage());
             }
         });
         cell.setOnDragDone((DragEvent event) -> clearDropLocation());

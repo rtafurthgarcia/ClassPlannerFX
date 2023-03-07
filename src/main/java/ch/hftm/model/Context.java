@@ -129,7 +129,7 @@ public class Context {
 
             mainController = loader.getController();
         } catch (IOException exception) {
-            logger.log(Level.SEVERE, exception.toString());
+            logger.log(Level.SEVERE, exception.getLocalizedMessage());
         }
     }
 

@@ -82,7 +82,7 @@ public class FileViewer extends Accordion {
                 }
            });
         } catch (IOException | CloneNotSupportedException exception) {
-            sharedContext.getLogger().log(Level.SEVERE, exception.toString());
+            sharedContext.getLogger().log(Level.SEVERE, exception.getLocalizedMessage());
         }
     }
 
@@ -101,7 +101,7 @@ public class FileViewer extends Accordion {
                 try {
                     tpFileArea.getChildren().add(new FileItem(f));
                 } catch (IOException exception) {
-                    sharedContext.getLogger().log(Level.SEVERE, exception.toString());
+                    sharedContext.getLogger().log(Level.SEVERE, exception.getLocalizedMessage());
                 }
             });
 
@@ -196,7 +196,7 @@ public class FileViewer extends Accordion {
 
                 getCompetency().getFiles().add(selectedFile);
             } catch (IOException exception) {
-                sharedContext.getLogger().log(Level.SEVERE, exception.toString());
+                sharedContext.getLogger().log(Level.SEVERE, exception.getLocalizedMessage());
             }
         }
     }
@@ -239,7 +239,7 @@ public class FileViewer extends Accordion {
                 tpFileArea.getChildren().add(new FileItem(f));
                 getCompetency().getFiles().add(f);
             } catch (IOException exception) {
-                sharedContext.getLogger().log(Level.INFO, exception.toString());
+                sharedContext.getLogger().log(Level.INFO, exception.getLocalizedMessage());
             }
         });
         
