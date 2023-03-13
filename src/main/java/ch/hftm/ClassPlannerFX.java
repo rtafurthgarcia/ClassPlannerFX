@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import ch.hftm.model.Classroom;
 import ch.hftm.model.Context;
 import ch.hftm.model.CoreCompetency;
+import ch.hftm.model.Intersection;
 import ch.hftm.model.Lesson;
 import ch.hftm.model.School;
 import ch.hftm.model.SchoolYear;
@@ -83,16 +84,20 @@ public class ClassPlannerFX extends Application {
         sharedContext.setSelectedLesson(lessonFrench);
 
         ThematicAxis taVocabulaire = new ThematicAxis("Vocabulaire 1");
-        taVocabulaire.getSubUnits()
-                .add(new CoreCompetency("Verbes en ER, IR")
-                        .setParentClassroom(sharedContext.getLoadedSchool().getClassrooms().get(0))
-                        .setParentSchoolYearQuarter(sharedContext.getSelectedSchoolYear().getQuarters().get(0))
-                        .setParentThematicAxis(taVocabulaire));
-        taVocabulaire.getSubUnits()
-                .add(new CoreCompetency("Verbes en UIR, DRE")
-                        .setParentClassroom(sharedContext.getLoadedSchool().getClassrooms().get(1))
-                        .setParentSchoolYearQuarter(sharedContext.getSelectedSchoolYear().getQuarters().get(2))
-                        .setParentThematicAxis(taVocabulaire));
+        taVocabulaire.getSubUnits().add(new CoreCompetency("Verbes en ER, IR").setIntersection(
+                new Intersection(
+                        sharedContext.getLoadedSchool().getClassrooms().get(0),
+                        sharedContext.getSelectedSchoolYear().getQuarters().get(0),
+                        taVocabulaire)
+                )
+        );
+        taVocabulaire.getSubUnits().add(new CoreCompetency("Verbes en UIR, DRE").setIntersection(
+                new Intersection(
+                        sharedContext.getLoadedSchool().getClassrooms().get(1),
+                        sharedContext.getSelectedSchoolYear().getQuarters().get(2),
+                        taVocabulaire)
+                )
+        );
 
         sharedContext.getSelectedLesson().getSubUnits().addAll(
                 taVocabulaire,

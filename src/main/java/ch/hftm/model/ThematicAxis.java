@@ -23,7 +23,7 @@ public class ThematicAxis extends SchoolUnit<CoreCompetency> implements Cloneabl
 
         String contextText = String.format(
                     "This one core competency is originally part of thematic axis '%s'. \nDo you want to create a copy that is part of '%s'?",
-                    source.getParentThematicAxis(),
+                    source.getIntersection().getThematicAxis(),
                     super.getName());
 
         Alert alert = new Alert(
@@ -52,11 +52,9 @@ public class ThematicAxis extends SchoolUnit<CoreCompetency> implements Cloneabl
         return isPresent;
     }
 
-    @Override
     protected ThematicAxis clone()  {
         ThematicAxis thematicAxis = new ThematicAxis(this.getName());
         thematicAxis.nameProperty().bindBidirectional(this.nameProperty());
-        //competency.files.addAll(this.files);
 
         return thematicAxis;
     }

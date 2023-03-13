@@ -13,17 +13,17 @@
          <tabs>
             <Tab id="tGeneral" text="General">
                <content>
-                  <Pane fx:id="pGeneral" prefHeight="200.0" prefWidth="200.0" />
+                  <fx:include source="GeneralView.fxml" />
                </content>
             </Tab>
             <Tab id="tQuartals" text="Quartals">
                <content>
-                  <Pane fx:id="pQuartals" prefHeight="200.0" prefWidth="200.0" />
+                  <fx:include source="QuartersView.fxml" />
                </content>
             </Tab>
             <Tab id="tClassrooms" text="Classrooms">
                <content>
-                  <Pane fx:id="pClassrooms" prefHeight="200.0" prefWidth="200.0" />
+                  <fx:include source="ClassroomsView.fxml" />
                </content>
             </Tab>
          </tabs>

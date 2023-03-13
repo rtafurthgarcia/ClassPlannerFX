@@ -168,7 +168,7 @@ public class MainViewController {
                                 return (FileViewer) n;
                             })
                             .filter(f -> f.getCompetency().equals((CoreCompetency) value)
-                                    && f.getCompetency().getParentThematicAxis().equals(parentThematicAxis))
+                                    && f.getCompetency().getIntersection().getThematicAxis().equals(parentThematicAxis))
                             .collect(Collectors.toList());
 
                     list.forEach(f -> {
@@ -283,9 +283,7 @@ public class MainViewController {
 
     void loadCoreCompetencies() {
         BiPredicate<CoreCompetency, FileViewerContainer> predicate = (cc,
-                c) -> c.getThematicAxis().equals(cc.getParentThematicAxis())
-                        && c.getClassroom().equals(cc.getParentClassroom())
-                        && c.getQuarter().equals(cc.getParentSchoolYearQuarter());
+                c) -> c.getIntersection().equals(cc.getIntersection());
 
         fileViewerContainers.stream()
                 .filter(c -> sharedContext.getSelectedLesson().getSubUnits().stream()
@@ -377,22 +375,6 @@ public class MainViewController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select a ClassPlannerFX school file");
         File selectedFile = fileChooser.showOpenDialog(sharedContext.getPrimaryStage());
-        /*
-         * if (selectedFile != null) {
-         * try {
-         * School loadedSchool = sharedContext.getSerializer()
-         * .fromJson(new JsonReader(new FileReader(selectedFile.getAbsolutePath())),
-         * School.class);
-         * sharedContext.setSaveFilePath(selectedFile.getAbsolutePath());
-         * 
-         * clear();
-         * sharedContext.setLoadedSchool(loadedSchool);
-         * initialize();
-         * } catch (IOException exception) {
-         * sharedContext.getLogger().log(Level.SEVERE, exception.getLocalizedMessage());
-         * }
-         * }
-         */
 
         if (selectedFile != null) {
             try {

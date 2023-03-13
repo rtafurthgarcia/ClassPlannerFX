@@ -18,14 +18,6 @@ import javafx.collections.ObservableList;
 @XmlSeeAlso({School.class, SchoolYear.class, ThematicAxis.class, Lesson.class, CoreCompetency.class})
 @XmlType
 abstract public class SchoolUnit<T extends SchoolUnit<?>> {
-    /*@XmlElements({
-        @XmlElement(name="school",type=School.class),
-        @XmlElement(name="schoolyear",type=SchoolYear.class),
-        @XmlElement(name="themaxicaxis",type=ThematicAxis.class),
-        @XmlElement(name="lesson",type=Lesson.class),
-        @XmlElement(name="corecompetency",type=CoreCompetency.class),
-    })*/
-    
     protected final StringProperty name = new SimpleStringProperty("");
     
     @XmlTransient
@@ -103,11 +95,8 @@ abstract public class SchoolUnit<T extends SchoolUnit<?>> {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        SchoolUnit other = (SchoolUnit) obj;
-        if (name == null) {
-            if (other.getName() != null)
-                return false;
-        } else if (!getName().equals(other.getName()))
+        SchoolUnit<?> other = (SchoolUnit<?>) obj;
+        if (!getName().equals(other.getName()))
             return false;
         return true;
     }

@@ -1,14 +1,22 @@
 package ch.hftm.model;
 
 import java.io.File;
+import java.util.Observable;
+import java.util.stream.Collectors;
 
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlElements;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.ListBinding;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -16,28 +24,32 @@ import javafx.collections.ObservableList;
 
 @XmlRootElement(name = "corecompetency")
 public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> implements Cloneable {
+    private StringProperty description = new SimpleStringProperty("");
+    private ObjectProperty<Intersection> intersection = new SimpleObjectProperty<>(new Intersection());
+    private ObservableList<File> files = FXCollections.observableArrayList();
+    private BooleanProperty isPartOfTreeView = new SimpleBooleanProperty(true);
 
     public CoreCompetency(String name) {
         super(name, FXCollections.observableArrayList());
-
-        isPartOfTreeView = true;
     }
 
     public CoreCompetency() {
         super("null", FXCollections.observableArrayList());
-
-        isPartOfTreeView = true;
     }
 
-    private StringProperty description = new SimpleStringProperty("");
+    public Intersection getIntersection() {
+        return intersection.get();
+    }
 
-    private Classroom parentClassroom;
-    private ThematicAxis parentThematicAxis;
-    private SchoolYearQuarter parentSchoolYearQuarter;
+    public CoreCompetency setIntersection(Intersection intersection) {
+        this.intersection.set(intersection);
 
-    private ListProperty<File> files = new SimpleListProperty<File>(FXCollections.observableArrayList());
+        return this;
+    }
 
-    private boolean isPartOfTreeView;
+    public ObjectProperty<Intersection> intersectionProperty() {
+        return intersection;
+    }
 
     @XmlElementWrapper(name="files")
     @XmlElements({
@@ -48,29 +60,33 @@ public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> implements Cloneab
     }
 
     public CoreCompetency setFiles(ObservableList<File> files) {
-        this.files.set(files);
+        this.files.setAll(files);
 
         return this;
     }
 
-    public ListProperty<File> filesProperty() {
+    public ObservableList<File> filesProperty() {
         return files;
     }
 
     public boolean isPartOfTreeView() {
-        return isPartOfTreeView;
+        return isPartOfTreeView.get();
     }
 
     @XmlAttribute(name = "treeview")
     public CoreCompetency setPartOfTreeView(boolean isPartOfTreeView) {
-        this.isPartOfTreeView = isPartOfTreeView;
+        this.isPartOfTreeView.set(isPartOfTreeView);;
 
         return this;
     }
 
+    public BooleanProperty isPartOfTreeViewProperty() {
+        return isPartOfTreeView;
+    }
+
     @XmlElement(name = "description")
     public CoreCompetency setDescription(String description) {
-        this.description = new SimpleStringProperty(description);
+        this.description.set(description);
 
         return this;
     }
@@ -83,46 +99,17 @@ public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> implements Cloneab
         return description.get(); 
     }
 
-    public Classroom getParentClassroom() {
-        return parentClassroom;
-    }
-
-    @XmlElement(type = Classroom.class, name = "classroom")
-    public CoreCompetency setParentClassroom(Classroom parentClassroom) {
-        this.parentClassroom = parentClassroom;
-
-        return this;
-    }
-
-    public ThematicAxis getParentThematicAxis() {
-        return parentThematicAxis;
-    }
-
-    @XmlElement(type = ThematicAxis.class, name = "thematicaxis")
-    public CoreCompetency setParentThematicAxis(ThematicAxis parentThematicAxis) {
-        this.parentThematicAxis = parentThematicAxis.clone();
-
-        return this;
-    }
-
-    public SchoolYearQuarter getParentSchoolYearQuarter() {
-        return parentSchoolYearQuarter;
-    }
-
-    @XmlElement(type = SchoolYearQuarter.class, name = "quarter")
-    public CoreCompetency setParentSchoolYearQuarter(SchoolYearQuarter parentSchoolYearQuarter) {
-        this.parentSchoolYearQuarter = parentSchoolYearQuarter;
-
-        return this;
-    }
 
     @Override
     public CoreCompetency clone() {
         CoreCompetency competency = new CoreCompetency(this.getName());
         competency.nameProperty().bindBidirectional(this.nameProperty());
         competency.descriptionProperty().bindBidirectional(this.descriptionProperty());
-        competency.filesProperty().bindBidirectional(this.filesProperty());
-        //competency.files.addAll(this.files);
+        //competency.files.setAll(this.files);
+        //ListBinding.
+        //competency.filesProperty().bindBidirectional(this.filesProperty());
+        //Bindings.createObjectBinding(competency.filesProperty(), this.filesProperty());
+        Bindings.createObjectBinding(() -> this.files.stream().collect(Collectors.toList()), this.filesProperty());
 
         return competency;
     }
@@ -131,11 +118,9 @@ public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> implements Cloneab
         CoreCompetency competency = new CoreCompetency(this.getName());
         competency.nameProperty().bindBidirectional(this.nameProperty());
         competency.descriptionProperty().bindBidirectional(this.descriptionProperty());
-        competency.parentClassroom = this.parentClassroom;
-        competency.parentThematicAxis = this.parentThematicAxis;
-        competency.parentSchoolYearQuarter = this.parentSchoolYearQuarter;
-        competency.filesProperty().bindBidirectional(this.filesProperty());
-        competency.isPartOfTreeView = false;
+        competency.intersection.set(this.getIntersection());
+        //competency.filesProperty().bindBidirectional(this.filesProperty());
+        competency.isPartOfTreeView.set(false);
 
         return competency;
     }
@@ -146,7 +131,7 @@ public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> implements Cloneab
         int result = super.hashCode();
         result = prime * result + ((description.get() == null) ? 0 : description.get().hashCode());
         result = prime * result + ((super.name.get() == null) ? 0 : super.name.get().hashCode());
-        result = prime * result + (isPartOfTreeView ? 1231 : 1237);
+        result = prime * result + (isPartOfTreeView() ? 1231 : 1237);
         return result;
     }
 

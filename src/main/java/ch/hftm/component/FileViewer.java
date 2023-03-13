@@ -2,20 +2,19 @@ package ch.hftm.component;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
+import org.controlsfx.control.GridView;
 
 import ch.hftm.ClassPlannerFX;
 import ch.hftm.model.Context;
 import ch.hftm.model.CoreCompetency;
+import ch.hftm.util.FileGridCell;
 import ch.hftm.util.OSHelper;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.ListChangeListener.Change;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Accordion;
@@ -34,8 +33,6 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.TilePane;
-import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 
 public class FileViewer extends Accordion {
@@ -48,13 +45,23 @@ public class FileViewer extends Accordion {
     @FXML
     private TitledPane tpFiles;
     @FXML
-    private TilePane tpFileArea;
-    @FXML
-    private Text tIndication;
+    private GridView<File> gvFiles;
 
     private ObjectProperty<CoreCompetency> competency = new SimpleObjectProperty<>();
 
-    private List<FileItem> selectedFileItems = new ArrayList<>();
+    private ObjectProperty<File> selectedFile = new SimpleObjectProperty<>();
+
+    public File getselectedFile() {
+        return selectedFile.get();
+    }
+
+    public void setselectedFile(File selectedFile) {
+        this.selectedFile.set(selectedFile);
+    }
+
+    public ObjectProperty<File> selectedFileProperty() {
+        return selectedFile;
+    }
 
     public FileViewer(CoreCompetency competency) {
         super();
@@ -70,17 +77,11 @@ public class FileViewer extends Accordion {
             this.setCompetency(competency);
 
             taDescription.setPrefHeight(Integer.MAX_VALUE);
-            tpFileArea.setPrefHeight(Integer.MAX_VALUE);
+            gvFiles.setPrefHeight(Integer.MAX_VALUE);
 
             this.setContextMenu(createContextMenu());
 
-            getCompetency().getFiles().addListener((Change<? extends File> c) -> {
-                if (getCompetency().getFiles().size() > 0) {
-                    tpFileArea.getChildren().remove(tIndication);
-                } else {
-                    tpFileArea.getChildren().add(tIndication);
-                }
-           });
+            gvFiles.setCellFactory(param -> new FileGridCell());
         } catch (IOException | CloneNotSupportedException exception) {
             sharedContext.getLogger().log(Level.SEVERE, exception.getLocalizedMessage());
         }
@@ -95,19 +96,7 @@ public class FileViewer extends Accordion {
 
         tpDescription.textProperty().bindBidirectional(this.competency.get().nameProperty());
         taDescription.textProperty().bindBidirectional(this.competency.get().descriptionProperty());
-
-        if (competency.getFiles().size() > 0) {
-            competency.getFiles().forEach(f -> {
-                try {
-                    tpFileArea.getChildren().add(new FileItem(f));
-                } catch (IOException exception) {
-                    sharedContext.getLogger().log(Level.SEVERE, exception.getLocalizedMessage());
-                }
-            });
-
-            tpFileArea.getChildren().remove(tIndication);
-        } 
-
+        //Bindings.createObjectBinding(() -> this.gvFiles.getItems(), this.competency.get().filesProperty());
         return this;
     }
 
@@ -121,12 +110,7 @@ public class FileViewer extends Accordion {
             return;
         Dragboard db = draggedFileViewer.startDragAndDrop(TransferMode.MOVE);
 
-        // to also handle the Color & Font classes
-        /*Gson gson = FxGson.coreBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-        String json = gson.toJson(draggedFileViewer.getCompetency());*/
-
         ClipboardContent content = new ClipboardContent();
-        //content.put(DataFormat.lookupMimeType("application/json"), json);
         content.put(DataFormat.PLAIN_TEXT, draggedFileViewer.getCompetency().getName());
         db.setContent(content);
         db.setDragView(draggedFileViewer.snapshot(null, null));
@@ -153,12 +137,12 @@ public class FileViewer extends Accordion {
             fileViewerContainer.getChildren().remove(this);
         });
 
-        if (! selectedFileItems.isEmpty()) {
+        if (selectedFile != null) { 
             contextMenu.getItems().addAll(miAddfile, smi2, miOpenFile, miDeleteFile, smi);
         } else {
             contextMenu.getItems().addAll(miAddfile, smi2);
         }
-        
+
         contextMenu.getItems().add(miDelete);
 
         return contextMenu;
@@ -166,38 +150,23 @@ public class FileViewer extends Accordion {
 
     private void onMouseClicked(MouseEvent event) {
         if (event.getButton().equals(MouseButton.PRIMARY)) {
-            if (getCompetency().getFiles().isEmpty()) {
-                addFilePerFileChooser();
-            } else {
-                selectedFileItems = tpFileArea.getChildren().stream()
-                    .filter(n -> n instanceof FileItem) 
-                    .map(n -> ((FileItem) n))
-                    .filter(n -> n.isSelected())
-                    .collect(Collectors.toList());
-            }
+           
+            
         }
 
         setContextMenu(createContextMenu());
     }
 
     private void openFileWithAssociatedProgram() {
-        selectedFileItems.forEach(f -> {
-            OSHelper.run(f.getFile());
-        });
+        OSHelper.run(selectedFile.get());
     }
 
     private void addFilePerFileChooser() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select a file you want to add to this core competency");
-        File selectedFile = fileChooser.showOpenDialog(this.getScene().getWindow());
-        if (selectedFile != null) {
-            try {
-                tpFileArea.getChildren().add(new FileItem(selectedFile));
-
-                getCompetency().getFiles().add(selectedFile);
-            } catch (IOException exception) {
-                sharedContext.getLogger().log(Level.SEVERE, exception.getLocalizedMessage());
-            }
+        File chosenFile = fileChooser.showOpenDialog(this.getScene().getWindow());
+        if (chosenFile != null) {
+            getCompetency().getFiles().add(chosenFile);
         }
     }
 
@@ -212,12 +181,15 @@ public class FileViewer extends Accordion {
         Optional<ButtonType> result = alert.showAndWait();
         
         if(result.isPresent() && result.get() == ButtonType.YES) {
-            selectedFileItems.forEach(f -> {
-                tpFileArea.getChildren().remove(f);
+            /*selectedFileItems.forEach(f -> {
+                gvFiles.getChildren().remove(f);
                 getCompetency().getFiles().remove(f);
             });
     
-            selectedFileItems.clear();
+            selectedFileItems.clear();*/
+
+            //gvFiles.getItems().remove(selectedFile);
+            getCompetency().getFiles().remove(selectedFile.get());
         }
     }
 
@@ -235,12 +207,8 @@ public class FileViewer extends Accordion {
         boolean success = db.hasFiles();
 
         db.getFiles().forEach(f -> {
-            try {
-                tpFileArea.getChildren().add(new FileItem(f));
-                getCompetency().getFiles().add(f);
-            } catch (IOException exception) {
-                sharedContext.getLogger().log(Level.INFO, exception.getLocalizedMessage());
-            }
+            getCompetency().getFiles().add(f);
+            gvFiles.getItems().add(f);
         });
         
         event.setDropCompleted(success);
@@ -249,9 +217,8 @@ public class FileViewer extends Accordion {
     @FXML
     private void initialize() {
         tpDescription.setOnDragDetected(event -> dragDetected(event, this));
-        tpFileArea.setOnMouseClicked(event -> onMouseClicked(event));
-        tpFileArea.setOnDragOver(event -> onDragOverFileArea(event));
-        tpFileArea.setOnDragDropped(event -> onDragDroppedFileArea(event));
-        //tpFileArea.setOnMouseEntered(event -> setContextMenu(createContextMenu()));
+        gvFiles.setOnMouseClicked(event -> onMouseClicked(event));
+        gvFiles.setOnDragOver(event -> onDragOverFileArea(event));
+        gvFiles.setOnDragDropped(event -> onDragDroppedFileArea(event));
     }
 }

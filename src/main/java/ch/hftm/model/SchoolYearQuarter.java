@@ -8,59 +8,56 @@ import javafx.beans.property.SimpleIntegerProperty;
 
 @XmlRootElement(name = "quarter")
 public class SchoolYearQuarter {
-    private IntegerProperty _quarter;
-    private IntegerProperty _startWeek;
-    private IntegerProperty _endWeek;
+    private IntegerProperty quarter = new SimpleIntegerProperty(0);
+    private IntegerProperty startWeek = new SimpleIntegerProperty(0);
+    private IntegerProperty endWeek = new SimpleIntegerProperty(0);
     
     public SchoolYearQuarter(Integer quarter, Integer startWeek, Integer endWeek) {
-        this._quarter = new SimpleIntegerProperty(quarter);
-        this._startWeek = new SimpleIntegerProperty(startWeek);
-        this._endWeek = new SimpleIntegerProperty(endWeek);
+        this.quarter.set(quarter);
+        this.startWeek.set(startWeek);
+        this.endWeek.set(endWeek);
     }
 
     public SchoolYearQuarter() {
-        this._quarter = new SimpleIntegerProperty(0);
-        this._startWeek = new SimpleIntegerProperty(0);
-        this._endWeek = new SimpleIntegerProperty(0);
     }
     
     public Integer getStartWeek() {
-        return _startWeek.get();
+        return startWeek.get();
     }
     
     @XmlElement(name = "startweek")
     public void setStartWeek(Integer startWeek) {
-        this._startWeek = new SimpleIntegerProperty(startWeek);
+        this.startWeek.set(startWeek);
     }
     
     public IntegerProperty endWeekProperty() {
-        return _endWeek;
+        return endWeek;
     } 
 
     public IntegerProperty startWeekProperty() {
-        return _startWeek;
+        return startWeek;
     }
 
     public Integer getEndWeek() {
-        return _endWeek.get();
+        return endWeek.get();
     }
 
     @XmlElement(name = "endweek")
     public void setEndWeek(Integer endWeek) {
-        this._endWeek = new SimpleIntegerProperty(endWeek);
+        this.endWeek.set(endWeek);
     }
 
     public Integer getQuarter() {
-        return _quarter.get();
+        return quarter.get();
     }
 
     @XmlAttribute(name = "quarterid")
     public void setQuarter(Integer quarter) {
-        this._quarter = new SimpleIntegerProperty(quarter);
+        this.quarter.set(quarter);
     }
 
     public IntegerProperty quarterProperty() {
-        return _quarter;
+        return quarter;
     }
 
     public String toString() {
@@ -71,9 +68,9 @@ public class SchoolYearQuarter {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((_quarter == null) ? 0 : _quarter.hashCode());
-        result = prime * result + ((_startWeek == null) ? 0 : _startWeek.hashCode());
-        result = prime * result + ((_endWeek == null) ? 0 : _endWeek.hashCode());
+        result = prime * result + ((quarter == null) ? 0 : quarter.hashCode());
+        result = prime * result + ((startWeek == null) ? 0 : startWeek.hashCode());
+        result = prime * result + ((endWeek == null) ? 0 : endWeek.hashCode());
         return result;
     }
 
@@ -86,20 +83,20 @@ public class SchoolYearQuarter {
         if (getClass() != obj.getClass())
             return false;
         SchoolYearQuarter other = (SchoolYearQuarter) obj;
-        if (_quarter == null) {
-            if (other._quarter != null)
+        if (quarter == null) {
+            if (other.quarter != null)
                 return false;
-        } else if (!_quarter.equals(other._quarter))
+        } else if (quarter.get() != other.quarter.get())
             return false;
-        if (_startWeek == null) {
-            if (other._startWeek != null)
+        if (startWeek == null) {
+            if (other.startWeek != null)
                 return false;
-        } else if (!_startWeek.equals(other._startWeek))
+        } else if (startWeek.get() != other.startWeek.get())
             return false;
-        if (_endWeek == null) {
-            if (other._endWeek != null)
+        if (endWeek == null) {
+            if (other.endWeek != null)
                 return false;
-        } else if (!_endWeek.equals(other._endWeek))
+        } else if (endWeek.get() != other.endWeek.get())
             return false;
         return true;
     }

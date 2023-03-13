@@ -21,11 +21,11 @@ import javafx.collections.ObservableList;
 
 @XmlRootElement(name = "schoolyear")
 public class SchoolYear extends SchoolUnit<Lesson> {
-    private ObjectProperty<LocalDate> startDay;
-    private ObjectProperty<LocalDate> endDay;
-    private BooleanProperty archived;
+    private ObjectProperty<LocalDate> startDay = new SimpleObjectProperty<>(LocalDate.now());
+    private ObjectProperty<LocalDate> endDay = new SimpleObjectProperty<>(LocalDate.now());
+    private BooleanProperty archived = new SimpleBooleanProperty(false);
 
-    private ObservableList<SchoolYearQuarter> quarters;
+    private ObservableList<SchoolYearQuarter> quarters = FXCollections.observableArrayList();
 
     @XmlTransient
     private final String YEAR_PATTERN = "yyyy"; 
@@ -45,34 +45,19 @@ public class SchoolYear extends SchoolUnit<Lesson> {
     public SchoolYear(LocalDate startDay, LocalDate endDay) {
         super(startDay.getYear() + "-" + startDay.getYear(), FXCollections.observableArrayList(), Lesson::new);
         
-        this.startDay = new SimpleObjectProperty<LocalDate>(startDay);
-        this.endDay =  new SimpleObjectProperty<LocalDate>(endDay);
-        
-        this.archived = new SimpleBooleanProperty(false);
-
-        this.quarters = FXCollections.observableArrayList();
+        this.startDay.set(startDay);
+        this.endDay.set(endDay);
     }
 
     public SchoolYear(String rangeToParse) {
         super(rangeToParse, FXCollections.observableArrayList(), Lesson::new);    
 
-        this.startDay = new SimpleObjectProperty<LocalDate>(LocalDate.parse(rangeToParse.subSequence(0, 3).toString(), yearlyFormat));
-        this.endDay = new SimpleObjectProperty<LocalDate>(LocalDate.parse(rangeToParse.subSequence(5, 8).toString(), yearlyFormat));
-
-        this.archived = new SimpleBooleanProperty(false);
-
-        this.quarters = FXCollections.observableArrayList();
+        this.startDay.set(LocalDate.parse(rangeToParse.subSequence(0, 3).toString(), yearlyFormat));
+        this.endDay.set(LocalDate.parse(rangeToParse.subSequence(5, 8).toString(), yearlyFormat));
     }
 
     public SchoolYear() {
         super("null", FXCollections.observableArrayList(), Lesson::new);    
-
-        this.startDay = new SimpleObjectProperty<LocalDate>(LocalDate.now());
-        this.endDay = new SimpleObjectProperty<LocalDate>(LocalDate.now());
-
-        this.archived = new SimpleBooleanProperty(false);
-
-        this.quarters = FXCollections.observableArrayList();
     }
 
     public ObjectProperty<LocalDate> startDayProperty() {
@@ -82,7 +67,7 @@ public class SchoolYear extends SchoolUnit<Lesson> {
     @XmlElement(name = "startday")
     @XmlJavaTypeAdapter(value = TypeHelper.LocalDateAdapter.class)
     public SchoolYear setStartDay(LocalDate startDay) {
-        this.startDay = new SimpleObjectProperty<LocalDate>(startDay);
+        this.startDay.set(startDay);
         setName(startDay.getYear() + "-" + endDay.get().getYear());
 
         return this;
@@ -95,7 +80,7 @@ public class SchoolYear extends SchoolUnit<Lesson> {
     @XmlElement(name = "endday")
     @XmlJavaTypeAdapter(value = TypeHelper.LocalDateAdapter.class)
     public SchoolYear setEndDay(LocalDate endDay) {
-        this.endDay = new SimpleObjectProperty<LocalDate>(endDay);
+        this.endDay.set(endDay);
         setName(startDay.get().getYear() + "-" + endDay.getYear());
 
         return this;
@@ -111,7 +96,7 @@ public class SchoolYear extends SchoolUnit<Lesson> {
 
     @XmlAttribute(name = "archived")
     public SchoolYear setArchived(boolean archived) {
-        this.archived = new SimpleBooleanProperty(archived);
+        this.archived.set(archived);
 
         return this;
     }
@@ -151,17 +136,17 @@ public class SchoolYear extends SchoolUnit<Lesson> {
         if (startDay == null) {
             if (other.startDay != null)
                 return false;
-        } else if (!startDay.equals(other.startDay))
+        } else if (!startDay.get().equals(other.startDay.get()))
             return false;
         if (endDay == null) {
             if (other.endDay != null)
                 return false;
-        } else if (!endDay.equals(other.endDay))
+        } else if (!endDay.get().equals(other.endDay.get()))
             return false;
         if (archived == null) {
             if (other.archived != null)
                 return false;
-        } else if (!archived.equals(other.archived))
+        } else if (archived.get() != other.archived.get())
             return false;
         return true;
     }

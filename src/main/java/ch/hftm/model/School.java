@@ -9,7 +9,7 @@ import javafx.collections.ObservableList;
 
 @XmlRootElement(name = "school")
 public class School extends SchoolUnit<SchoolYear> {
-    private ObservableList<Classroom> classrooms;
+    private ObservableList<Classroom> classrooms = FXCollections.observableArrayList();
     
     @XmlElementWrapper(name = "classrooms")
     @XmlElements({
@@ -21,13 +21,9 @@ public class School extends SchoolUnit<SchoolYear> {
 
     public School(String name) {
         super(name, FXCollections.observableArrayList(), SchoolYear::new);
-
-        classrooms = FXCollections.observableArrayList();
     }
 
     public School() {
         super("null", FXCollections.observableArrayList(), SchoolYear::new);
-
-        classrooms = FXCollections.observableArrayList();
     }
 }

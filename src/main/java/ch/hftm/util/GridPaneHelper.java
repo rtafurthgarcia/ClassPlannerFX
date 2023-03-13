@@ -5,7 +5,7 @@ import java.util.List;
 
 import ch.hftm.component.FileViewerContainer;
 import ch.hftm.model.Classroom;
-import ch.hftm.model.SchoolUnit;
+import ch.hftm.model.Intersection;
 import ch.hftm.model.SchoolYearQuarter;
 import ch.hftm.model.ThematicAxis;
 import javafx.geometry.HPos;
@@ -56,9 +56,7 @@ public class GridPaneHelper {
         for (int i = COLUMN_STARTING_INDEX + 1; i < COLUMN_MAX + 1; i++) {
             FileViewerContainer container = new FileViewerContainer();
             
-            container.setClassroom((columns.get(i - 1).classroom()));
-            container.setQuarter(columns.get(i - 1).quarter());
-            container.setThematicAxis(thematicAxis);
+            container.setIntersection(new Intersection((columns.get(i - 1).classroom()), columns.get(i - 1).quarter(), thematicAxis));
            
             pane.getChildren().add(container);
             GridPane.setConstraints(container, i, pane.getRowCount() - 1, 1, 1, HPos.CENTER, VPos.CENTER);
@@ -76,12 +74,14 @@ public class GridPaneHelper {
         ComponentsRow row = list.stream()
                             .filter(t -> t.thematicAxis().equals(thematicAxis))
                             .findFirst()
-                            .get();
+                            .orElse(null);
 
-        thematicAxis.getSubUnits().clear();
-        pane.getChildren().removeAll(row.containers());
-        pane.getChildren().remove(row.relatedLabel());
-        list.remove(row);
+        if (row != null) {
+            thematicAxis.getSubUnits().clear();
+            pane.getChildren().removeAll(row.containers());
+            pane.getChildren().remove(row.relatedLabel());
+            list.remove(row);
+        }
     } 
 
     public static void addGridHeaderRow(GridPane pane, List<?> list, int columnSpan, int columnStartOffset) {

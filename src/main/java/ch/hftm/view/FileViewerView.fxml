@@ -4,9 +4,8 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TitledPane?>
-<?import javafx.scene.layout.TilePane?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
+<?import org.controlsfx.control.GridView?>
 
 <fx:root snapToPixel="false" type="javafx.scene.control.Accordion" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
    <panes>
@@ -20,13 +19,9 @@
             <Font name="System Italic" size="13.0" />
          </font>
          <content>
-            <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" pannable="true" vbarPolicy="ALWAYS">
+            <ScrollPane>
                <content>
-                  <TilePane fx:id="tpFileArea" alignment="CENTER" hgap="12.0" vgap="12.0">
-                     <children>
-                        <Text fx:id="tIndication" nodeOrientation="LEFT_TO_RIGHT" strokeType="OUTSIDE" strokeWidth="0.0" text="Drag and drop files here..." textAlignment="CENTER" wrappingWidth="150.0" TilePane.alignment="CENTER" />
-                     </children>
-                  </TilePane>
+                  <GridView fx:id="gvFiles" cellHeight="128.0" cellWidth="128.0" />
                </content>
             </ScrollPane>
          </content>

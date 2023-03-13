@@ -1,9 +1,6 @@
 package ch.hftm.component;
 
-import ch.hftm.util.OSHelper;
-
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -19,19 +16,16 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 public class FileItem extends VBox {
     @FXML
     Label lFileName;
 
-    private File file;
     private FileType fileType;
 
-    private String CSS_CLASS = "file-item";
-    private String CSS_CLASS_SELECTION = "file-item-selected";
+    private final String CSS_CLASS = "filePath-item";
+    private final String CSS_CLASS_SELECTION = "filePath-item-selected";
 
     private BooleanProperty selected = new SimpleBooleanProperty(false);
 
@@ -49,7 +43,7 @@ public class FileItem extends VBox {
         return selected;
     }
 
-    public FileItem(File file) throws IOException {
+    public FileItem(String filePath) throws IOException {
         super();
 
         FXMLLoader loader = new FXMLLoader();
@@ -59,17 +53,14 @@ public class FileItem extends VBox {
         loader.setController(this);
 
         loader.load();
-        this.file = file;
-        fileType = FileType.getByExtension(getExtensionByStringHandling(file.getAbsolutePath()));
-        lFileName.setText(file.getName());
+        fileType = FileType.getByExtension(getExtensionByStringHandling(filePath));
+        lFileName.setText(filePath);
         SVGImage svgImage = SVGLoader.load(readFromInputStream(ClassPlannerFX.class.getResourceAsStream(fileType.resource)));
         svgImage.setScaleX(1.5);
         svgImage.setScaleY(1.5);
         getChildren().add(0, svgImage);
 
         getStyleClass().add(CSS_CLASS);
-
-        setOnMouseClicked(event -> onMouseClicked(event));
 
         selected.addListener(observable -> {
             if (isSelected()) {
@@ -82,22 +73,8 @@ public class FileItem extends VBox {
         });
     }
 
-    public final File getFile() {
-        return file;
-    }
-
     public final FileType getType() {
         return fileType;
-    }
-
-    private void onMouseClicked(MouseEvent event) {
-        if (event.getButton().equals(MouseButton.PRIMARY)) {
-            selected.set(! selected.get());
-
-            if (event.getClickCount() == 2) {
-                OSHelper.run(getFile());
-            }
-        }
     }
 
     private String getExtensionByStringHandling(String filename) {

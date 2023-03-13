@@ -17,8 +17,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 
-import com.google.gson.stream.JsonReader;
-
 import ch.hftm.model.Classroom;
 import ch.hftm.model.Context;
 import ch.hftm.model.CoreCompetency;
