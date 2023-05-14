@@ -19,10 +19,17 @@ public enum FileType {
     UNDEFINED("resources/Papirus-Team-Papirus-Mimetypes-Unknown.svg", "");
 
     private static final List<FileType> EXTENSION_LIST = Arrays.asList(values());
+    private final String resource;
+    private final String extensions;
+    
+    public String getResource() {
+        return resource;
+    }
 
-    public final String resource;
-    public final String extensions;
-
+    public String getExtensions() {
+        return extensions;
+    }
+    
     private FileType(String resource, String extensions) {
         this.resource = resource;
         this.extensions = extensions;

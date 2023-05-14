@@ -5,14 +5,11 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.logging.Level;
 
-import org.controlsfx.control.GridView;
-
 import ch.hftm.ClassPlannerFX;
 import ch.hftm.model.Context;
 import ch.hftm.model.CoreCompetency;
-import ch.hftm.util.FileGridCell;
+import ch.hftm.util.FileCell;
 import ch.hftm.util.OSHelper;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
@@ -22,7 +19,9 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TitledPane;
@@ -30,7 +29,6 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.stage.FileChooser;
@@ -45,23 +43,9 @@ public class FileViewer extends Accordion {
     @FXML
     private TitledPane tpFiles;
     @FXML
-    private GridView<File> gvFiles;
+    private ListView<File> lvFiles;
 
     private ObjectProperty<CoreCompetency> competency = new SimpleObjectProperty<>();
-
-    private ObjectProperty<File> selectedFile = new SimpleObjectProperty<>();
-
-    public File getselectedFile() {
-        return selectedFile.get();
-    }
-
-    public void setselectedFile(File selectedFile) {
-        this.selectedFile.set(selectedFile);
-    }
-
-    public ObjectProperty<File> selectedFileProperty() {
-        return selectedFile;
-    }
 
     public FileViewer(CoreCompetency competency) {
         super();
@@ -74,14 +58,14 @@ public class FileViewer extends Accordion {
 
         try {
             loader.load();
-            this.setCompetency(competency);
+            lvFiles.setCellFactory(param -> new FileCell());
+            lvFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+            setCompetency(competency);
 
             taDescription.setPrefHeight(Integer.MAX_VALUE);
-            gvFiles.setPrefHeight(Integer.MAX_VALUE);
+            lvFiles.setPrefHeight(Integer.MAX_VALUE);
 
-            this.setContextMenu(createContextMenu());
-
-            gvFiles.setCellFactory(param -> new FileGridCell());
+            setContextMenu(createContextMenu());
         } catch (IOException | CloneNotSupportedException exception) {
             sharedContext.getLogger().log(Level.SEVERE, exception.getLocalizedMessage());
         }
@@ -96,7 +80,7 @@ public class FileViewer extends Accordion {
 
         tpDescription.textProperty().bindBidirectional(this.competency.get().nameProperty());
         taDescription.textProperty().bindBidirectional(this.competency.get().descriptionProperty());
-        //Bindings.createObjectBinding(() -> this.gvFiles.getItems(), this.competency.get().filesProperty());
+        lvFiles.setItems(competency.filesProperty());
         return this;
     }
 
@@ -137,10 +121,10 @@ public class FileViewer extends Accordion {
             fileViewerContainer.getChildren().remove(this);
         });
 
-        if (selectedFile != null) { 
-            contextMenu.getItems().addAll(miAddfile, smi2, miOpenFile, miDeleteFile, smi);
-        } else {
+        if (lvFiles.getSelectionModel().getSelectedItems().isEmpty()) { 
             contextMenu.getItems().addAll(miAddfile, smi2);
+        } else {
+            contextMenu.getItems().addAll(miAddfile, smi2, miOpenFile, miDeleteFile, smi);
         }
 
         contextMenu.getItems().add(miDelete);
@@ -149,16 +133,11 @@ public class FileViewer extends Accordion {
     }
 
     private void onMouseClicked(MouseEvent event) {
-        if (event.getButton().equals(MouseButton.PRIMARY)) {
-           
-            
-        }
-
         setContextMenu(createContextMenu());
     }
 
     private void openFileWithAssociatedProgram() {
-        OSHelper.run(selectedFile.get());
+        lvFiles.getSelectionModel().getSelectedItems().forEach(OSHelper::run);
     }
 
     private void addFilePerFileChooser() {
@@ -181,15 +160,7 @@ public class FileViewer extends Accordion {
         Optional<ButtonType> result = alert.showAndWait();
         
         if(result.isPresent() && result.get() == ButtonType.YES) {
-            /*selectedFileItems.forEach(f -> {
-                gvFiles.getChildren().remove(f);
-                getCompetency().getFiles().remove(f);
-            });
-    
-            selectedFileItems.clear();*/
-
-            //gvFiles.getItems().remove(selectedFile);
-            getCompetency().getFiles().remove(selectedFile.get());
+            getCompetency().getFiles().removeAll(lvFiles.getSelectionModel().getSelectedItems());
         }
     }
 
@@ -206,10 +177,7 @@ public class FileViewer extends Accordion {
         Dragboard db = event.getDragboard();
         boolean success = db.hasFiles();
 
-        db.getFiles().forEach(f -> {
-            getCompetency().getFiles().add(f);
-            gvFiles.getItems().add(f);
-        });
+        db.getFiles().forEach(getCompetency().getFiles()::add);
         
         event.setDropCompleted(success);
     }
@@ -217,8 +185,8 @@ public class FileViewer extends Accordion {
     @FXML
     private void initialize() {
         tpDescription.setOnDragDetected(event -> dragDetected(event, this));
-        gvFiles.setOnMouseClicked(event -> onMouseClicked(event));
-        gvFiles.setOnDragOver(event -> onDragOverFileArea(event));
-        gvFiles.setOnDragDropped(event -> onDragDroppedFileArea(event));
+        lvFiles.setOnMouseClicked(event -> onMouseClicked(event));
+        lvFiles.setOnDragOver(event -> onDragOverFileArea(event));
+        lvFiles.setOnDragDropped(event -> onDragDroppedFileArea(event));
     }
 }

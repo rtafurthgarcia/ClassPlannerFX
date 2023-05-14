@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Accordion?>
-<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.text.Font?>
-<?import org.controlsfx.control.GridView?>
 
 <fx:root snapToPixel="false" type="javafx.scene.control.Accordion" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
    <panes>
@@ -19,11 +18,7 @@
             <Font name="System Italic" size="13.0" />
          </font>
          <content>
-            <ScrollPane>
-               <content>
-                  <GridView fx:id="gvFiles" cellHeight="128.0" cellWidth="128.0" />
-               </content>
-            </ScrollPane>
+            <ListView fx:id="lvFiles" prefHeight="200.0" prefWidth="200.0" />
          </content>
       </TitledPane>
    </panes>
