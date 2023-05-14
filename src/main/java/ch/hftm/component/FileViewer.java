@@ -10,6 +10,7 @@ import ch.hftm.model.Context;
 import ch.hftm.model.CoreCompetency;
 import ch.hftm.util.FileCell;
 import ch.hftm.util.OSHelper;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
@@ -80,7 +81,8 @@ public class FileViewer extends Accordion {
 
         tpDescription.textProperty().bindBidirectional(this.competency.get().nameProperty());
         taDescription.textProperty().bindBidirectional(this.competency.get().descriptionProperty());
-        lvFiles.setItems(competency.filesProperty());
+        lvFiles.setItems(competency.getFiles());
+        //Bindings.bindContentBidirectional(lvFiles.getItems(), competency.getFiles());
         return this;
     }
 

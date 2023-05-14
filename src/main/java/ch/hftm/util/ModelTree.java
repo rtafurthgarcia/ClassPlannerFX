@@ -78,9 +78,6 @@ public class ModelTree<T> {
                     item.getChildren().removeIf(treeItem -> change.getRemoved()
                             .contains(treeItem.getValue()));
                 }
-
-                //item.getChildren().sort((c1, c2) -> c1.getValue().toString().compareTo(c2.getValue().toString()));
-                //if (change.wasPermutated())
             }
         });
 

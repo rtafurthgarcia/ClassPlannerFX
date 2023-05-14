@@ -10,6 +10,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
+// Necessary container for our fileviewers; is basically at the intersection of classrooms, school year quarters and thematic axis. 
 public class FileViewerContainer extends VBox {
     public static final String CSS_CLASS = "file-viewer-container";
     public static final String CSS_CLASS_RIGHT = "file-viewer-container-right";
@@ -22,7 +23,13 @@ public class FileViewerContainer extends VBox {
         this.intersection = new Intersection();
 
         this.setOnDragOver(event -> onDragOverContainer(event, this));
-        this.setOnDragDropped(event -> onDragDroppedContainer(event, this));
+        this.setOnDragDropped(event -> {
+            try {
+                onDragDroppedContainer(event, this);
+            } catch (CloneNotSupportedException e) {
+                e.printStackTrace();
+            }
+        });
         this.getStyleClass().add(CSS_CLASS);
         
         this.setOnMouseEntered(event -> onMouseEntered(this));
@@ -66,7 +73,7 @@ public class FileViewerContainer extends VBox {
     }
 
     
-    private static void onDragDroppedContainer(DragEvent event, FileViewerContainer target) {
+    private static void onDragDroppedContainer(DragEvent event, FileViewerContainer target) throws CloneNotSupportedException {
         boolean success = false;
 
         // when moving core competency between tiles
@@ -75,43 +82,64 @@ public class FileViewerContainer extends VBox {
             FileViewerContainer parent = (FileViewerContainer) source.getParent();
             
             boolean shouldContinue = true;
-            if (!target.getIntersection().getThematicAxis().isEqualCoreCompetencyInside(source.getCompetency()) && !target.getIntersection().getThematicAxis().equals(source.getCompetency().getIntersection().getThematicAxis())) {
-                shouldContinue = target.getIntersection().getThematicAxis().copyInsideIfNecessary(source.getCompetency());
+            CoreCompetency clone = null;
+
+            // make a copy of our core competency inside a new thematic axis if necessary
+            if (!target.getIntersection().getThematicAxis().isEqualCoreCompetencyInside(source.getCompetency()) 
+            && !target.getIntersection().getThematicAxis().equals(source.getCompetency().getIntersection().getThematicAxis())) {
+                clone = target.getIntersection().getThematicAxis().copyInsideIfNecessary(source.getCompetency());
+                shouldContinue = clone != null;
             }
 
             if (shouldContinue) {
+                // make sure not to copy the same core competency within the same tile
                 shouldContinue = ! target.getChildren().stream()
-                    .map(n -> {
-                        return ((FileViewer) n).getCompetency();
-                    })
+                    .map(n -> ((FileViewer) n).getCompetency() )
                     .anyMatch(f -> (f.equals(source.getCompetency())));
             }
             
             if (shouldContinue) {
+                // remove it from its previous tile
                 parent.getChildren().remove(source);
                 source.getCompetency().getIntersection().getThematicAxis().getSubUnits().removeIf(
                     c -> (c.equals(source.getCompetency()) && ! c.isPartOfTreeView())
                 );
                 
+                if (clone != null) {
+                    source.setCompetency(clone.clone());
+                }
+
+                // add it back within the destination
                 target.getChildren().add(source);
                 
                 source.getCompetency().setIntersection(target.getIntersection());
                 success = true;
             }
-            // when drag and dropping a core competency from the treeview to the grid
+        // when drag and dropping a core competency from the treeview to the grid
         } else if (event.getGestureSource() instanceof TreeCell) {
-            CoreCompetency source = ((CoreCompetency) ((TreeCell<?>) event.getGestureSource()).getItem()).clone();
+            CoreCompetency source = ((CoreCompetency) ((TreeCell<?>) event.getGestureSource()).getItem());
             
             boolean shouldContinue = true;
-            if (! target.getIntersection().getThematicAxis().isEqualCoreCompetencyInside(source) && !target.getIntersection().getThematicAxis().equals(source.getIntersection().getThematicAxis())) {
-                shouldContinue = target.getIntersection().getThematicAxis().copyInsideIfNecessary(source);
+            CoreCompetency clone = null;
+
+            // make a copy of our core competency inside a new thematic axis if necessary
+            if (! target.getIntersection().getThematicAxis().isEqualCoreCompetencyInside(source) 
+            && !target.getIntersection().getThematicAxis().equals(source.getIntersection().getThematicAxis())) {
+                clone = target.getIntersection().getThematicAxis().copyInsideIfNecessary(source);
+                shouldContinue = clone != null;
             }
 
             if (shouldContinue) {
-                source.setIntersection(target.getIntersection());
-                source.setPartOfTreeView(false);
+                CoreCompetency coreCompetencyFromTreeView = null;
+                if (clone != null) {
+                    coreCompetencyFromTreeView = clone.clone();
+                } else {
+                    coreCompetencyFromTreeView = source.clone();
+                }
                 
-                target.getChildren().add(new FileViewer(source));
+                coreCompetencyFromTreeView.setIntersection(target.getIntersection());
+                coreCompetencyFromTreeView.setPartOfTreeView(false);
+                target.getChildren().add(new FileViewer(coreCompetencyFromTreeView));
                 
                 success = true;
             }

@@ -292,13 +292,13 @@ public class MainViewController {
                 .collect(Collectors.toList())
                 .forEach(c -> {
                     c.getChildren().add(
-                            new FileViewer(
-                                    sharedContext.getSelectedLesson().getSubUnits().stream()
-                                            .flatMap(t -> t.getSubUnits().stream())
-                                            .filter(cc -> predicate.test(cc, c))
-                                            .findFirst()
-                                            .get()
-                                            .cloneForGrid()));
+                        new FileViewer(
+                                sharedContext.getSelectedLesson().getSubUnits().stream()
+                                    .flatMap(t -> t.getSubUnits().stream())
+                                    .filter(cc -> predicate.test(cc, c))
+                                    .findFirst()
+                                    .get()
+                                    .cloneForGrid()));
                 });
     }
 
@@ -449,8 +449,33 @@ public class MainViewController {
                         AlertType.ERROR,
                         exception.getLocalizedMessage());
                 alert.setHeaderText("Impossible to save school file");
+                alert.setContentText(exception.getLocalizedMessage());
                 alert.setTitle("File saving failed");
                 alert.showAndWait();
         }
+    }
+
+    public GridPane getGpMain() {
+        return gpMain;
+    }
+
+    public AnchorPane getApTreeView() {
+        return apTreeView;
+    }
+
+    public TreeView<SchoolUnit<?>> getTwSchoolYearPlan() {
+        return twSchoolYearPlan;
+    }
+
+    public ArrayList<ComponentsRow> getGraphicalRows() {
+        return graphicalRows;
+    }
+
+    public ArrayList<ComponentsColumn> getComponentsColumns() {
+        return componentsColumns;
+    }
+
+    public ArrayList<FileViewerContainer> getFileViewerContainers() {
+        return fileViewerContainers;
     }
 }

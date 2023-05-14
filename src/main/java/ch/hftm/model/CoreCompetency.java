@@ -1,8 +1,6 @@
 package ch.hftm.model;
 
 import java.io.File;
-import java.util.Observable;
-import java.util.stream.Collectors;
 
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
@@ -10,12 +8,9 @@ import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlElements;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.ListBinding;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -103,13 +98,23 @@ public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> implements Cloneab
     @Override
     public CoreCompetency clone() {
         CoreCompetency competency = new CoreCompetency(this.getName());
+        competency.setIntersection(this.getIntersection());
         competency.nameProperty().bindBidirectional(this.nameProperty());
         competency.descriptionProperty().bindBidirectional(this.descriptionProperty());
-        //competency.files.setAll(this.files);
-        //ListBinding.
-        //competency.filesProperty().bindBidirectional(this.filesProperty());
-        //Bindings.createObjectBinding(competency.filesProperty(), this.filesProperty());
-        Bindings.createObjectBinding(() -> this.files.stream().collect(Collectors.toList()), this.filesProperty());
+
+        competency.setFiles(this.getFiles());
+        Bindings.bindContentBidirectional(this.files, competency.files);
+
+        return competency;
+    }
+
+    public CoreCompetency cloneForDifferentThematicAxis() {
+        CoreCompetency competency = new CoreCompetency(this.getName());
+        competency.setIntersection(this.getIntersection());
+        //competency.nameProperty().bindBidirectional(this.nameProperty());
+        competency.setName(this.getName());
+        competency.setDescription(this.getDescription());
+        //competency.descriptionProperty().bindBidirectional(this.descriptionProperty());
 
         return competency;
     }
@@ -117,9 +122,10 @@ public class CoreCompetency extends SchoolUnit<SchoolUnit<?>> implements Cloneab
     public CoreCompetency cloneForGrid() {
         CoreCompetency competency = new CoreCompetency(this.getName());
         competency.nameProperty().bindBidirectional(this.nameProperty());
+        competency.setIntersection(this.getIntersection());
         competency.descriptionProperty().bindBidirectional(this.descriptionProperty());
-        competency.intersection.set(this.getIntersection());
-        //competency.filesProperty().bindBidirectional(this.filesProperty());
+        competency.setFiles(this.getFiles());
+        Bindings.bindContentBidirectional(this.files, competency.files);
         competency.isPartOfTreeView.set(false);
 
         return competency;

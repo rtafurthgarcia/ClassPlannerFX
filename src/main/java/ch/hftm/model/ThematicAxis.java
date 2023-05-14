@@ -18,8 +18,8 @@ public class ThematicAxis extends SchoolUnit<CoreCompetency> implements Cloneabl
         super("null", FXCollections.observableArrayList(), CoreCompetency::new);
     }
 
-    public boolean copyInsideIfNecessary(CoreCompetency source) {
-        boolean hadToCopy = false;
+    public CoreCompetency copyInsideIfNecessary(CoreCompetency source) {
+        CoreCompetency clone = null;
 
         String contextText = String.format(
                     "This one core competency is originally part of thematic axis '%s'. \nDo you want to create a copy that is part of '%s'?",
@@ -34,13 +34,13 @@ public class ThematicAxis extends SchoolUnit<CoreCompetency> implements Cloneabl
         alert.setHeaderText("Core competency");
         alert.setTitle("Core competency: new copy?");
         Optional<ButtonType> result = alert.showAndWait();
-        hadToCopy = (result.isPresent() && result.get() == ButtonType.YES);
 
-        if (hadToCopy) {
-            this.getSubUnits().add(source.clone()/* .setParentThematicAxis(this)*/);
+        if (result.isPresent() && result.get() == ButtonType.YES) {
+            clone = source.cloneForDifferentThematicAxis();
+            this.getSubUnits().add(clone);
         }
 
-        return hadToCopy;
+        return clone;
     }
 
     public boolean isEqualCoreCompetencyInside(CoreCompetency source) {
