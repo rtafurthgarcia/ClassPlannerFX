@@ -1,5 +1,6 @@
 package ch.hftm.util;
 
+import java.util.Objects;
 import java.util.logging.Level;
 
 import ch.hftm.model.Context;
@@ -22,8 +23,9 @@ import javafx.util.Callback;
 
 public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCell<T>> {
     private static final String CSS_SELECTION_CLASS = "selected-treeitem";
+    private static final String CSS_DROP_HINT = "drop-under";
     private TreeCell<T> dropZone;
-    private TreeItem<T> draggedItem;
+    private TreeItem<T> source;
 
     private Context sharedContext = Context.getInstance();
 
@@ -120,12 +122,14 @@ public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
         };
         cell.setOnDragDetected((MouseEvent event) -> {
             try {
-                dragDetected(event, cell);
+                onDragDetected(event, cell);
             } catch (CloneNotSupportedException exception) {
                 sharedContext.getLogger().log(Level.WARNING, exception.getLocalizedMessage());
             }
         });
         cell.setOnDragDone((DragEvent event) -> clearDropLocation());
+        cell.setOnDragOver(event -> onDragOver(event, cell));
+        cell.setOnDragDropped(event -> onDrop(event, cell));
 
         // sucks ass but works so ig im not gonna change anything
         // sucks ass due to the fact it requires so many listeners. it saturates memory
@@ -156,15 +160,15 @@ public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
         }
     }
 
-    private void dragDetected(MouseEvent event, TreeCell<T> treeCell) throws CloneNotSupportedException {
-        draggedItem = treeCell.getTreeItem();
+    private void onDragDetected(MouseEvent event, TreeCell<T> treeCell) throws CloneNotSupportedException {
+        source = treeCell.getTreeItem();
 
         // root can't be dragged
-        if (draggedItem.getParent() == null && !(draggedItem.getValue() instanceof CoreCompetency))
+        if (source.getParent() == null && !(source.getValue() instanceof CoreCompetency))
             return;
         Dragboard db = treeCell.startDragAndDrop(TransferMode.MOVE);
 
-        CoreCompetency clone = (CoreCompetency) ((CoreCompetency) draggedItem.getValue()).clone();
+        CoreCompetency clone = (CoreCompetency) ((CoreCompetency) source.getValue()).clone();
 
         ClipboardContent content = new ClipboardContent();
         content.put(DataFormat.PLAIN_TEXT, clone.getName());
@@ -173,8 +177,68 @@ public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
         event.consume();
     }
 
+    private void onDragOver(DragEvent event, TreeCell<T> target) {
+        if (!event.getDragboard().hasContent(DataFormat.PLAIN_TEXT)) return;
+        TreeItem<T> thisItem = target.getTreeItem();
+     
+        // can't drop on itself nor can drop on something different than CoreCompetency
+        if (source == null || thisItem == null || thisItem == source 
+        || !(target.getItem() instanceof CoreCompetency || target.getItem() instanceof ThematicAxis
+        ) || !(source.getValue() instanceof CoreCompetency)) return;
+        // ignore if this is the root
+        if (source.getParent() == null) {
+            clearDropLocation();
+            return;
+        }
+     
+        event.acceptTransferModes(TransferMode.MOVE);
+        if (!Objects.equals(dropZone, target)) {
+            clearDropLocation();
+            this.dropZone = target;
+            dropZone.getStyleClass().add(CSS_DROP_HINT);
+        }
+    }
+
+    private void onDrop(DragEvent event, TreeCell<T> target) {
+        Dragboard db = event.getDragboard();
+        boolean success = false;
+        if (!db.hasContent(DataFormat.PLAIN_TEXT)) return;
+
+        TreeItem<T> targetItem = target.getTreeItem();
+        CoreCompetency coreCompetencySource = (CoreCompetency) source.getValue();
+        ThematicAxis targetThematicAxis = null;
+
+        if (targetItem.getParent().getValue() instanceof ThematicAxis) {
+            targetThematicAxis = (ThematicAxis) targetItem.getParent().getValue();
+        } else if ((ThematicAxis) targetItem.getValue() instanceof ThematicAxis){
+            targetThematicAxis = (ThematicAxis) targetItem.getValue();
+        }
+
+        if (targetThematicAxis != null && ! targetThematicAxis.isEqualCoreCompetencyInside(coreCompetencySource) 
+            && !targetThematicAxis.equals(coreCompetencySource.getIntersection().getThematicAxis())) {
+                success = targetThematicAxis.copyInsideIfNecessary(coreCompetencySource) != null;
+            }
+            
+        event.setDropCompleted(success);
+        /*// remove from previous location
+        droppedItemParent.getChildren().remove(draggedItem);
+
+        // dropping on parent node makes it the first child
+        if (Objects.equals(droppedItemParent, thisItem)) {
+            thisItem.getChildren().add(0, draggedItem);
+            treeView.getSelectionModel().select(draggedItem);
+        }
+        else {
+            // add to new location
+            int indexInParent = thisItem.getParent().getChildren().indexOf(thisItem);
+            thisItem.getParent().getChildren().add(indexInParent + 1, draggedItem);
+        }
+        treeView.getSelectionModel().select(draggedItem);
+        event.setDropCompleted(success);*/
+    }
+
     private void clearDropLocation() {
         if (dropZone != null)
-            dropZone.setStyle("");
+            dropZone.getStyleClass().remove(CSS_DROP_HINT);
     }
 }
