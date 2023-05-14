@@ -11,9 +11,6 @@ import java.util.function.BiPredicate;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-import com.google.gson.JsonIOException;
-import com.google.gson.stream.JsonReader;
-
 import ch.hftm.component.FileViewer;
 import ch.hftm.component.FileViewerContainer;
 import ch.hftm.model.Context;
@@ -28,6 +25,9 @@ import ch.hftm.util.GridPaneHelper.ComponentsColumn;
 import ch.hftm.util.GridPaneHelper.ComponentsRow;
 import ch.hftm.util.ModelTree;
 import ch.hftm.util.TextFieldTreeCellFactory;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -57,8 +57,6 @@ public class MainViewController {
     private Context sharedContext = Context.getInstance();
 
     private Integer counter;
-
-    private boolean alreadyInitializedOnce = false;
 
     private ArrayList<ComponentsRow> graphicalRows = new ArrayList<>();
     private ArrayList<ComponentsColumn> componentsColumns = new ArrayList<>();
@@ -131,7 +129,7 @@ public class MainViewController {
             try {
                 initialize();
             } catch (NullPointerException | IOException exception) {
-                sharedContext.getLogger().log(Level.SEVERE, exception.toString());
+                sharedContext.getLogger().log(Level.SEVERE, exception.getLocalizedMessage());
             }
         }
     };
@@ -170,7 +168,7 @@ public class MainViewController {
                                 return (FileViewer) n;
                             })
                             .filter(f -> f.getCompetency().equals((CoreCompetency) value)
-                                    && f.getCompetency().getParentThematicAxis().equals(parentThematicAxis))
+                                    && f.getCompetency().getIntersection().getThematicAxis().equals(parentThematicAxis))
                             .collect(Collectors.toList());
 
                     list.forEach(f -> {
@@ -229,11 +227,7 @@ public class MainViewController {
         loadThematicAxises();
         loadCoreCompetencies();
 
-        if (!alreadyInitializedOnce) {
-            loadTreeView();
-        }
-
-        alreadyInitializedOnce = true;
+        loadTreeView();
     }
 
     void generateColumns() {
@@ -289,9 +283,7 @@ public class MainViewController {
 
     void loadCoreCompetencies() {
         BiPredicate<CoreCompetency, FileViewerContainer> predicate = (cc,
-                c) -> c.getThematicAxis().equals(cc.getParentThematicAxis())
-                        && c.getClassroom().equals(cc.getParentClassroom())
-                        && c.getQuarter().equals(cc.getParentSchoolYearQuarter());
+                c) -> c.getIntersection().equals(cc.getIntersection());
 
         fileViewerContainers.stream()
                 .filter(c -> sharedContext.getSelectedLesson().getSubUnits().stream()
@@ -383,17 +375,26 @@ public class MainViewController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select a ClassPlannerFX school file");
         File selectedFile = fileChooser.showOpenDialog(sharedContext.getPrimaryStage());
+
         if (selectedFile != null) {
             try {
-                School loadedSchool = sharedContext.getSerializer()
-                        .fromJson(new JsonReader(new FileReader(selectedFile.getAbsolutePath())), School.class);
-                sharedContext.setSaveFilePath(selectedFile.getAbsolutePath());
+                JAXBContext context = JAXBContext.newInstance(School.class);    
+                sharedContext.setLoadedSchool((School) context.createUnmarshaller().unmarshal(selectedFile));    
+                sharedContext.setSelectedSchoolYear(sharedContext.getLoadedSchool().getSubUnits().stream().findFirst().get());
+                sharedContext.setSelectedLesson(sharedContext.getLoadedSchool().getSubUnits().stream().findFirst().get().getSubUnits().stream().findFirst().get());
 
                 clear();
-                sharedContext.setLoadedSchool(loadedSchool);
                 initialize();
-            } catch (IOException exception) {
-                sharedContext.getLogger().log(Level.SEVERE, exception.toString());
+
+            } catch (IOException | JAXBException exception) {
+                sharedContext.getLogger().log(Level.SEVERE, exception.getLocalizedMessage());
+
+                Alert alert = new Alert(
+                        AlertType.ERROR,
+                        exception.getLocalizedMessage());
+                alert.setHeaderText("Impossible to open school file");
+                alert.setTitle("File opening failed");
+                alert.showAndWait();
             }
         }
     }
@@ -425,13 +426,31 @@ public class MainViewController {
     }
 
     public void saveCurrentSchoolFile(String filePath) {
+        /*
+         * try {
+         * String json =
+         * sharedContext.getSerializer().toJson(sharedContext.getLoadedSchool());
+         * BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
+         * writer.write(json);
+         * writer.close();
+         * } catch (JsonIOException | IOException exception) {
+         * sharedContext.getLogger().log(Level.SEVERE, exception.getLocalizedMessage());
+         * }
+         */
         try {
-            String json = sharedContext.getSerializer().toJson(sharedContext.getLoadedSchool());
-            BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
-            writer.write(json);
-            writer.close();
-        } catch (JsonIOException | IOException exception) {
-            sharedContext.getLogger().log(Level.SEVERE, exception.toString());
+            JAXBContext context = JAXBContext.newInstance(School.class);
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            marshaller.marshal(sharedContext.getLoadedSchool(), new File(filePath));
+        } catch (JAXBException exception) {
+            sharedContext.getLogger().log(Level.SEVERE, exception.getLocalizedMessage());
+
+            Alert alert = new Alert(
+                        AlertType.ERROR,
+                        exception.getLocalizedMessage());
+                alert.setHeaderText("Impossible to save school file");
+                alert.setTitle("File saving failed");
+                alert.showAndWait();
         }
     }
 }

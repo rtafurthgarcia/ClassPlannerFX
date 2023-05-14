@@ -1,21 +1,28 @@
 package ch.hftm.model;
 
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlValue;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+@XmlRootElement(name = "classroom")
 public class Classroom {
-    private StringProperty name;
+    private StringProperty name = new SimpleStringProperty("null");
 
     public Classroom(String name) {
-        this.name = new SimpleStringProperty(name);
+        this.name.set(name);
+    }
+
+    public Classroom() {
     }
 
     public StringProperty nameProperty() {
         return name;
     }
 
-    public Classroom setName(StringProperty name) {
-        this.name = name;
+    @XmlValue()
+    public Classroom setName(String name) {
+        this.name.set(name);
 
         return this;
     }

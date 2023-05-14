@@ -2,14 +2,20 @@ package ch.hftm.model;
 
 import java.util.Optional;
 
+import jakarta.xml.bind.annotation.XmlRootElement;
 import javafx.collections.FXCollections;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 
+@XmlRootElement(name = "thematicaxis")
 public class ThematicAxis extends SchoolUnit<CoreCompetency> implements Cloneable {
     public ThematicAxis(String name) {
         super(name, FXCollections.observableArrayList(), CoreCompetency::new);
+    }
+
+    public ThematicAxis() {
+        super("null", FXCollections.observableArrayList(), CoreCompetency::new);
     }
 
     public boolean copyInsideIfNecessary(CoreCompetency source) {
@@ -17,7 +23,7 @@ public class ThematicAxis extends SchoolUnit<CoreCompetency> implements Cloneabl
 
         String contextText = String.format(
                     "This one core competency is originally part of thematic axis '%s'. \nDo you want to create a copy that is part of '%s'?",
-                    source.getParentThematicAxis(),
+                    source.getIntersection().getThematicAxis(),
                     super.getName());
 
         Alert alert = new Alert(
@@ -46,11 +52,9 @@ public class ThematicAxis extends SchoolUnit<CoreCompetency> implements Cloneabl
         return isPresent;
     }
 
-    @Override
     protected ThematicAxis clone()  {
         ThematicAxis thematicAxis = new ThematicAxis(this.getName());
         thematicAxis.nameProperty().bindBidirectional(this.nameProperty());
-        //competency.files.addAll(this.files);
 
         return thematicAxis;
     }

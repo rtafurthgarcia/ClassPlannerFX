@@ -21,8 +21,6 @@ import javafx.scene.input.TransferMode;
 import javafx.util.Callback;
 
 public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCell<T>> {
-    // private static final DataFormat JSON_FORMAT = new
-    // DataFormat("application/json");
     private static final String CSS_SELECTION_CLASS = "selected-treeitem";
     private TreeCell<T> dropZone;
     private TreeItem<T> draggedItem;
@@ -124,7 +122,7 @@ public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
             try {
                 dragDetected(event, cell);
             } catch (CloneNotSupportedException exception) {
-                sharedContext.getLogger().log(Level.WARNING, exception.toString());
+                sharedContext.getLogger().log(Level.WARNING, exception.getLocalizedMessage());
             }
         });
         cell.setOnDragDone((DragEvent event) -> clearDropLocation());
@@ -168,13 +166,7 @@ public class TextFieldTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
 
         CoreCompetency clone = (CoreCompetency) ((CoreCompetency) draggedItem.getValue()).clone();
 
-        // to also handle the Color & Font classes
-        // Gson gson =
-        // FxGson.coreBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-        // String json = gson.toJson(clone);
-
         ClipboardContent content = new ClipboardContent();
-        // content.put(JSON_FORMAT, json);
         content.put(DataFormat.PLAIN_TEXT, clone.getName());
         db.setContent(content);
         db.setDragView(treeCell.snapshot(null, null));

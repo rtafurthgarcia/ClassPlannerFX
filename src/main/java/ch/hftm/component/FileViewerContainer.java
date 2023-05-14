@@ -1,81 +1,32 @@
 package ch.hftm.component;
 
-import ch.hftm.model.Classroom;
 import ch.hftm.model.CoreCompetency;
-import ch.hftm.model.SchoolYearQuarter;
-import ch.hftm.model.ThematicAxis;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import ch.hftm.model.Intersection;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.control.TreeCell;
 import javafx.scene.input.DragEvent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
 public class FileViewerContainer extends VBox {
-
-    private ObjectProperty<Classroom> classroom = new SimpleObjectProperty<>();
-    private ObjectProperty<SchoolYearQuarter> quarter = new SimpleObjectProperty<>();
-    private ObjectProperty<ThematicAxis> thematicAxis = new SimpleObjectProperty<>();
-
     public static final String CSS_CLASS = "file-viewer-container";
     public static final String CSS_CLASS_RIGHT = "file-viewer-container-right";
 
-    public ThematicAxis getThematicAxis() {
-        return thematicAxis.get();
-    }
-
-    public FileViewerContainer setThematicAxis(ThematicAxis thematicAxis) {
-        this.thematicAxis.set(thematicAxis);
-
-        return this;
-    }
-
-    public ObjectProperty<ThematicAxis> thematicAxisProperty() {
-        return thematicAxis;
-    }
-
-    public SchoolYearQuarter getQuarter() {
-        return quarter.get();
-    }
-
-    public FileViewerContainer setQuarter(SchoolYearQuarter quarter) {
-        this.quarter.set(quarter);
-
-        return this;
-    }
-
-    public ObjectProperty<SchoolYearQuarter> quarterProperty() {
-        return quarter;
-    }
-
-    public Classroom getClassroom() {
-        return classroom.get();
-    }
-
-    public FileViewerContainer setClassroom(Classroom classroom) {
-        this.classroom.set(classroom);
-
-        return this;
-    }
-
-    public ObjectProperty<Classroom> classroomProperty() {
-        return classroom;
-    }
-
+    private Intersection intersection;
+    
     public FileViewerContainer() {
         super();
+        
+        this.intersection = new Intersection();
 
         this.setOnDragOver(event -> onDragOverContainer(event, this));
         this.setOnDragDropped(event -> onDragDroppedContainer(event, this));
         this.getStyleClass().add(CSS_CLASS);
-
-        this.setOnMouseEntered(event -> onMouseEntered(event, this));
-        this.setOnMouseExited(event -> onMouseExited(event, this));
+        
+        this.setOnMouseEntered(event -> onMouseEntered(this));
+        this.setOnMouseExited(event -> onMouseExited(this));
         // oddity I dont quite understand: I cant use calculated values such as USE_COMPUTED_SIZE & co
         // had to set weird values aswell in the pref heights from my controls aswell
         this.setPrefHeight(Integer.MAX_VALUE);
@@ -83,11 +34,16 @@ public class FileViewerContainer extends VBox {
         this.setMinWidth(10);
     }
 
+    public void setIntersection(Intersection intersection) {
+        this.intersection = intersection;
+    }
+
+    public Intersection getIntersection() {
+        return intersection;
+    }
+    
     private static void onDragOverContainer(DragEvent event, FileViewerContainer target) {
-        Dragboard db = event.getDragboard();
         boolean success = false;
-        /*if (!db.hasContent(DataFormat.lookupMimeType("application/json")))
-            return;*/
 
         if (event.getGestureSource() instanceof FileViewer) {
             FileViewer source = ((FileViewer) event.getGestureSource());
@@ -95,7 +51,7 @@ public class FileViewerContainer extends VBox {
                 success = true;
             }
         } else if (event.getGestureSource() instanceof TreeCell) {
-            CoreCompetency source = (CoreCompetency) ((TreeCell) event.getGestureSource()).getItem();
+            CoreCompetency source = (CoreCompetency) ((TreeCell<?>) event.getGestureSource()).getItem();
 
             success = !target.getChildren().stream()
                     .map(n -> {
@@ -111,10 +67,6 @@ public class FileViewerContainer extends VBox {
 
     
     private static void onDragDroppedContainer(DragEvent event, FileViewerContainer target) {
-        Dragboard db = event.getDragboard();
-        /*if (!db.hasContent(DataFormat.lookupMimeType("application/json")))
-            return;*/
-        
         boolean success = false;
 
         // when moving core competency between tiles
@@ -123,8 +75,8 @@ public class FileViewerContainer extends VBox {
             FileViewerContainer parent = (FileViewerContainer) source.getParent();
             
             boolean shouldContinue = true;
-            if (!target.getThematicAxis().isEqualCoreCompetencyInside(source.getCompetency()) && !target.getThematicAxis().equals(source.getCompetency().getParentThematicAxis())) {
-                shouldContinue = target.getThematicAxis().copyInsideIfNecessary(source.getCompetency());
+            if (!target.getIntersection().getThematicAxis().isEqualCoreCompetencyInside(source.getCompetency()) && !target.getIntersection().getThematicAxis().equals(source.getCompetency().getIntersection().getThematicAxis())) {
+                shouldContinue = target.getIntersection().getThematicAxis().copyInsideIfNecessary(source.getCompetency());
             }
 
             if (shouldContinue) {
@@ -137,30 +89,26 @@ public class FileViewerContainer extends VBox {
             
             if (shouldContinue) {
                 parent.getChildren().remove(source);
-                source.getCompetency().getParentThematicAxis().getSubUnits().removeIf(
+                source.getCompetency().getIntersection().getThematicAxis().getSubUnits().removeIf(
                     c -> (c.equals(source.getCompetency()) && ! c.isPartOfTreeView())
                 );
                 
                 target.getChildren().add(source);
                 
-                source.getCompetency().setParentThematicAxis(target.getThematicAxis());
-                source.getCompetency().setParentClassroom(target.getClassroom());
-                source.getCompetency().setParentSchoolYearQuarter(target.getQuarter());
+                source.getCompetency().setIntersection(target.getIntersection());
                 success = true;
             }
             // when drag and dropping a core competency from the treeview to the grid
         } else if (event.getGestureSource() instanceof TreeCell) {
-            CoreCompetency source = ((CoreCompetency) ((TreeCell) event.getGestureSource()).getItem()).clone();
+            CoreCompetency source = ((CoreCompetency) ((TreeCell<?>) event.getGestureSource()).getItem()).clone();
             
             boolean shouldContinue = true;
-            if (! target.getThematicAxis().isEqualCoreCompetencyInside(source) && !target.getThematicAxis().equals(source.getParentThematicAxis())) {
-                shouldContinue = target.getThematicAxis().copyInsideIfNecessary(source);
+            if (! target.getIntersection().getThematicAxis().isEqualCoreCompetencyInside(source) && !target.getIntersection().getThematicAxis().equals(source.getIntersection().getThematicAxis())) {
+                shouldContinue = target.getIntersection().getThematicAxis().copyInsideIfNecessary(source);
             }
 
             if (shouldContinue) {
-                source.setParentThematicAxis(target.getThematicAxis());
-                source.setParentClassroom(target.getClassroom());
-                source.setParentSchoolYearQuarter(target.getQuarter());
+                source.setIntersection(target.getIntersection());
                 source.setPartOfTreeView(false);
                 
                 target.getChildren().add(new FileViewer(source));
@@ -172,7 +120,7 @@ public class FileViewerContainer extends VBox {
         event.setDropCompleted(success);
     }
 
-    private static void onMouseEntered(MouseEvent event, FileViewerContainer target) {
+    private static void onMouseEntered(FileViewerContainer target) {
         if (target.getChildren().size() > 0) {
             int columnIndex = GridPane.getColumnIndex(target);
             if (((GridPane) target.getParent()).getColumnCount() > columnIndex + 1) {
@@ -184,7 +132,7 @@ public class FileViewerContainer extends VBox {
         }
     }
     
-    private static void onMouseExited(MouseEvent event, FileViewerContainer target) {
+    private static void onMouseExited(FileViewerContainer target) {
         if (target.getChildren().size() > 0) {
             int columnIndex = GridPane.getColumnIndex(target);
             int rowIndex = GridPane.getRowIndex(target);
