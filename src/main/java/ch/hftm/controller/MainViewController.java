@@ -383,7 +383,7 @@ public class MainViewController {
 
     @FXML
     public void onOpenSettings() throws IOException {
-        SettingsController.showSettingsView();
+        sharedContext.setSecondaryStage(SettingsController.showSettingsView());
     }
 
     @FXML

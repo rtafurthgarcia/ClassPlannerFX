@@ -3,43 +3,40 @@ package ch.hftm.controller;
 import java.io.IOException;
 
 import ch.hftm.ClassPlannerFX;
+import ch.hftm.model.Classroom;
 import ch.hftm.model.Context;
+import ch.hftm.model.SchoolYear;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.DatePicker;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 public class SettingsController {
-
-    @FXML
-    DatePicker dpStartDay;
-
-    @FXML
-    DatePicker dpEndDay;
-
-    @FXML 
-    TextField tfAuthor;
-
-    @FXML
-    TextField tfSchoolName;
-
-    private Stage stage;
-
     private Context sharedContext = Context.getInstance();
 
-    public void setApp() throws IOException {
-        //this.pGeneral = FXMLLoader.load(ClassPlannerFX.class.getResource("view/GeneralView.fxml"));
-        //this.pQuarters = FXMLLoader.load(ClassPlannerFX.class.getResource("view/QuartersView.fxml"));
-        //this.pClassrooms = FXMLLoader.load(ClassPlannerFX.class.getResource("view/ClassroomsView.fxml"));
-    }
+    @FXML
+    private GridPane gpGeneral;
 
-    public static void showSettingsView() throws IOException {
+    @FXML
+    private GridPane gpYears;
+
+    @FXML
+    private BorderPane bpClassrooms;
+
+    private TextField tfAuthor;
+    private TextField tfSchoolName;
+
+    private ListView<Classroom> lvClassrooms;
+    private ListView<SchoolYear> lvYears;
+
+    public static Stage showSettingsView() throws IOException {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(ClassPlannerFX.class.getResource("view/SettingsView.fxml"));
-        Scene scene = new Scene(loader.load(), 480, 480);
+        Scene scene = new Scene(loader.load(), 600, 480);
         
         Stage settingsStage = new Stage();
         settingsStage.setResizable(false);
@@ -48,22 +45,41 @@ public class SettingsController {
         settingsStage.setScene(scene);
         settingsStage.show();
         
-        SettingsController settingsViewController = loader.getController();
-        settingsViewController.setStage(settingsStage);
+        loader.getController();
+
+        return settingsStage;
     }
 
-    public void setStage(Stage stage) {
-        this.stage = stage;
+    private void bindControlsAndComponents() {
+        tfAuthor = (TextField) gpGeneral.lookup("#tfAuthor");
+        tfSchoolName = (TextField) gpGeneral.lookup("#tfSchoolName");
+        lvClassrooms = (ListView<Classroom>) bpClassrooms.lookup("#lvClassrooms");
+        lvYears = (ListView<SchoolYear>) gpYears.lookup("#lvYears");
     }
 
+    private void loadValues() {
+        tfAuthor.setText(sharedContext.getLoadedSchool().getAuthor());
+        tfSchoolName.setText(sharedContext.getLoadedSchool().getName());
+        lvClassrooms.setItems(sharedContext.getLoadedSchool().getClassrooms());
+        lvYears.setItems(sharedContext.getLoadedSchool().getSubUnits());
+    }
 
     @FXML
     public void initialize(){
-        tfAuthor.setText("lmao");
+        bindControlsAndComponents();
+        loadValues();
     }
 
     @FXML
-    void onClose() {
-        Context.getInstance().getPrimaryStage().close();
+    void onSave() {
+        sharedContext.getLoadedSchool().setAuthor(tfAuthor.getText());
+        sharedContext.getLoadedSchool().setName(tfSchoolName.getText());
+
+        sharedContext.getSecondaryStage().close();
+    }
+
+    @FXML
+    void onCancel() {
+        Context.getInstance().getSecondaryStage().close();
     }
 }

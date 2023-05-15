@@ -23,6 +23,8 @@ public class Context {
     private MainViewController mainController;
 
     private Stage primaryStage;
+    private Stage secondaryStage;
+
     private School loadedSchool;
     private DateTimeFormatter dateFormatUsed;
 
@@ -102,7 +104,6 @@ public class Context {
         this.primaryStage = primaryStage;
     }
 
-
     public School getLoadedSchool() {
         return loadedSchool;
     }
@@ -118,4 +119,13 @@ public class Context {
     public void setMainController(MainViewController mainController) {
         this.mainController = mainController;
     }
+
+    public Stage getSecondaryStage() {
+        return secondaryStage;
+    }
+
+    public void setSecondaryStage(Stage secondaryStage) {
+        this.secondaryStage = secondaryStage;
+    }
+
 }

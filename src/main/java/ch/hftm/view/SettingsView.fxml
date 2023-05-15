@@ -4,37 +4,34 @@
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.ToolBar?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="200.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.hftm.controller.SettingsController">
-   <center>
-      <TabPane id="tbMain" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="540.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.hftm.controller.SettingsController">
+   <children>
+      <TabPane id="tbMain" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
          <tabs>
             <Tab id="tGeneral" text="General">
                <content>
-                  <fx:include source="GeneralView.fxml" />
+                  <fx:include fx:id="gpGeneral" source="GeneralView.fxml" />
                </content>
             </Tab>
-            <Tab id="tQuartals" text="Quartals">
+            <Tab id="tYears" text="Years">
                <content>
-                  <fx:include source="QuartersView.fxml" />
+                  <fx:include fx:id="gpYears" source="YearlyView.fxml" />
                </content>
             </Tab>
             <Tab id="tClassrooms" text="Classrooms">
                <content>
-                  <fx:include source="ClassroomsView.fxml" />
+                  <fx:include fx:id="bpClassrooms" source="ClassroomsView.fxml" />
                </content>
             </Tab>
          </tabs>
       </TabPane>
-   </center>
-   <bottom>
-      <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+      <ToolBar maxHeight="40.0" maxWidth="1.7976931348623157E308" prefHeight="40.0" VBox.vgrow="ALWAYS">
          <items>
-            <Button id="btnSave" mnemonicParsing="false" text="Save" />
-            <Button id="btnCancel" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" text="Cancel" />
+            <Button id="btnSave" mnemonicParsing="false" onAction="#onSave" text="Save" />
+            <Button id="btnCancel" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#onCancel" text="Cancel" />
          </items>
       </ToolBar>
-   </bottom>
-</BorderPane>
+   </children>
+</VBox>
