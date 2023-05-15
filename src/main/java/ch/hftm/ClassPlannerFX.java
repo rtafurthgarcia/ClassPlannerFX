@@ -8,6 +8,7 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
+import ch.hftm.controller.MainViewController;
 import ch.hftm.model.Classroom;
 import ch.hftm.model.Context;
 import ch.hftm.model.CoreCompetency;
@@ -27,25 +28,20 @@ public class ClassPlannerFX extends Application {
     private Context sharedContext = Context.getInstance();
 
     @Override
-    public void start(Stage primaryStage) throws ParseException {
+    public void start(Stage primaryStage) throws ParseException, IOException {
         generateDefaultValues();
 
         primaryStage.setMaximized(true);
         sharedContext.setPrimaryStage(primaryStage);
         sharedContext.getPrimaryStage().setTitle("ClassPlannerFX");
+        
+        sharedContext.getLogManager().readConfiguration(ClassPlannerFX.class.getResourceAsStream(("resources/logging.properties")));
+        sharedContext.setLogger(Logger.getLogger(ClassPlannerFX.class.getName()));
+        sharedContext.getLogger().addHandler(new ConsoleHandler());
+        sharedContext.getLogger().addHandler(new FileHandler("ClassPlannerFX.log", 2000, 5));
+        sharedContext.getLogManager().addLogger(sharedContext.getLogger());
 
-        sharedContext.showMainView();
-
-        try {
-            sharedContext.getLogManager()
-                    .readConfiguration(ClassPlannerFX.class.getResourceAsStream(("resources/logging.properties")));
-            sharedContext.setLogger(Logger.getLogger(ClassPlannerFX.class.getName()));
-            sharedContext.getLogger().addHandler(new ConsoleHandler());
-            sharedContext.getLogger().addHandler(new FileHandler("ClassPlannerFX.log", 2000, 5));
-            sharedContext.getLogManager().addLogger(sharedContext.getLogger());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        sharedContext.setMainController(MainViewController.showMainView(primaryStage));
     }
 
     public void generateDefaultValues() throws ParseException {

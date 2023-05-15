@@ -115,40 +115,7 @@ public class Context {
         return mainController;
     }
 
-    public void showMainView() {
-        try {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(ClassPlannerFX.class.getResource("view/MainView.fxml"));
-
-            // Show the scene containing the root layout.
-            Scene scene = new Scene(loader.load());
-            instance.primaryStage.setScene(scene);
-            instance.primaryStage.show();
-
-            mainController = loader.getController();
-        } catch (IOException exception) {
-            logger.log(Level.SEVERE, exception.getLocalizedMessage());
-        }
-    }
-
-    public void showSettingsView() {
-        try {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(ClassPlannerFX.class.getResource("view/SettingsView.fxml"));
-            Scene scene = new Scene(loader.load(), 480, 480);
-            
-            Stage settingsView = new Stage();
-            settingsView.setResizable(false);
-            
-            settingsView.setTitle("Planning settings");
-            settingsView.setScene(scene);
-            settingsView.show();
-            
-            SettingsController settingsViewController = loader.getController();
-            settingsViewController.setStage(settingsView);
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void setMainController(MainViewController mainController) {
+        this.mainController = mainController;
     }
 }

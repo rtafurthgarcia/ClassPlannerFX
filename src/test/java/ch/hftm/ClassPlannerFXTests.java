@@ -43,13 +43,14 @@ class ClassPlannerFXTests {
      * Will be called with {@code @Before} semantics, i. e. before each test method.
      *
      * @param stage - Will be injected by the test runner.
+ * @throws IOException
      */
     @Start
-	public void start(Stage stage) {
+	public void start(Stage stage) throws IOException {
         sharedContext.setPrimaryStage(stage);
         
         sharedContext.getPrimaryStage().setTitle("ClassPlannerFX");
-        sharedContext.showMainView();
+        MainViewController.showMainView(stage);
 
         controller = sharedContext.getMainController();
     }

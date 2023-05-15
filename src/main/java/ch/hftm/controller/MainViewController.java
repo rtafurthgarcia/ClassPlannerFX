@@ -11,6 +11,7 @@ import java.util.function.BiPredicate;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+import ch.hftm.ClassPlannerFX;
 import ch.hftm.component.FileViewer;
 import ch.hftm.component.FileViewerContainer;
 import ch.hftm.model.Context;
@@ -32,6 +33,8 @@ import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ContextMenu;
@@ -44,6 +47,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 public class MainViewController {
     @FXML
@@ -191,6 +195,18 @@ public class MainViewController {
             }
         }
     };
+
+    public static MainViewController showMainView(Stage stage) throws IOException {
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(ClassPlannerFX.class.getResource("view/MainView.fxml"));
+
+        // Show the scene containing the root layout.
+        Scene scene = new Scene(loader.load());
+        stage.setScene(scene);
+        stage.show();
+
+        return loader.getController();
+    }
 
     @FXML
     public void initialize() throws IOException {
@@ -366,8 +382,8 @@ public class MainViewController {
     }
 
     @FXML
-    public void onOpenSettings() {
-        sharedContext.showSettingsView();
+    public void onOpenSettings() throws IOException {
+        SettingsController.showSettingsView();
     }
 
     @FXML
