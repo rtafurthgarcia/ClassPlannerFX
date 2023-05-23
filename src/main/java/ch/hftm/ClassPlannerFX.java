@@ -8,6 +8,9 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
+import atlantafx.base.theme.NordLight;
+import atlantafx.base.theme.PrimerLight;
+
 import ch.hftm.controller.MainViewController;
 import ch.hftm.model.Classroom;
 import ch.hftm.model.Context;
@@ -29,6 +32,9 @@ public class ClassPlannerFX extends Application {
 
     @Override
     public void start(Stage primaryStage) throws ParseException, IOException {
+        // find more themes in 'atlantafx.base.theme' package
+        Application.setUserAgentStylesheet(new NordLight().getUserAgentStylesheet());
+
         generateDefaultValues();
 
         primaryStage.setMaximized(true);

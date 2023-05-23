@@ -15,6 +15,7 @@ public class School extends SchoolUnit<SchoolYear> {
     @XmlElement(name = "author")
     private StringProperty author = new SimpleStringProperty("");
     private ObservableList<Classroom> classrooms = FXCollections.observableArrayList();
+    private StringProperty comment = new SimpleStringProperty("");
 
     public String getAuthor() {
         return author.get();
@@ -44,5 +45,20 @@ public class School extends SchoolUnit<SchoolYear> {
 
     public School() {
         super("null", FXCollections.observableArrayList(), SchoolYear::new);
+    }
+
+    public String getComment() {
+        return comment.get();
+    }
+
+    @XmlElement(name = "comment")
+    public School setComment(String comment) {
+        this.comment.set(comment);
+
+        return this;
+    }
+
+    public StringProperty commentProperty() {
+        return comment;
     }
 }

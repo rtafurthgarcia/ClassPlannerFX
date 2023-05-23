@@ -52,8 +52,13 @@ public class SchoolYear extends SchoolUnit<Lesson> {
     public SchoolYear(String rangeToParse) {
         super(rangeToParse, FXCollections.observableArrayList(), Lesson::new);    
 
-        this.startDay.set(LocalDate.parse(rangeToParse.subSequence(0, 3).toString(), yearlyFormat));
-        this.endDay.set(LocalDate.parse(rangeToParse.subSequence(5, 8).toString(), yearlyFormat));
+        String[] years = rangeToParse.split("-");
+
+        int startYear = Integer.parseInt(years[0].trim());
+        int endYear = Integer.parseInt(years[1].trim());
+
+        this.startDay.set(LocalDate.of(startYear, 1, 1));
+        this.endDay.set(LocalDate.of(endYear, 12, 31));
     }
 
     public SchoolYear() {

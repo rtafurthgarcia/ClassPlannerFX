@@ -138,24 +138,6 @@ public class MainViewController {
         }
     };
 
-    /*
-     * EventHandler<ActionEvent> onAddNewYear = new EventHandler<>() {
-     * public void handle(ActionEvent e) {
-     * if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue()
-     * instanceof SchoolYear) {
-     * //twSchoolYearPlan.getSelectionModel().getSelectedItem().getParent().getValue
-     * ().createAndAddSubUnit("new school year");
-     * }
-     * 
-     * if (twSchoolYearPlan.getSelectionModel().getSelectedItem() ==
-     * twSchoolYearPlan.getRoot()) {
-     * //twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue().
-     * createAndAddSubUnit("new school year");
-     * }
-     * }
-     * };
-     */
-
     EventHandler<ActionEvent> onDeleteSchoolUnit = new EventHandler<ActionEvent>() {
         public void handle(ActionEvent e) {
             if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getChildren().size() == 0) {
@@ -384,6 +366,9 @@ public class MainViewController {
     @FXML
     public void onOpenSettings() throws IOException {
         sharedContext.setSecondaryStage(SettingsController.showSettingsView());
+
+        clear();
+        initialize();
     }
 
     @FXML

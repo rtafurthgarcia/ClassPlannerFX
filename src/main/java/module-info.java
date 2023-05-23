@@ -8,6 +8,7 @@ module ch.hftm {
     requires jakarta.activation;
     requires jakarta.xml.bind;
     requires org.girod.javafx.svgimage;
+    requires atlantafx.base;
 
     exports ch.hftm;
 
@@ -16,5 +17,4 @@ module ch.hftm {
 
     opens ch.hftm.model to jakarta.xml.bind;
     opens ch.hftm.util to jakarta.xml.bind, com.sun.xml.bind.core;
-    //opens java.base to com.google.gson;
 }

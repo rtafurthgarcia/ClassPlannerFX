@@ -22,15 +22,14 @@
             </Tab>
             <Tab id="tClassrooms" text="Classrooms">
                <content>
-                  <fx:include fx:id="bpClassrooms" source="ClassroomsView.fxml" />
+                  <fx:include fx:id="gpClassrooms" source="ClassroomsView.fxml" />
                </content>
             </Tab>
          </tabs>
       </TabPane>
       <ToolBar maxHeight="40.0" maxWidth="1.7976931348623157E308" prefHeight="40.0" VBox.vgrow="ALWAYS">
          <items>
-            <Button id="btnSave" mnemonicParsing="false" onAction="#onSave" text="Save" />
-            <Button id="btnCancel" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#onCancel" text="Cancel" />
+            <Button id="btnSave" mnemonicParsing="false" onAction="#onClose" text="Close" />
          </items>
       </ToolBar>
    </children>
