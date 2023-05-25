@@ -34,10 +34,7 @@ public class SettingsController {
     private GridPane gpGeneral;
 
     @FXML
-    private GridPane gpYears;
-
-    @FXML
-    private GridPane gpClassrooms;
+    private GridPane gpYearsClassrooms;
 
     private TextField tfAuthor;
     private TextField tfSchoolName;
@@ -47,10 +44,10 @@ public class SettingsController {
     private ListView<Classroom> lvClassrooms;
     private ListView<SchoolYear> lvYears;
 
-    private Button bAddYear;
-    private Button bDeleteYear;
-    private Button bAddClassroom;
-    private Button bDeleteClassroom;
+    private ListView focusedListView;
+
+    private Button bAddItem;
+    private Button bDeleteItem;
 
     private DatePicker dpBegin1;
     private DatePicker dpEnd1;
@@ -66,7 +63,7 @@ public class SettingsController {
     public static Stage showSettingsView() throws IOException {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(ClassPlannerFX.class.getResource("view/SettingsView.fxml"));
-        Scene scene = new Scene(loader.load(), 640, 480);
+        Scene scene = new Scene(loader.load(), 640, 540);
         
         Stage settingsStage = new Stage();
         settingsStage.setResizable(false);
@@ -75,58 +72,54 @@ public class SettingsController {
         settingsStage.setScene(scene);
         settingsStage.show();
         
-        loader.getController();
+        scene.focusOwnerProperty().addListener((observable, oldValue, newValue) -> ((SettingsController) loader.getController()).setFocusedListView(newValue));
 
         return settingsStage;
     }
 
-    private void bindControlsAndComponents() {
-        ToolBar tbYears = (ToolBar) gpYears.lookup("#tbYears");
-        ToolBar tbClassrooms = (ToolBar) gpClassrooms.lookup("#tbClassrooms");
-
+    private void setControlsAndComponents() {     
+        ToolBar tbYears = (ToolBar) gpYearsClassrooms.lookup("#tbYears");
+        
         tfAuthor = (TextField) gpGeneral.lookup("#tfAuthor");
         tfSchoolName = (TextField) gpGeneral.lookup("#tfSchoolName");
 
         taComment = (TextArea) gpGeneral.lookup("#taComment");
 
-        lvClassrooms = (ListView<Classroom>) gpClassrooms.lookup("#lvClassrooms");
-        lvYears = (ListView<SchoolYear>) gpYears.lookup("#lvYears");
+        lvClassrooms = (ListView<Classroom>) gpYearsClassrooms.lookup("#lvClassrooms");
+        lvYears = (ListView<SchoolYear>) gpYearsClassrooms.lookup("#lvYears");
 
         lvYears.setEditable(true);
         lvYears.setCellFactory(param -> new TextFieldListCell<>(new SchoolYearConverter()));
+        lvYears.setFocusTraversable(true);
 
         lvClassrooms.setEditable(true);
         lvClassrooms.setCellFactory(param -> new TextFieldListCell<>(new ClassroomConverter()));
+        lvClassrooms.setFocusTraversable(true);
         //lvClassrooms.setCellFactory();
 
-        dpBegin1 = (DatePicker) gpYears.lookup("#dpBegin1");
-        dpEnd1 = (DatePicker) gpYears.lookup("#dpEnd1");
-        dpBegin2 = (DatePicker) gpYears.lookup("#dpBegin2");
-        dpEnd2 = (DatePicker) gpYears.lookup("#dpEnd2");
-        dpBegin3 = (DatePicker) gpYears.lookup("#dpBegin3");
-        dpEnd3 = (DatePicker) gpYears.lookup("#dpEnd3");
-        dpBegin4 = (DatePicker) gpYears.lookup("#dpBegin4");
-        dpEnd4 = (DatePicker) gpYears.lookup("#dpEnd4");
+        dpBegin1 = (DatePicker) gpYearsClassrooms.lookup("#dpBegin1");
+        dpEnd1 = (DatePicker) gpYearsClassrooms.lookup("#dpEnd1");
+        dpBegin2 = (DatePicker) gpYearsClassrooms.lookup("#dpBegin2");
+        dpEnd2 = (DatePicker) gpYearsClassrooms.lookup("#dpEnd2");
+        dpBegin3 = (DatePicker) gpYearsClassrooms.lookup("#dpBegin3");
+        dpEnd3 = (DatePicker) gpYearsClassrooms.lookup("#dpEnd3");
+        dpBegin4 = (DatePicker) gpYearsClassrooms.lookup("#dpBegin4");
+        dpEnd4 = (DatePicker) gpYearsClassrooms.lookup("#dpEnd4");
 
-        bAddYear = (Button) tbYears.getItems().get(0);
-        bDeleteYear = (Button) tbYears.getItems().get(1);
+        bAddItem = (Button) tbYears.getItems().get(0);
+        bDeleteItem = (Button) tbYears.getItems().get(1);
 
-        bAddClassroom = (Button) tbClassrooms.getItems().get(0);
-        bDeleteClassroom = (Button) tbClassrooms.getItems().get(1);
+        cbArchived = (CheckBox) gpYearsClassrooms.lookup("#cbArchived");
 
-        cbArchived = (CheckBox) gpYears.lookup("#cbArchived");
-
-        bAddYear.setOnMouseClicked(event -> onAddYear());
-        bDeleteYear.setOnMouseClicked(event -> onDeleteYear());
-        bAddClassroom.setOnMouseClicked(event -> onAddClassroom());
-        bDeleteClassroom.setOnMouseClicked(event -> onDeleteClassroom());
+        bAddItem.setOnMouseClicked(event -> onAddItem());
+        bDeleteItem.setOnMouseClicked(event -> onDeleteItem());
     }
 
     private void loadValues() {
         tfAuthor.textProperty().bindBidirectional(sharedContext.getLoadedSchool().authorProperty());
         tfSchoolName.textProperty().bindBidirectional(sharedContext.getLoadedSchool().nameProperty());
         taComment.textProperty().bindBidirectional(sharedContext.getLoadedSchool().commentProperty());
-        lvClassrooms.setItems(sharedContext.getLoadedSchool().getClassrooms());
+
         lvYears.setItems(sharedContext.getLoadedSchool().getSubUnits());
 
         lvYears.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> loadYearsValues(oldValue, newValue));
@@ -155,7 +148,6 @@ public class SettingsController {
             dpEnd4.valueProperty().unbindBidirectional(q4.endWeekProperty());
 
             cbArchived.selectedProperty().unbindBidirectional(previouslySelectedYear.archivedProperty());
-
         }
 
         SchoolYearQuarter q1 = selectedYear.getQuarter(1);
@@ -176,6 +168,8 @@ public class SettingsController {
         dpEnd4.valueProperty().bindBidirectional(q4.endWeekProperty());
 
         cbArchived.selectedProperty().bindBidirectional(selectedYear.archivedProperty());
+
+        lvClassrooms.setItems(selectedYear.getClassrooms());
     }
 
     private void setQuartersEditable(boolean isEditable) {
@@ -194,66 +188,74 @@ public class SettingsController {
 
     @FXML
     public void initialize(){
-        bindControlsAndComponents();
+        setControlsAndComponents();
         loadValues();
     }
 
     @FXML
     void onClose() {
-        sharedContext.getLoadedSchool().setAuthor(tfAuthor.getText());
-        sharedContext.getLoadedSchool().setName(tfSchoolName.getText());
+        //sharedContext.getLoadedSchool().setAuthor(tfAuthor.getText());
+        //sharedContext.getLoadedSchool().setName(tfSchoolName.getText());
 
         sharedContext.getSecondaryStage().close();
     }
 
-    void onAddYear() {
-        String newYear = String.format("%d-%d", LocalDate.now().getYear(), LocalDate.now().plusYears(1).getYear()); 
+    public void setFocusedListView(Object object) {
+        if (object instanceof ListView) {
+            focusedListView = (ListView) object;
+        }
+    }
 
-        lvYears.getItems().add(new SchoolYear(newYear));
-        lvYears.getSelectionModel().selectLast();
-        lvYears.edit(lvYears.getSelectionModel().getSelectedIndex());
+    void onAddItem() {
+        if (focusedListView == lvYears) {
+            String newYear = String.format("%d-%d", LocalDate.now().getYear(), LocalDate.now().plusYears(1).getYear()); 
+    
+            lvYears.getItems().add(new SchoolYear(newYear));
+            lvYears.getSelectionModel().selectLast();
+            lvYears.edit(lvYears.getSelectionModel().getSelectedIndex());
+        } else if (focusedListView == lvClassrooms) {
+            lvClassrooms.getItems().add(new Classroom("new classroom"));
+            lvClassrooms.getSelectionModel().selectLast();
+            lvClassrooms.edit(lvClassrooms.getSelectionModel().getSelectedIndex());
+        }
         
     }
 
-    void onDeleteYear() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Delete Confirmation");
-        alert.setHeaderText("Delete Item");
-        alert.setContentText("Are you sure you want to delete this year and its related data?");
+    void onDeleteItem() {
+        if (focusedListView == lvYears) {
 
-        ButtonType buttonTypeYes = new ButtonType("Yes");
-        ButtonType buttonTypeNo = new ButtonType("No");
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Delete Confirmation");
+            alert.setHeaderText("Delete Item");
+            alert.setContentText("Are you sure you want to delete this year and its related data?");
 
-        alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
+            ButtonType buttonTypeYes = new ButtonType("Yes");
+            ButtonType buttonTypeNo = new ButtonType("No");
 
-        alert.showAndWait().ifPresent(response -> {
-            if (response == buttonTypeYes) {
-                lvYears.getItems().remove(lvYears.getSelectionModel().getSelectedItem());
-            }
-        });
-    }
+            alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
 
-    void onAddClassroom() {
-        lvClassrooms.getItems().add(new Classroom("new classroom"));
-        lvClassrooms.getSelectionModel().selectLast();
-        lvClassrooms.edit(lvClassrooms.getSelectionModel().getSelectedIndex());
-    }
+            alert.showAndWait().ifPresent(response -> {
+                if (response == buttonTypeYes) {
+                    lvYears.getItems().remove(lvYears.getSelectionModel().getSelectedItem());
+                }
+            });
+        } else if (focusedListView == lvClassrooms) {
 
-    void onDeleteClassroom() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Delete Confirmation");
-        alert.setHeaderText("Delete Item");
-        alert.setContentText("Are you sure you want to delete this classroom and its related data?");
-
-        ButtonType buttonTypeYes = new ButtonType("Yes");
-        ButtonType buttonTypeNo = new ButtonType("No");
-
-        alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
-
-        alert.showAndWait().ifPresent(response -> {
-            if (response == buttonTypeYes) {
-                lvClassrooms.getItems().remove(lvClassrooms.getSelectionModel().getSelectedItem());
-            }
-        });
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Delete Confirmation");
+            alert.setHeaderText("Delete Item");
+            alert.setContentText("Are you sure you want to delete this classroom and its related data?");
+    
+            ButtonType buttonTypeYes = new ButtonType("Yes");
+            ButtonType buttonTypeNo = new ButtonType("No");
+    
+            alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
+    
+            alert.showAndWait().ifPresent(response -> {
+                if (response == buttonTypeYes) {
+                    lvClassrooms.getItems().remove(lvClassrooms.getSelectionModel().getSelectedItem());
+                }
+            });
+        }
     }
 }

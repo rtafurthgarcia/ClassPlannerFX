@@ -24,7 +24,7 @@ public class SchoolYear extends SchoolUnit<Lesson> {
     private ObjectProperty<LocalDate> startDay = new SimpleObjectProperty<>(LocalDate.now());
     private ObjectProperty<LocalDate> endDay = new SimpleObjectProperty<>(LocalDate.now());
     private BooleanProperty archived = new SimpleBooleanProperty(false);
-
+    private ObservableList<Classroom> classrooms = FXCollections.observableArrayList();
     private ObservableList<SchoolYearQuarter> quarters = FXCollections.observableArrayList();
 
     @XmlTransient
@@ -40,6 +40,14 @@ public class SchoolYear extends SchoolUnit<Lesson> {
     })
     public ObservableList<SchoolYearQuarter> getQuarters() {
         return quarters;
+    }
+
+    @XmlElementWrapper(name = "classrooms")
+    @XmlElements({
+        @XmlElement(name="classroom", type=Classroom.class)
+    })
+    public ObservableList<Classroom> getClassrooms() {
+        return classrooms;
     }
 
     public SchoolYear(LocalDate startDay, LocalDate endDay) {

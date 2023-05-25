@@ -209,12 +209,12 @@ public class MainViewController {
         int i = 0;
         int rowIndex = gpMain.getRowCount();
         gpMain.getRowConstraints().add(new RowConstraints(30));
-        while (i < sharedContext.getLoadedSchool().getClassrooms().size()
+        while (i < sharedContext.getSelectedSchoolYear().getClassrooms().size()
                 * sharedContext.getSelectedSchoolYear().getQuarters().size()) {
-            for (int j = 0; j < sharedContext.getLoadedSchool().getClassrooms().size(); j++) {
+            for (int j = 0; j < sharedContext.getSelectedSchoolYear().getClassrooms().size(); j++) {
                 GridPaneHelper.addGridHeaderRow(
                         gpMain,
-                        List.of(sharedContext.getLoadedSchool().getClassrooms().get(j)),
+                        List.of(sharedContext.getSelectedSchoolYear().getClassrooms().get(j)),
                         1,
                         1 + i,
                         rowIndex);
@@ -231,7 +231,7 @@ public class MainViewController {
     void generateColumns() {
         counter = 0;
         sharedContext.getSelectedSchoolYear().getQuarters().forEach(quarter -> {
-            sharedContext.getLoadedSchool().getClassrooms().forEach(classroom -> {
+            sharedContext.getSelectedSchoolYear().getClassrooms().forEach(classroom -> {
                 componentsColumns.add(counter, new ComponentsColumn(quarter, classroom));
                 counter++;
             });
@@ -255,9 +255,9 @@ public class MainViewController {
 
     void loadTreeView() {
         ModelTree<SchoolUnit<?>> tree = new ModelTree<>(sharedContext.getLoadedSchool(),
-                SchoolUnit::getSubUnits,
-                SchoolUnit::nameProperty,
-                unit -> PseudoClass.getPseudoClass(unit.getClass().getSimpleName().toLowerCase()));
+            SchoolUnit::getSubUnits,
+            SchoolUnit::nameProperty,
+            unit -> PseudoClass.getPseudoClass(unit.getClass().getSimpleName().toLowerCase()));
 
         twSchoolYearPlan = tree.getTreeView();
 
@@ -403,7 +403,7 @@ public class MainViewController {
         FileChooser fileChooser = new FileChooser();
 
         FileChooser.ExtensionFilter extensions = new FileChooser.ExtensionFilter("ClassPlannerFX files (*.cpf)",
-                "*.cpf");
+            "*.cpf");
         fileChooser.getExtensionFilters().add(extensions);
         fileChooser.setTitle("Chose the directory and the filename of your savefile");
         fileChooser.setInitialFileName("school.cpf");
@@ -445,8 +445,8 @@ public class MainViewController {
             sharedContext.getLogger().log(Level.SEVERE, exception.getLocalizedMessage());
 
             Alert alert = new Alert(
-                        AlertType.ERROR,
-                        exception.getLocalizedMessage());
+                    AlertType.ERROR,
+                    exception.getLocalizedMessage());
                 alert.setHeaderText("Impossible to save school file");
                 alert.setContentText(exception.getLocalizedMessage());
                 alert.setTitle("File saving failed");
