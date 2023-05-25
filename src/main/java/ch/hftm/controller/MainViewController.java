@@ -328,8 +328,6 @@ public class MainViewController {
             miLoadLesson.setOnAction(onLoadSelection);
             miLoadSchoolYear.setOnAction(onLoadSelection);
 
-            // miCreateNewYear.setOnAction(onAddNewYear);
-
             if (twSchoolYearPlan.getSelectionModel().getSelectedItem() == twSchoolYearPlan.getRoot()) {
                 contextMenu.getItems().addAll(miCreateNewYear);
             } else if (twSchoolYearPlan.getSelectionModel().getSelectedItem().getValue() instanceof SchoolYear) {

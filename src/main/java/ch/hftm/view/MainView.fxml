@@ -67,10 +67,10 @@
         </Menu>
       </menus>
     </MenuBar>
-    <SplitPane dividerPositions="0.2505567928730512" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+    <SplitPane dividerPositions="0.2" focusTraversable="true" maxWidth="1.7976931348623157E308" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
       <items>
-        <AnchorPane fx:id="apTreeView" maxWidth="200.0" prefWidth="200.0" />
-            <GridPane fx:id="gpMain" styleClass="grid">
+        <AnchorPane fx:id="apTreeView" maxWidth="400.0" />
+            <GridPane fx:id="gpMain" maxWidth="1.7976931348623157E308" styleClass="grid">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
               </columnConstraints>

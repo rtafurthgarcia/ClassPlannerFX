@@ -7,7 +7,10 @@ import ch.hftm.ClassPlannerFX;
 import ch.hftm.model.Classroom;
 import ch.hftm.model.Context;
 import ch.hftm.model.SchoolYear;
-import ch.hftm.util.SchoolYearConverter;
+import ch.hftm.model.SchoolYearQuarter;
+import ch.hftm.util.ListViewConverter;
+import ch.hftm.util.ListViewConverter.ClassroomConverter;
+import ch.hftm.util.ListViewConverter.SchoolYearConverter;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -21,7 +24,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.cell.TextFieldListCell;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
@@ -90,10 +92,12 @@ public class SettingsController {
         lvClassrooms = (ListView<Classroom>) gpClassrooms.lookup("#lvClassrooms");
         lvYears = (ListView<SchoolYear>) gpYears.lookup("#lvYears");
 
-        SchoolYearConverter converter = new SchoolYearConverter();
-
         lvYears.setEditable(true);
-        lvYears.setCellFactory(param -> new TextFieldListCell<>(converter));
+        lvYears.setCellFactory(param -> new TextFieldListCell<>(new SchoolYearConverter()));
+
+        lvClassrooms.setEditable(true);
+        lvClassrooms.setCellFactory(param -> new TextFieldListCell<>(new ClassroomConverter()));
+        //lvClassrooms.setCellFactory();
 
         dpBegin1 = (DatePicker) gpYears.lookup("#dpBegin1");
         dpEnd1 = (DatePicker) gpYears.lookup("#dpEnd1");
@@ -114,20 +118,38 @@ public class SettingsController {
 
         bAddYear.setOnMouseClicked(event -> onAddYear());
         bDeleteYear.setOnMouseClicked(event -> onDeleteYear());
-        //cbArchived.setOnMouseClicked(event -> onSetAsArchivedOrNot());
         bAddClassroom.setOnMouseClicked(event -> onAddClassroom());
         bDeleteClassroom.setOnMouseClicked(event -> onDeleteClassroom());
-        //btnAddYear.setOnMouseClicked(event -> on());
     }
 
     private void loadValues() {
-        //tfAuthor.setText(sharedContext.getLoadedSchool().getAuthor());
-        //tfSchoolName.setText(sharedContext.getLoadedSchool().getName());
         tfAuthor.textProperty().bindBidirectional(sharedContext.getLoadedSchool().authorProperty());
         tfSchoolName.textProperty().bindBidirectional(sharedContext.getLoadedSchool().nameProperty());
         taComment.textProperty().bindBidirectional(sharedContext.getLoadedSchool().commentProperty());
         lvClassrooms.setItems(sharedContext.getLoadedSchool().getClassrooms());
         lvYears.setItems(sharedContext.getLoadedSchool().getSubUnits());
+
+        SchoolYearQuarter q1 = sharedContext.getSelectedSchoolYear().getQuarters().stream()
+            .filter(quarter -> quarter.getQuarter() == 1)
+            .findFirst()
+            .get();
+        
+        SchoolYearQuarter q2 = sharedContext.getSelectedSchoolYear().getQuarters().stream()
+            .filter(quarter -> quarter.getQuarter() == 2)
+            .findFirst()
+            .get();
+
+        SchoolYearQuarter q3 = sharedContext.getSelectedSchoolYear().getQuarters().stream()
+            .filter(quarter -> quarter.getQuarter() == 3)
+            .findFirst()
+            .get();
+
+        SchoolYearQuarter q4 = sharedContext.getSelectedSchoolYear().getQuarters().stream()
+            .filter(quarter -> quarter.getQuarter() == 4)
+            .findFirst()
+            .get();
+
+        //dpBegin1.promptTextProperty().bindBidirectional(q1.startWeekProperty());
     }
 
     @FXML

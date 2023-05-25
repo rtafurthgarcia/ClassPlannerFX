@@ -6,9 +6,9 @@
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="540.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.hftm.controller.SettingsController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.hftm.controller.SettingsController">
    <children>
-      <TabPane id="tbMain" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+      <TabPane id="tbMain" maxHeight="440.0" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="440.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
          <tabs>
             <Tab id="tGeneral" text="General">
                <content>
@@ -17,12 +17,12 @@
             </Tab>
             <Tab id="tYears" text="Years">
                <content>
-                  <fx:include fx:id="gpYears" source="YearlyView.fxml" />
+                  <fx:include fx:id="gpYears" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" source="YearlyView.fxml" />
                </content>
             </Tab>
             <Tab id="tClassrooms" text="Classrooms">
                <content>
-                  <fx:include fx:id="gpClassrooms" source="ClassroomsView.fxml" />
+                  <fx:include fx:id="gpClassrooms" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" source="ClassroomsView.fxml" />
                </content>
             </Tab>
          </tabs>

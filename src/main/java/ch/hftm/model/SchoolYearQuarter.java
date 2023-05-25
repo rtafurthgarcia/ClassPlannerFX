@@ -1,18 +1,35 @@
 package ch.hftm.model;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.WeekFields;
+
+import ch.hftm.util.TypeHelper;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 @XmlRootElement(name = "quarter")
 public class SchoolYearQuarter {
     private IntegerProperty quarter = new SimpleIntegerProperty(0);
-    private IntegerProperty startWeek = new SimpleIntegerProperty(0);
-    private IntegerProperty endWeek = new SimpleIntegerProperty(0);
+    private ObjectProperty<LocalDate> startWeek = new SimpleObjectProperty<>(LocalDate.now());
+    private ObjectProperty<LocalDate> endWeek = new SimpleObjectProperty<>(LocalDate.now());
+
+    @XmlTransient
+    private final String YEAR_PATTERN = "yyyy"; 
+    @XmlTransient
+    private DateTimeFormatter yearlyFormat = new DateTimeFormatterBuilder()
+        .appendPattern(YEAR_PATTERN)
+        .toFormatter();
     
-    public SchoolYearQuarter(Integer quarter, Integer startWeek, Integer endWeek) {
+    public SchoolYearQuarter(Integer quarter, LocalDate startWeek, LocalDate endWeek) {
         this.quarter.set(quarter);
         this.startWeek.set(startWeek);
         this.endWeek.set(endWeek);
@@ -21,29 +38,31 @@ public class SchoolYearQuarter {
     public SchoolYearQuarter() {
     }
     
-    public Integer getStartWeek() {
+    public LocalDate getStartWeek() {
         return startWeek.get();
     }
     
     @XmlElement(name = "startweek")
-    public void setStartWeek(Integer startWeek) {
+    @XmlJavaTypeAdapter(value = TypeHelper.LocalDateAdapter.class)
+    public void setStartWeek(LocalDate startWeek) {
         this.startWeek.set(startWeek);
     }
     
-    public IntegerProperty endWeekProperty() {
+    public ObjectProperty<LocalDate> endWeekProperty() {
         return endWeek;
     } 
 
-    public IntegerProperty startWeekProperty() {
+    public ObjectProperty<LocalDate> startWeekProperty() {
         return startWeek;
     }
 
-    public Integer getEndWeek() {
+    public LocalDate getEndWeek() {
         return endWeek.get();
     }
 
     @XmlElement(name = "endweek")
-    public void setEndWeek(Integer endWeek) {
+    @XmlJavaTypeAdapter(value = TypeHelper.LocalDateAdapter.class)
+    public void setEndWeek(LocalDate endWeek) {
         this.endWeek.set(endWeek);
     }
 
@@ -61,7 +80,11 @@ public class SchoolYearQuarter {
     }
 
     public String toString() {
-        return String.format("Semaine %d à %d", getStartWeek(), getEndWeek()); 
+        return String.format(
+            "Semaine %d à %d - %d", 
+            getStartWeek().get(WeekFields.of(yearlyFormat.getLocale()).weekOfYear()), 
+            getEndWeek().get(WeekFields.of(yearlyFormat.getLocale()).weekOfYear()),
+            getEndWeek().getYear()); 
     }
 
     @Override

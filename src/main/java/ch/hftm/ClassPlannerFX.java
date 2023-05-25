@@ -58,23 +58,22 @@ public class ClassPlannerFX extends Application {
         sharedContext.getLoadedSchool().getClassrooms().addAll(new Classroom("Classe 711"),
                 new Classroom("Classe 712"));
 
-        sharedContext
-                .setSelectedSchoolYear(new SchoolYear(LocalDate.parse("02.05.2023", sharedContext.getDateFormatUsed()),
-                        LocalDate.parse("29.04.2024", sharedContext.getDateFormatUsed())));
+        sharedContext.setSelectedSchoolYear(new SchoolYear(LocalDate.parse("01.07.2023", sharedContext.getDateFormatUsed()),
+                        LocalDate.parse("30.06.2024", sharedContext.getDateFormatUsed())));
 
         sharedContext.getSelectedSchoolYear().getQuarters().addAll(
-                new SchoolYearQuarter(1, 4, 19),
-                new SchoolYearQuarter(2, 20, 35),
-                new SchoolYearQuarter(3, 36, 51),
-                new SchoolYearQuarter(4, 52, 68));
-
-        SchoolYear schoolYear2025 = new SchoolYear(LocalDate.parse("02.05.2024", sharedContext.getDateFormatUsed()),
-                LocalDate.parse("29.04.2025", sharedContext.getDateFormatUsed()));
+                new SchoolYearQuarter(1, LocalDate.parse("01.07.2023", sharedContext.getDateFormatUsed()), LocalDate.parse("30.09.2023", sharedContext.getDateFormatUsed())),
+                new SchoolYearQuarter(2, LocalDate.parse("01.10.2023", sharedContext.getDateFormatUsed()), LocalDate.parse("31.12.2023", sharedContext.getDateFormatUsed())),
+                new SchoolYearQuarter(3, LocalDate.parse("01.01.2024", sharedContext.getDateFormatUsed()), LocalDate.parse("31.03.2024", sharedContext.getDateFormatUsed())),
+                new SchoolYearQuarter(4, LocalDate.parse("01.04.2024", sharedContext.getDateFormatUsed()), LocalDate.parse("30.06.2024", sharedContext.getDateFormatUsed()))
+        );
+        SchoolYear schoolYear2025 = new SchoolYear(LocalDate.parse("01.07.2024", sharedContext.getDateFormatUsed()),
+                LocalDate.parse("30.06.2025", sharedContext.getDateFormatUsed()));
         schoolYear2025.getQuarters().addAll(
-                new SchoolYearQuarter(1, 4, 19),
-                new SchoolYearQuarter(2, 20, 35),
-                new SchoolYearQuarter(3, 36, 51),
-                new SchoolYearQuarter(4, 52, 68));
+                new SchoolYearQuarter(1, LocalDate.parse("01.07.2024", sharedContext.getDateFormatUsed()), LocalDate.parse("30.09.2024", sharedContext.getDateFormatUsed())),
+                new SchoolYearQuarter(2, LocalDate.parse("01.10.2024", sharedContext.getDateFormatUsed()), LocalDate.parse("31.12.2024", sharedContext.getDateFormatUsed())),
+                new SchoolYearQuarter(3, LocalDate.parse("01.01.2025", sharedContext.getDateFormatUsed()), LocalDate.parse("31.03.2025", sharedContext.getDateFormatUsed())),
+                new SchoolYearQuarter(4, LocalDate.parse("01.04.2025", sharedContext.getDateFormatUsed()), LocalDate.parse("30.06.2025", sharedContext.getDateFormatUsed())));
 
         sharedContext.getLoadedSchool().getSubUnits().addAll(sharedContext.getSelectedSchoolYear(), schoolYear2025);
 

@@ -4,41 +4,41 @@
 
 .file-viewer-container {
     -fx-border-width: 0 1px 1px 0;
-    -fx-border-color: black;
+    -fx-border-color: -color-border-muted;
 }
 
 .file-viewer-container-right {
     -fx-border-width: 0 0 1px 0;
-    -fx-border-color: black;
+    -fx-border-color: -color-border-muted;
 }
 
 .header-first {
     -fx-border-width: 0 0 1px 0;
-    -fx-border-color: black;
+    -fx-border-color: -color-border-muted;
     -fx-text-alignment: center;
     -fx-alignment: center;
 }
 
 .header {
     -fx-border-width: 0 0 1px 1px;
-    -fx-border-color: black;
+    -fx-border-color: -color-border-muted;
     -fx-text-alignment: center;
     -fx-alignment: center;
 }
 
 .thematic-axis {
     -fx-border-width: 0 1px 1px 0;
-    -fx-border-color: black;
+    -fx-border-color: -color-border-muted;
 }
 
 .thematic-axis-first {
     -fx-border-width: 1px 1px 1px 0;
-    -fx-border-color: black;
+    -fx-border-color: -color-border-muted;
 }
 
 .grid {
     -fx-border-width: 1px 1px 1px 1px;
-    -fx-border-color: black;
+    -fx-border-color: -color-border-muted;
 }
 
 .file-item:hover, .file-item-selected {
