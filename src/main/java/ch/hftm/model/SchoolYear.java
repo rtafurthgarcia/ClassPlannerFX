@@ -114,6 +114,13 @@ public class SchoolYear extends SchoolUnit<Lesson> {
         return startDay.get();
     }
 
+    public SchoolYearQuarter getQuarter(int value) {
+        return getQuarters().stream()
+        .filter(quarter -> quarter.getQuarter() == value)
+        .findFirst()
+        .get();
+    }
+
     @Override
     public String toString() {
         return startDay.get().getYear() + "-" + endDay.get().getYear();

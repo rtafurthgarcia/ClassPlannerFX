@@ -129,27 +129,51 @@ public class SettingsController {
         lvClassrooms.setItems(sharedContext.getLoadedSchool().getClassrooms());
         lvYears.setItems(sharedContext.getLoadedSchool().getSubUnits());
 
-        SchoolYearQuarter q1 = sharedContext.getSelectedSchoolYear().getQuarters().stream()
-            .filter(quarter -> quarter.getQuarter() == 1)
-            .findFirst()
-            .get();
-        
-        SchoolYearQuarter q2 = sharedContext.getSelectedSchoolYear().getQuarters().stream()
-            .filter(quarter -> quarter.getQuarter() == 2)
-            .findFirst()
-            .get();
+        lvYears.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> loadYearsValues(oldValue, newValue));
+        lvYears.getSelectionModel().select(sharedContext.getSelectedSchoolYear());
+    }
 
-        SchoolYearQuarter q3 = sharedContext.getSelectedSchoolYear().getQuarters().stream()
-            .filter(quarter -> quarter.getQuarter() == 3)
-            .findFirst()
-            .get();
+    private void loadYearsValues(SchoolYear previouslySelectedYear, SchoolYear selectedYear) {
+        if (previouslySelectedYear != null) {
+            SchoolYearQuarter q1 = previouslySelectedYear.getQuarter(1);
+            SchoolYearQuarter q2 = previouslySelectedYear.getQuarter(2);
+            SchoolYearQuarter q3 = previouslySelectedYear.getQuarter(3);
+            SchoolYearQuarter q4 = previouslySelectedYear.getQuarter(4);
 
-        SchoolYearQuarter q4 = sharedContext.getSelectedSchoolYear().getQuarters().stream()
-            .filter(quarter -> quarter.getQuarter() == 4)
-            .findFirst()
-            .get();
+            dpBegin1.valueProperty().unbindBidirectional(q1.startWeekProperty());
+            dpEnd1.valueProperty().unbindBidirectional(q1.endWeekProperty());
+    
+            dpBegin2.valueProperty().unbindBidirectional(q2.startWeekProperty());
+            dpEnd2.valueProperty().unbindBidirectional(q2.endWeekProperty());
+    
+            dpBegin3.valueProperty().unbindBidirectional(q3.startWeekProperty());
+            dpEnd3.valueProperty().unbindBidirectional(q3.endWeekProperty());
+    
+            dpBegin4.valueProperty().unbindBidirectional(q4.startWeekProperty());
+            dpEnd4.valueProperty().unbindBidirectional(q4.endWeekProperty());
 
-        //dpBegin1.promptTextProperty().bindBidirectional(q1.startWeekProperty());
+            cbArchived.selectedProperty().unbindBidirectional(previouslySelectedYear.archivedProperty());
+
+        }
+
+        SchoolYearQuarter q1 = selectedYear.getQuarter(1);
+        SchoolYearQuarter q2 = selectedYear.getQuarter(2);
+        SchoolYearQuarter q3 = selectedYear.getQuarter(3);
+        SchoolYearQuarter q4 = selectedYear.getQuarter(4);
+
+        dpBegin1.valueProperty().bindBidirectional(q1.startWeekProperty());
+        dpEnd1.valueProperty().bindBidirectional(q1.endWeekProperty());
+
+        dpBegin2.valueProperty().bindBidirectional(q2.startWeekProperty());
+        dpEnd2.valueProperty().bindBidirectional(q2.endWeekProperty());
+
+        dpBegin3.valueProperty().bindBidirectional(q3.startWeekProperty());
+        dpEnd3.valueProperty().bindBidirectional(q3.endWeekProperty());
+
+        dpBegin4.valueProperty().bindBidirectional(q4.startWeekProperty());
+        dpEnd4.valueProperty().bindBidirectional(q4.endWeekProperty());
+
+        cbArchived.selectedProperty().bindBidirectional(selectedYear.archivedProperty());
     }
 
     @FXML
