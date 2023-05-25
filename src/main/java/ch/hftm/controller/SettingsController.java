@@ -131,6 +131,8 @@ public class SettingsController {
 
         lvYears.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> loadYearsValues(oldValue, newValue));
         lvYears.getSelectionModel().select(sharedContext.getSelectedSchoolYear());
+
+        cbArchived.selectedProperty().addListener((observable, oldValue, newValue) -> setQuartersEditable(newValue));
     }
 
     private void loadYearsValues(SchoolYear previouslySelectedYear, SchoolYear selectedYear) {
@@ -174,6 +176,20 @@ public class SettingsController {
         dpEnd4.valueProperty().bindBidirectional(q4.endWeekProperty());
 
         cbArchived.selectedProperty().bindBidirectional(selectedYear.archivedProperty());
+    }
+
+    private void setQuartersEditable(boolean isEditable) {
+        dpBegin1.setDisable(isEditable);
+        dpEnd1.setDisable(isEditable);
+
+        dpBegin2.setDisable(isEditable);
+        dpEnd2.setDisable(isEditable);
+
+        dpBegin3.setDisable(isEditable);
+        dpEnd3.setDisable(isEditable);
+
+        dpBegin4.setDisable(isEditable);
+        dpEnd4.setDisable(isEditable);
     }
 
     @FXML
