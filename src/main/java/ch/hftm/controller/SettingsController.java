@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import ch.hftm.ClassPlannerFX;
 import ch.hftm.model.Classroom;
 import ch.hftm.model.Context;
+import ch.hftm.model.School;
 import ch.hftm.model.SchoolYear;
 import ch.hftm.model.SchoolYearQuarter;
 import ch.hftm.util.ListViewConverter;
@@ -149,11 +150,23 @@ public class SettingsController {
 
             cbArchived.selectedProperty().unbindBidirectional(previouslySelectedYear.archivedProperty());
         }
+        
+        LocalDate lastYearsDate = LocalDate.now();
+        if (lvYears.getItems().size() > 1) {
+            lastYearsDate = lvYears.getItems().get(lvYears.getItems().size() -2).getEndDay();
+        }
 
-        SchoolYearQuarter q1 = selectedYear.getQuarter(1);
-        SchoolYearQuarter q2 = selectedYear.getQuarter(2);
-        SchoolYearQuarter q3 = selectedYear.getQuarter(3);
-        SchoolYearQuarter q4 = selectedYear.getQuarter(4);
+        SchoolYearQuarter q1 = new SchoolYearQuarter(1, lastYearsDate, lastYearsDate.plusMonths(3));
+        SchoolYearQuarter q2 = new SchoolYearQuarter(2, lastYearsDate.plusMonths(3).plusDays(1), lastYearsDate.plusMonths(6));
+        SchoolYearQuarter q3 = new SchoolYearQuarter(3, lastYearsDate.plusMonths(6).plusDays(1), lastYearsDate.plusMonths(9));
+        SchoolYearQuarter q4 = new SchoolYearQuarter(3, lastYearsDate.plusMonths(9).plusDays(1), lastYearsDate.plusYears(1));
+
+        if (! selectedYear.getQuarters().isEmpty()) {
+            q1 = selectedYear.getQuarter(1);
+            q2 = selectedYear.getQuarter(2);
+            q3 = selectedYear.getQuarter(3);
+            q4 = selectedYear.getQuarter(4);
+        }
 
         dpBegin1.valueProperty().bindBidirectional(q1.startWeekProperty());
         dpEnd1.valueProperty().bindBidirectional(q1.endWeekProperty());
@@ -170,6 +183,12 @@ public class SettingsController {
         cbArchived.selectedProperty().bindBidirectional(selectedYear.archivedProperty());
 
         lvClassrooms.setItems(selectedYear.getClassrooms());
+
+        lvYears.onEditCommitProperty().addListener((observable, oldValue, newValue) -> );
+    }
+
+    private void onVerifyYear(SchoolYear schoolYear) {
+        //if lvYears.getItems().contains(schoolYear)
     }
 
     private void setQuartersEditable(boolean isEditable) {
@@ -186,20 +205,6 @@ public class SettingsController {
         dpEnd4.setDisable(isEditable);
     }
 
-    @FXML
-    public void initialize(){
-        setControlsAndComponents();
-        loadValues();
-    }
-
-    @FXML
-    void onClose() {
-        //sharedContext.getLoadedSchool().setAuthor(tfAuthor.getText());
-        //sharedContext.getLoadedSchool().setName(tfSchoolName.getText());
-
-        sharedContext.getSecondaryStage().close();
-    }
-
     public void setFocusedListView(Object object) {
         if (object instanceof ListView) {
             focusedListView = (ListView) object;
@@ -208,7 +213,12 @@ public class SettingsController {
 
     void onAddItem() {
         if (focusedListView == lvYears) {
-            String newYear = String.format("%d-%d", LocalDate.now().getYear(), LocalDate.now().plusYears(1).getYear()); 
+            LocalDate lastYear = LocalDate.now();
+            if (! lvYears.getItems().isEmpty()) {
+                lastYear = lvYears.getItems().get(lvYears.getItems().sorted((y1, y2) -> y1.getStartDay().compareTo(y2.getStartDay())).size()-1).getEndDay();
+            }
+
+            String newYear = String.format("%d-%d", lastYear.getYear(), lastYear.plusYears(1).getYear()); 
     
             lvYears.getItems().add(new SchoolYear(newYear));
             lvYears.getSelectionModel().selectLast();
@@ -257,5 +267,16 @@ public class SettingsController {
                 }
             });
         }
+    }
+
+    @FXML
+    public void initialize(){
+        setControlsAndComponents();
+        loadValues();
+    }
+
+    @FXML
+    void onClose() {
+        sharedContext.getSecondaryStage().close();
     }
 }
