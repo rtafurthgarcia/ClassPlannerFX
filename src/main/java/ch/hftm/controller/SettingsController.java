@@ -3,22 +3,30 @@ package ch.hftm.controller;
 import java.io.IOException;
 import java.time.LocalDate;
 
+import org.controlsfx.tools.ValueExtractor;
+import org.controlsfx.validation.Severity;
+import org.controlsfx.validation.ValidationResult;
+import org.controlsfx.validation.ValidationSupport;
+import org.controlsfx.validation.Validator;
+import org.controlsfx.validation.decoration.StyleClassValidationDecoration;
+import org.girod.javafx.svgimage.xml.parsers.SVGParsingException;
+
 import ch.hftm.ClassPlannerFX;
 import ch.hftm.model.Classroom;
 import ch.hftm.model.Context;
-import ch.hftm.model.School;
 import ch.hftm.model.SchoolYear;
 import ch.hftm.model.SchoolYearQuarter;
-import ch.hftm.util.ListViewConverter;
 import ch.hftm.util.ListViewConverter.ClassroomConverter;
 import ch.hftm.util.ListViewConverter.SchoolYearConverter;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
@@ -61,6 +69,8 @@ public class SettingsController {
     
     private CheckBox cbArchived;
 
+    ValidationSupport validationSupport = new ValidationSupport();
+
     public static Stage showSettingsView() throws IOException {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(ClassPlannerFX.class.getResource("view/SettingsView.fxml"));
@@ -74,7 +84,7 @@ public class SettingsController {
         settingsStage.show();
         
         scene.focusOwnerProperty().addListener((observable, oldValue, newValue) -> ((SettingsController) loader.getController()).setFocusedListView(newValue));
-
+        
         return settingsStage;
     }
 
@@ -116,6 +126,35 @@ public class SettingsController {
         bDeleteItem.setOnMouseClicked(event -> onDeleteItem());
     }
 
+    private void defineValidators() throws SVGParsingException, IOException {
+        validationSupport.setValidationDecorator(new StyleClassValidationDecoration("validation-error", "validation-warning"));
+        ValueExtractor.addObservableValueExtractor(
+            c -> c instanceof ListView,
+            c -> ((ListView) c).getSelectionModel().selectedItemProperty()
+        );
+        
+        Validator<SchoolYear> identicalYearValidator = new Validator<>() {
+            @Override
+            public ValidationResult apply(Control control, SchoolYear schoolYear) {
+                boolean hasDuplicates = lvYears.getItems().stream().filter(y -> y.equals(schoolYear)).count() > 1;
+                
+                if (hasDuplicates) {
+                    Alert alert = new Alert(
+                        AlertType.ERROR,
+                        "his year already exists within this school.");
+                        alert.setHeaderText("Duplicated year");
+                        alert.setTitle("Year");
+                        alert.showAndWait();
+                }
+
+                return ValidationResult.fromMessageIf(control, "This year already exists within this school.", Severity.ERROR, hasDuplicates);
+            }
+        };
+        
+        validationSupport.registerValidator(lvYears, true, identicalYearValidator);
+        validationSupport.registerValidator(tfSchoolName, Validator.createEmptyValidator("School name cannot be left empty"));
+    }
+
     private void loadValues() {
         tfAuthor.textProperty().bindBidirectional(sharedContext.getLoadedSchool().authorProperty());
         tfSchoolName.textProperty().bindBidirectional(sharedContext.getLoadedSchool().nameProperty());
@@ -131,22 +170,25 @@ public class SettingsController {
 
     private void loadYearsValues(SchoolYear previouslySelectedYear, SchoolYear selectedYear) {
         if (previouslySelectedYear != null) {
-            SchoolYearQuarter q1 = previouslySelectedYear.getQuarter(1);
-            SchoolYearQuarter q2 = previouslySelectedYear.getQuarter(2);
-            SchoolYearQuarter q3 = previouslySelectedYear.getQuarter(3);
-            SchoolYearQuarter q4 = previouslySelectedYear.getQuarter(4);
 
-            dpBegin1.valueProperty().unbindBidirectional(q1.startWeekProperty());
-            dpEnd1.valueProperty().unbindBidirectional(q1.endWeekProperty());
-    
-            dpBegin2.valueProperty().unbindBidirectional(q2.startWeekProperty());
-            dpEnd2.valueProperty().unbindBidirectional(q2.endWeekProperty());
-    
-            dpBegin3.valueProperty().unbindBidirectional(q3.startWeekProperty());
-            dpEnd3.valueProperty().unbindBidirectional(q3.endWeekProperty());
-    
-            dpBegin4.valueProperty().unbindBidirectional(q4.startWeekProperty());
-            dpEnd4.valueProperty().unbindBidirectional(q4.endWeekProperty());
+            if (! previouslySelectedYear.getQuarters().isEmpty()) {
+                SchoolYearQuarter q1 = previouslySelectedYear.getQuarter(1);
+                SchoolYearQuarter q2 = previouslySelectedYear.getQuarter(2);
+                SchoolYearQuarter q3 = previouslySelectedYear.getQuarter(3);
+                SchoolYearQuarter q4 = previouslySelectedYear.getQuarter(4);
+
+                dpBegin1.valueProperty().unbindBidirectional(q1.startWeekProperty());
+                dpEnd1.valueProperty().unbindBidirectional(q1.endWeekProperty());
+        
+                dpBegin2.valueProperty().unbindBidirectional(q2.startWeekProperty());
+                dpEnd2.valueProperty().unbindBidirectional(q2.endWeekProperty());
+        
+                dpBegin3.valueProperty().unbindBidirectional(q3.startWeekProperty());
+                dpEnd3.valueProperty().unbindBidirectional(q3.endWeekProperty());
+        
+                dpBegin4.valueProperty().unbindBidirectional(q4.startWeekProperty());
+                dpEnd4.valueProperty().unbindBidirectional(q4.endWeekProperty());
+            }
 
             cbArchived.selectedProperty().unbindBidirectional(previouslySelectedYear.archivedProperty());
         }
@@ -183,12 +225,6 @@ public class SettingsController {
         cbArchived.selectedProperty().bindBidirectional(selectedYear.archivedProperty());
 
         lvClassrooms.setItems(selectedYear.getClassrooms());
-
-        lvYears.onEditCommitProperty().addListener((observable, oldValue, newValue) -> );
-    }
-
-    private void onVerifyYear(SchoolYear schoolYear) {
-        //if lvYears.getItems().contains(schoolYear)
     }
 
     private void setQuartersEditable(boolean isEditable) {
@@ -270,8 +306,9 @@ public class SettingsController {
     }
 
     @FXML
-    public void initialize(){
+    public void initialize() throws SVGParsingException, IOException{
         setControlsAndComponents();
+        defineValidators();
         loadValues();
     }
 

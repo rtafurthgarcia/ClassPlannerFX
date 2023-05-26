@@ -41,7 +41,7 @@ public class FileCell extends ListCell<File> {
             .orElse("");
     }
 
-    private String readFromInputStream(InputStream inputStream)
+    public static String readFromInputStream(InputStream inputStream)
             throws IOException {
         StringBuilder resultStringBuilder = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {

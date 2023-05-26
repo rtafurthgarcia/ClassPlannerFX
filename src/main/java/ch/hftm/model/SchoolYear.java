@@ -138,9 +138,8 @@ public class SchoolYear extends SchoolUnit<Lesson> {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((startDay == null) ? 0 : startDay.hashCode());
-        result = prime * result + ((endDay == null) ? 0 : endDay.hashCode());
-        result = prime * result + ((archived == null) ? 0 : archived.hashCode());
+        result = prime * result + ((startDay.get() == null) ? 0 : startDay.get().hashCode());
+        result = prime * result + ((endDay.get() == null) ? 0 : endDay.get().hashCode());
         return result;
     }
 
@@ -156,17 +155,12 @@ public class SchoolYear extends SchoolUnit<Lesson> {
         if (startDay == null) {
             if (other.startDay != null)
                 return false;
-        } else if (!startDay.get().equals(other.startDay.get()))
+        } else if (startDay.get().getYear() != other.startDay.get().getYear())
             return false;
         if (endDay == null) {
             if (other.endDay != null)
                 return false;
-        } else if (!endDay.get().equals(other.endDay.get()))
-            return false;
-        if (archived == null) {
-            if (other.archived != null)
-                return false;
-        } else if (archived.get() != other.archived.get())
+        } else if (endDay.get().getYear() != (other.endDay.get().getYear()))
             return false;
         return true;
     }
