@@ -9,7 +9,6 @@ import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
 import atlantafx.base.theme.NordLight;
-import atlantafx.base.theme.PrimerLight;
 
 import ch.hftm.controller.MainViewController;
 import ch.hftm.model.Classroom;

@@ -2,9 +2,12 @@ package ch.hftm.controller;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.controlsfx.tools.ValueExtractor;
 import org.controlsfx.validation.Severity;
+import org.controlsfx.validation.ValidationMessage;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
@@ -35,6 +38,7 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 public class SettingsController {
     private Context sharedContext = Context.getInstance();
@@ -54,6 +58,9 @@ public class SettingsController {
     private ListView<SchoolYear> lvYears;
 
     private ListView focusedListView;
+
+    @FXML
+    private Button bClose;
 
     private Button bAddItem;
     private Button bDeleteItem;
@@ -82,6 +89,8 @@ public class SettingsController {
         settingsStage.setTitle("Planning settings");
         settingsStage.setScene(scene);
         settingsStage.show();
+
+        settingsStage.setOnCloseRequest(event -> ((SettingsController) loader.getController()).onClose(event));
         
         scene.focusOwnerProperty().addListener((observable, oldValue, newValue) -> ((SettingsController) loader.getController()).setFocusedListView(newValue));
         
@@ -122,6 +131,10 @@ public class SettingsController {
 
         cbArchived = (CheckBox) gpYearsClassrooms.lookup("#cbArchived");
 
+        bClose.setOnAction(event -> {
+            WindowEvent closeEvent = new WindowEvent(sharedContext.getSecondaryStage(), WindowEvent.WINDOW_CLOSE_REQUEST);
+            sharedContext.getSecondaryStage().fireEvent(closeEvent);
+        });
         bAddItem.setOnMouseClicked(event -> onAddItem());
         bDeleteItem.setOnMouseClicked(event -> onDeleteItem());
     }
@@ -150,8 +163,28 @@ public class SettingsController {
                 return ValidationResult.fromMessageIf(control, "This year already exists within this school.", Severity.ERROR, hasDuplicates);
             }
         };
-        
+
+        Validator<Classroom> identicalClassroomValidator = new Validator<>() {
+            @Override
+            public ValidationResult apply(Control control, Classroom classroom) {
+                boolean hasDuplicates = lvClassrooms.getItems().stream().filter(c -> c.equals(classroom)).count() > 1;
+                
+                if (hasDuplicates) {
+                    Alert alert = new Alert(
+                        AlertType.ERROR,
+                        "his year already exists within this school.");
+                        alert.setHeaderText("Duplicated year");
+                        alert.setTitle("Year");
+                        alert.showAndWait();
+                }
+
+                return ValidationResult.fromMessageIf(control, "This classroom already exists within this selected year.", Severity.ERROR, hasDuplicates);
+            }
+        };
+
+
         validationSupport.registerValidator(lvYears, true, identicalYearValidator);
+        validationSupport.registerValidator(lvClassrooms, true, identicalClassroomValidator);
         validationSupport.registerValidator(tfSchoolName, Validator.createEmptyValidator("School name cannot be left empty"));
     }
 
@@ -264,7 +297,6 @@ public class SettingsController {
             lvClassrooms.getSelectionModel().selectLast();
             lvClassrooms.edit(lvClassrooms.getSelectionModel().getSelectedIndex());
         }
-        
     }
 
     void onDeleteItem() {
@@ -313,7 +345,21 @@ public class SettingsController {
     }
 
     @FXML
-    void onClose() {
-        sharedContext.getSecondaryStage().close();
+    public void onClose(WindowEvent event) {
+        event.consume();
+
+        ValidationResult validationResult = validationSupport.getValidationResult();
+
+        if (validationResult.getErrors().isEmpty()) {
+            sharedContext.getSecondaryStage().close();
+        } else {
+            Alert alert = new Alert(
+                AlertType.ERROR,
+                "Please make sure all required fields are complete and there is no duplicate within your years or classrooms.");
+                alert.setHeaderText("Errors");
+                alert.setTitle("Validation errors");
+                alert.showAndWait();
+        }
+
     }
 }
