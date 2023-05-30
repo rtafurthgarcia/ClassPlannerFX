@@ -2,15 +2,13 @@ package ch.hftm.controller;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.controlsfx.tools.ValueExtractor;
 import org.controlsfx.validation.Severity;
-import org.controlsfx.validation.ValidationMessage;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
+import org.controlsfx.validation.decoration.CompoundValidationDecoration;
 import org.controlsfx.validation.decoration.StyleClassValidationDecoration;
 import org.girod.javafx.svgimage.xml.parsers.SVGParsingException;
 
@@ -19,6 +17,7 @@ import ch.hftm.model.Classroom;
 import ch.hftm.model.Context;
 import ch.hftm.model.SchoolYear;
 import ch.hftm.model.SchoolYearQuarter;
+import ch.hftm.util.CustomValidationDecoration;
 import ch.hftm.util.ListViewConverter.ClassroomConverter;
 import ch.hftm.util.ListViewConverter.SchoolYearConverter;
 import javafx.fxml.FXML;
@@ -137,28 +136,27 @@ public class SettingsController {
         });
         bAddItem.setOnMouseClicked(event -> onAddItem());
         bDeleteItem.setOnMouseClicked(event -> onDeleteItem());
+
+        //validationSupport.setValidationDecorator(null);
     }
 
     private void defineValidators() throws SVGParsingException, IOException {
-        validationSupport.setValidationDecorator(new StyleClassValidationDecoration("validation-error", "validation-warning"));
+        validationSupport.setValidationDecorator(
+            new CompoundValidationDecoration(
+                new StyleClassValidationDecoration(),
+                new CustomValidationDecoration()
+            )
+        );
+        
         ValueExtractor.addObservableValueExtractor(
             c -> c instanceof ListView,
             c -> ((ListView) c).getSelectionModel().selectedItemProperty()
         );
         
-        Validator<SchoolYear> identicalYearValidator = new Validator<>() {
+        Validator<SchoolYear> properYearValidator = new Validator<>() {
             @Override
             public ValidationResult apply(Control control, SchoolYear schoolYear) {
                 boolean hasDuplicates = lvYears.getItems().stream().filter(y -> y.equals(schoolYear)).count() > 1;
-                
-                if (hasDuplicates) {
-                    Alert alert = new Alert(
-                        AlertType.ERROR,
-                        "his year already exists within this school.");
-                        alert.setHeaderText("Duplicated year");
-                        alert.setTitle("Year");
-                        alert.showAndWait();
-                }
 
                 return ValidationResult.fromMessageIf(control, "This year already exists within this school.", Severity.ERROR, hasDuplicates);
             }
@@ -169,23 +167,39 @@ public class SettingsController {
             public ValidationResult apply(Control control, Classroom classroom) {
                 boolean hasDuplicates = lvClassrooms.getItems().stream().filter(c -> c.equals(classroom)).count() > 1;
                 
-                if (hasDuplicates) {
-                    Alert alert = new Alert(
-                        AlertType.ERROR,
-                        "his year already exists within this school.");
-                        alert.setHeaderText("Duplicated year");
-                        alert.setTitle("Year");
-                        alert.showAndWait();
-                }
-
                 return ValidationResult.fromMessageIf(control, "This classroom already exists within this selected year.", Severity.ERROR, hasDuplicates);
             }
         };
 
+        Validator<LocalDate> schoolYearQuarterValidator = new Validator<>() {
+            @Override
+            public ValidationResult apply(Control control, LocalDate date) {
+                LocalDate yearStartDate = lvYears.getSelectionModel().getSelectedItem().getStartDay();
+                LocalDate yearEndDate = lvYears.getSelectionModel().getSelectedItem().getEndDay();
+                boolean isNotWithinRange = false;
 
-        validationSupport.registerValidator(lvYears, true, identicalYearValidator);
+                if (date != null && (date.isAfter(yearEndDate) || date.isBefore(yearStartDate))) {
+                    isNotWithinRange = true;
+                }
+                
+                return ValidationResult.fromMessageIf(control, "This date has to be within the school year.", Severity.ERROR, isNotWithinRange);
+            }
+        };
+
+        validationSupport.registerValidator(lvYears, true, properYearValidator);
         validationSupport.registerValidator(lvClassrooms, true, identicalClassroomValidator);
+        //validationSupport.registerValidator(lvYears,Validator.createRegexValidator("Year must be within format ####-####", "^\\d{4}-\\d{4}$", Severity.ERROR));
         validationSupport.registerValidator(tfSchoolName, Validator.createEmptyValidator("School name cannot be left empty"));
+        validationSupport.registerValidator(dpEnd1, schoolYearQuarterValidator);
+        validationSupport.registerValidator(dpBegin1, schoolYearQuarterValidator);
+        validationSupport.registerValidator(dpEnd2, schoolYearQuarterValidator);
+        validationSupport.registerValidator(dpBegin2, schoolYearQuarterValidator);
+        validationSupport.registerValidator(dpEnd3, schoolYearQuarterValidator);
+        validationSupport.registerValidator(dpBegin3, schoolYearQuarterValidator);
+        validationSupport.registerValidator(dpEnd3, schoolYearQuarterValidator);
+        validationSupport.registerValidator(dpBegin4, schoolYearQuarterValidator);
+        validationSupport.registerValidator(dpEnd4, schoolYearQuarterValidator);
+    
     }
 
     private void loadValues() {
@@ -272,6 +286,8 @@ public class SettingsController {
 
         dpBegin4.setDisable(isEditable);
         dpEnd4.setDisable(isEditable);
+
+        lvClassrooms.setDisable(isEditable);
     }
 
     public void setFocusedListView(Object object) {

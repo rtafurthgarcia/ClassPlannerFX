@@ -62,8 +62,8 @@ public class ClassPlannerFX extends Application {
          */
 
         sharedContext
-            .setSelectedSchoolYear(new SchoolYear(LocalDate.parse("01.07.2023", sharedContext.getDateFormatUsed()),
-                LocalDate.parse("30.06.2024", sharedContext.getDateFormatUsed())));
+            .setSelectedSchoolYear(new SchoolYear(LocalDate.parse("01.01.2023", sharedContext.getDateFormatUsed()),
+                LocalDate.parse("31.12.2024", sharedContext.getDateFormatUsed())));
 
         sharedContext.getSelectedSchoolYear().getQuarters().addAll(
             new SchoolYearQuarter(1, LocalDate.parse("01.07.2023", sharedContext.getDateFormatUsed()),
@@ -79,8 +79,8 @@ public class ClassPlannerFX extends Application {
             new Classroom("Classe 711"),
             new Classroom("Classe 712"));
 
-        SchoolYear schoolYear2025 = new SchoolYear(LocalDate.parse("01.07.2024", sharedContext.getDateFormatUsed()),
-                LocalDate.parse("30.06.2025", sharedContext.getDateFormatUsed()));
+        SchoolYear schoolYear2025 = new SchoolYear(LocalDate.parse("01.01.2024", sharedContext.getDateFormatUsed()),
+                LocalDate.parse("31.12.2025", sharedContext.getDateFormatUsed()));
         schoolYear2025.getQuarters().addAll(
             new SchoolYearQuarter(1, LocalDate.parse("01.07.2024", sharedContext.getDateFormatUsed()),
                     LocalDate.parse("30.09.2024", sharedContext.getDateFormatUsed())),
